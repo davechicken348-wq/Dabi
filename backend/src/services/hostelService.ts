@@ -1,6 +1,7 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
 import { computeLiveAvailability } from "../utils/availability";
+import { cached } from "../utils/cache";
 import type { HostelCreate, HostelDTO, HostelUpdate } from "../types";
 
 async function resolveFacilities(keys: string[]) {
@@ -64,7 +65,8 @@ function toDTO(
 }
 
 export async function listHostels(): Promise<HostelDTO[]> {
-  const hostels = await prisma.hostel.findMany({
+  return cached("hostels:list", 30_000, async () => {
+    const hostels = await prisma.hostel.findMany({
     include: { facilities: true },
     orderBy: { name: "asc" },
   });
@@ -77,6 +79,7 @@ export async function listHostels(): Promise<HostelDTO[]> {
     bedsByHostel.set(t.hostelId, (bedsByHostel.get(t.hostelId) ?? 0) + (t.beds ?? 0));
   }
   return hostels.map((h) => toDTO(h, bedsByHostel.get(h.id) ?? 0));
+  });
 }
 
 export async function getHostel(id: string): Promise<HostelDTO> {

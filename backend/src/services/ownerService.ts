@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
+import { cached } from "../utils/cache";
 import type { OwnerCreate, OwnerDTO, OwnerUpdate } from "../types";
 
 async function hostelIdsForOwner(ownerId: string): Promise<string[]> {
@@ -20,6 +21,7 @@ async function hostelIdsByOwner(
   });
   const map: Record<string, string[]> = {};
   for (const h of hostels) {
+    if (!h.ownerId) continue;
     (map[h.ownerId] ??= []).push(h.id);
   }
   return map;
@@ -45,11 +47,13 @@ function toDTO(owner: {
 }
 
 export async function listOwners(): Promise<OwnerDTO[]> {
-  const owners = await prisma.owner.findMany({
-    orderBy: { name: "asc" },
+  return cached("owners:list", 30_000, async () => {
+    const owners = await prisma.owner.findMany({
+      orderBy: { name: "asc" },
+    });
+    const hostelIds = await hostelIdsByOwner(owners.map((o) => o.id));
+    return owners.map((o) => toDTO(o, hostelIds[o.id] ?? []));
   });
-  const hostelIds = await hostelIdsByOwner(owners.map((o) => o.id));
-  return owners.map((o) => toDTO(o, hostelIds[o.id] ?? []));
 }
 
 export async function getOwner(id: string): Promise<OwnerDTO> {

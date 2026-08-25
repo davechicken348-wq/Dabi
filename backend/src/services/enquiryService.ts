@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
+import { cached } from "../utils/cache";
 import type { EnquiryDTO, EnquiryUpdate, EnquiryCreate } from "../types";
 
 function toDTO(e: {
@@ -31,10 +32,12 @@ function toDTO(e: {
 }
 
 export async function listEnquiries(): Promise<EnquiryDTO[]> {
-  const enquiries = await prisma.enquiry.findMany({
-    orderBy: { createdAt: "desc" },
+  return cached("enquiries:list", 30_000, async () => {
+    const enquiries = await prisma.enquiry.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return enquiries.map(toDTO);
   });
-  return enquiries.map(toDTO);
 }
 
 export async function createEnquiry(input: EnquiryCreate): Promise<EnquiryDTO> {

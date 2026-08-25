@@ -15,6 +15,7 @@ import authRoutes from "./routes/authRoutes";
 import { requireAuth } from "./middleware/requireAuth";
 import { errorHandler } from "./middleware/errorHandler";
 import { seedIfEmpty } from "./prisma/seed";
+import { clearCache } from "./utils/cache";
 
 // GET endpoints consumed by the public site stay open; everything else under
 // /api requires a valid admin token.
@@ -32,12 +33,22 @@ app.get("/", (_req, res) => {
   res.json({ message: "Dabi API" });
 });
 
+// Lightweight liveness probe for uptime pingers (keeps the service awake on
+// Render's free tier, which spins down after 15 min of inactivity).
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", time: Date.now() });
+});
+
 app.use("/uploads", express.static(uploadDir));
 
 app.use("/api", (req, res, next) => {
   if (req.path.startsWith("/auth")) return next();
   if (req.method === "GET" && PUBLIC_GET.some((re) => re.test(req.path))) {
     return next();
+  }
+  if (req.method !== "GET") {
+    // Any mutation invalidates the read cache so list/dashboard views stay fresh.
+    clearCache();
   }
   return requireAuth(req, res, next);
 });

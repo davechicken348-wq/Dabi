@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
+import { cached } from "../utils/cache";
 import type { FacilityDTO, FacilityCreate, FacilityUpdate } from "../types";
 
 /** Normalize a facility key: lowercase, trimmed, spaces -> dashes. */
@@ -28,8 +29,10 @@ function toDTO(f: {
 }
 
 export async function listFacilities(): Promise<FacilityDTO[]> {
-  const fs = await prisma.facility.findMany({ orderBy: { label: "asc" } });
-  return fs.map(toDTO);
+  return cached("facilities:list", 30_000, async () => {
+    const fs = await prisma.facility.findMany({ orderBy: { label: "asc" } });
+    return fs.map(toDTO);
+  });
 }
 
 export async function createFacility(input: FacilityCreate): Promise<FacilityDTO> {

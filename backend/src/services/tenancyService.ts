@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
+import { cached } from "../utils/cache";
 import type {
   TenancyDTO,
   TenancyCreate,
@@ -39,11 +40,14 @@ function toDTO(t: TenancyRow): TenancyDTO {
 }
 
 export async function listTenancies(hostelId?: string): Promise<TenancyDTO[]> {
-  const items = await prisma.tenancy.findMany({
-    where: hostelId ? { hostelId } : undefined,
-    orderBy: { createdAt: "desc" },
+  const key = hostelId ? `tenancies:list:${hostelId}` : "tenancies:list";
+  return cached(key, 30_000, async () => {
+    const items = await prisma.tenancy.findMany({
+      where: hostelId ? { hostelId } : undefined,
+      orderBy: { createdAt: "desc" },
+    });
+    return items.map(toDTO);
   });
-  return items.map(toDTO);
 }
 
 export async function getTenancy(id: string): Promise<TenancyDTO> {

@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
+import { cached } from "../utils/cache";
 import type { DealCreate, DealDTO, DealUpdate } from "../types";
 
 function toDTO(d: {
@@ -27,8 +28,10 @@ function toDTO(d: {
 }
 
 export async function listDeals(): Promise<DealDTO[]> {
-  const deals = await prisma.deal.findMany({ orderBy: { title: "asc" } });
-  return deals.map(toDTO);
+  return cached("deals:list", 30_000, async () => {
+    const deals = await prisma.deal.findMany({ orderBy: { title: "asc" } });
+    return deals.map(toDTO);
+  });
 }
 
 export async function getDeal(id: string): Promise<DealDTO> {

@@ -1,9 +1,11 @@
 import { prisma } from "../prisma";
 import { computeLiveAvailability } from "../utils/availability";
+import { cached } from "../utils/cache";
 import type { Availability, DashboardStats } from "../types";
 
 export async function getStats(): Promise<DashboardStats> {
-  const [
+  return cached("dashboard:stats", 30_000, async () => {
+    const [
     totalHostels,
     verifiedHostels,
     totalOwners,
@@ -61,4 +63,5 @@ export async function getStats(): Promise<DashboardStats> {
     availability,
     potentialRevenue,
   };
+  });
 }

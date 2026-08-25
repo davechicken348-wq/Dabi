@@ -47,7 +47,7 @@ if (!/^postgresql:\/\//i.test(DATABASE_URL)) {
   fail("DATABASE_URL", "must be a postgresql:// connection string");
 }
 
-const CLIENT_URL = asString("CLIENT_URL", process.env.CLIENT_URL || "http://localhost:5173");
+const CLIENT_URL = asString("CLIENT_URL", process.env.CLIENT_URL || "http://localhost:5173").replace(/\/$/, "");
 try {
   // eslint-disable-next-line no-new
   new URL(CLIENT_URL);

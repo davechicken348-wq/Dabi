@@ -10,6 +10,21 @@ async function hostelIdsForOwner(ownerId: string): Promise<string[]> {
   return hostels.map((h) => h.id);
 }
 
+async function hostelIdsByOwner(
+  ownerIds: string[],
+): Promise<Record<string, string[]>> {
+  if (!ownerIds.length) return {};
+  const hostels = await prisma.hostel.findMany({
+    where: { ownerId: { in: ownerIds } },
+    select: { id: true, ownerId: true },
+  });
+  const map: Record<string, string[]> = {};
+  for (const h of hostels) {
+    (map[h.ownerId] ??= []).push(h.id);
+  }
+  return map;
+}
+
 function toDTO(owner: {
   id: string;
   name: string;
@@ -33,9 +48,8 @@ export async function listOwners(): Promise<OwnerDTO[]> {
   const owners = await prisma.owner.findMany({
     orderBy: { name: "asc" },
   });
-  return Promise.all(
-    owners.map(async (o) => toDTO(o, await hostelIdsForOwner(o.id))),
-  );
+  const hostelIds = await hostelIdsByOwner(owners.map((o) => o.id));
+  return owners.map((o) => toDTO(o, hostelIds[o.id] ?? []));
 }
 
 export async function getOwner(id: string): Promise<OwnerDTO> {

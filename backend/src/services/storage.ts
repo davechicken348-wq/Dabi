@@ -85,8 +85,15 @@ export async function saveImage(
       throw new ApiError(500, `Upload failed: ${error.message}`);
     }
     const { data } = client.storage.from(bucket).getPublicUrl(objectPath);
+    // Verification: list the destination folder so logs prove the object
+    // actually landed in THIS bucket/project (not a different one).
+    const { data: listed } = await client.storage.from(bucket).list(dir);
     // eslint-disable-next-line no-console
-    console.log(`[storage] Uploaded "${bucket}/${objectPath}" -> ${data.publicUrl}`);
+    console.log(
+      `[storage] Uploaded "${bucket}/${objectPath}" -> ${data.publicUrl}` +
+        `\n  project: ${supabaseUrl}` +
+        `\n  folder "${dir}" contains: [${(listed ?? []).map((f) => f.name).join(", ")}]`,
+    );
     return data.publicUrl;
   }
 

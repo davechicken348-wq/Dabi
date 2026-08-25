@@ -17,6 +17,13 @@ const client: SupabaseClient | null =
     ? createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } })
     : null;
 
+// eslint-disable-next-line no-console
+console.log(
+  client
+    ? `[storage] Supabase configured — uploads go to bucket "${bucket}"`
+    : "[storage] Supabase NOT configured — uploads fall back to local ./uploads (ephemeral on Render)",
+);
+
 let bucketReady = false;
 async function ensureBucket(): Promise<void> {
   if (!client || bucketReady) return;
@@ -27,6 +34,15 @@ async function ensureBucket(): Promise<void> {
   // A 409 ("already exists") is fine — the bucket was created out of band.
   if (error && !/already exists/i.test(error.message)) {
     throw new ApiError(500, `Storage bucket error: ${error.message}`);
+  }
+  // Warn if the (pre-existing) bucket isn't public — uploads would then
+  // succeed but getPublicUrl() returns a URL that 403s when loaded.
+  const { data: info } = await client.storage.getBucket(bucket);
+  if (info && info.public === false) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[storage] Bucket "${bucket}" exists but is NOT public — uploaded images will not be viewable. Set it public in Supabase.`,
+    );
   }
   bucketReady = true;
 }
@@ -63,13 +79,21 @@ export async function saveImage(
     const { error } = await client.storage
       .from(bucket)
       .upload(objectPath, buffer, { contentType: mimetype, upsert: true });
-    if (error) throw new ApiError(500, `Upload failed: ${error.message}`);
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error(`[storage] Upload to "${bucket}/${objectPath}" failed:`, error.message);
+      throw new ApiError(500, `Upload failed: ${error.message}`);
+    }
     const { data } = client.storage.from(bucket).getPublicUrl(objectPath);
+    // eslint-disable-next-line no-console
+    console.log(`[storage] Uploaded "${bucket}/${objectPath}" -> ${data.publicUrl}`);
     return data.publicUrl;
   }
 
   await fs.mkdir(path.join(uploadDir, dir), { recursive: true });
   await fs.writeFile(path.join(uploadDir, dir, filename), buffer);
+  // eslint-disable-next-line no-console
+  console.log(`[storage] Saved locally: ./uploads/${objectPath}`);
   // Return an absolute URL so the image resolves from any frontend origin
   // (the Vite dev server can't serve /uploads itself).
   return origin ? `${origin}/uploads/${objectPath}` : `/uploads/${objectPath}`;

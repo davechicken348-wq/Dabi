@@ -16,6 +16,11 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Install devDependencies (typescript, @types/*, tsx, prisma) so the
+      # build and start commands work. Render defaults to production-only
+      # installs otherwise, which breaks the tsc type-check.
+      - key: NPM_CONFIG_PRODUCTION
+        value: false
       - key: PORT
         value: 4000
       - key: DATABASE_URL

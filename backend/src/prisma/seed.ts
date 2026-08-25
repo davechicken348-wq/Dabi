@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { randomBytes, scryptSync } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
-import type { HostelDTO, OwnerDTO, EnquiryDTO, DealDTO, TenancyDTO } from "../src/types";
+import type { HostelDTO, OwnerDTO, EnquiryDTO, DealDTO, TenancyDTO } from "../types";
 
 const prisma = new PrismaClient();
 
@@ -134,16 +134,7 @@ const tenancies: TenancyDTO[] = [
   { id: "ten_3", hostelId: "campus-lodge", hostelName: "Campus View Lodge", roomType: "1-in-1", beds: 1, occupantName: "Yaa K.", phone: "020 777 1212", moveInDate: "2026-08-25", status: "Active", source: "admin", createdAt: "2026-08-05T10:00:00.000Z" },
 ];
 
-async function main() {
-  // Reset in dependency order.
-  await prisma.enquiry.deleteMany();
-  await prisma.tenancy.deleteMany();
-  await prisma.deal.deleteMany();
-  await prisma.hostel.deleteMany();
-  await prisma.owner.deleteMany();
-  await prisma.facility.deleteMany();
-  await prisma.admin.deleteMany();
-
+async function populate() {
   await prisma.facility.createMany({
     data: FACILITIES.map((f) => ({
       key: f.key,
@@ -230,12 +221,44 @@ async function main() {
   );
 }
 
-main()
-  .catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+async function main() {
+  // Reset in dependency order.
+  await prisma.enquiry.deleteMany();
+  await prisma.tenancy.deleteMany();
+  await prisma.deal.deleteMany();
+  await prisma.hostel.deleteMany();
+  await prisma.owner.deleteMany();
+  await prisma.facility.deleteMany();
+  await prisma.admin.deleteMany();
+  await populate();
+  // eslint-disable-next-line no-console
+  console.log(
+    `Seed complete: 10 hostels, 4 owners, 5 enquiries, 3 tenancies, 3 deals, 1 admin (${ADMIN_EMAIL}).`,
+  );
+}
+
+/** Idempotent seed for server boot: only populates when the DB is empty. */
+export async function seedIfEmpty(): Promise<void> {
+  const count = await prisma.admin.count();
+  if (count > 0) return;
+  await populate();
+  // eslint-disable-next-line no-console
+  console.log(
+    `Auto-seed complete (DB was empty): 10 hostels, 4 owners, 5 enquiries, 3 tenancies, 3 deals, 1 admin (${ADMIN_EMAIL}).`,
+  );
+}
+
+// Only run the full reset when executed directly via `npm run db:seed`.
+const isDirectRun =
+  process.argv[1]?.endsWith("seed.ts") || process.argv[1]?.endsWith("seed");
+if (isDirectRun) {
+  main()
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

@@ -14,6 +14,7 @@ import facilityRoutes from "./routes/facilityRoutes";
 import authRoutes from "./routes/authRoutes";
 import { requireAuth } from "./middleware/requireAuth";
 import { errorHandler } from "./middleware/errorHandler";
+import { seedIfEmpty } from "./prisma/seed";
 
 // GET endpoints consumed by the public site stay open; everything else under
 // /api requires a valid admin token.
@@ -56,4 +57,10 @@ app.use(errorHandler);
 app.listen(env.PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Dabi backend listening on port ${env.PORT}`);
+});
+
+// Idempotently seed sample data + admin on first boot (only if the DB is empty).
+seedIfEmpty().catch((err) => {
+  // eslint-disable-next-line no-console
+  console.error("Auto-seed failed:", err);
 });

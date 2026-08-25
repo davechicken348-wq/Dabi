@@ -26,11 +26,14 @@ router.post(
       throw new ApiError(400, "No image was uploaded");
     }
     const origin = `${req.protocol}://${req.get("host")}`;
+    const hostelId =
+      typeof req.body?.hostelId === "string" ? req.body.hostelId : undefined;
     const url = await saveImage(
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
       origin,
+      hostelId,
     );
     res.status(201).json({ url });
   }),

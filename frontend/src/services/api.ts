@@ -212,9 +212,13 @@ export function deleteHostel(id: string): Promise<void> {
   return apiSend<void>(`/api/hostels/${id}`, "DELETE");
 }
 
-export async function uploadHostelImage(file: File): Promise<string> {
+export async function uploadHostelImage(
+  file: File,
+  hostelId?: string,
+): Promise<string> {
   const form = new FormData();
   form.append("image", file);
+  if (hostelId) form.append("hostelId", hostelId);
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api/upload`, {

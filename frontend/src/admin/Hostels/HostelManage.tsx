@@ -123,6 +123,10 @@ export default function HostelManage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
+  // Folder used for uploaded images. Existing hostels use their real id;
+  // new ones get a stable draft id so uploads stay grouped until saved.
+  const [draftId] = useState(() => `temp-${crypto.randomUUID()}`);
+  const imageFolder = id ?? draftId;
 
   const { facilities: facilityCatalog } = useFacilities();
 
@@ -307,7 +311,9 @@ export default function HostelManage() {
     setUploading(true);
     setUploadError(null);
     try {
-      const urls = await Promise.all(files.map((f) => uploadHostelImage(f)));
+      const urls = await Promise.all(
+        files.map((f) => uploadHostelImage(f, imageFolder)),
+      );
       setPhotos((prev) => {
         const next = [...prev];
         for (const url of urls) if (!next.includes(url)) next.push(url);

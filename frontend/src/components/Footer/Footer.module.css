@@ -1,0 +1,246 @@
+.footer {
+  background: var(--dabi-charcoal);
+  color: rgba(255, 255, 255, 0.85);
+  padding-top: clamp(3rem, 6vw, 4.5rem);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.brand {
+  max-width: 340px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.tag {
+  margin: 0.85rem 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.desc {
+  margin: 0.6rem 0 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 38ch;
+}
+
+.social {
+  margin-top: 1.3rem;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  transition: background 0.18s var(--ease), transform 0.18s var(--ease),
+    color 0.18s var(--ease), border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+
+.socialLink:hover {
+  background: var(--dabi-gold);
+  color: var(--dabi-green-700);
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -8px rgba(233, 185, 73, 0.6);
+}
+
+.socialLink:focus-visible {
+  outline: none;
+  border-color: var(--dabi-gold);
+  box-shadow: 0 0 0 3px rgba(233, 185, 73, 0.45);
+}
+
+.socialLink svg {
+  transition: transform 0.18s var(--ease);
+}
+
+.socialLink:hover svg {
+  transform: scale(1.08);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.colTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dabi-gold);
+  margin: 0 0 0.3rem;
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 600;
+  width: fit-content;
+  transition: color 0.15s var(--ease);
+}
+
+.link:hover {
+  color: var(--dabi-gold);
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.5rem;
+  padding: clamp(1.2rem, 3vw, 1.6rem) 0 clamp(1.6rem, 4vw, 2.4rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.built {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.builtDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dabi-gold);
+}
+
+/* Progressive shrink — taper the footer as the viewport narrows. */
+@media (max-width: 980px) {
+  .inner {
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  }
+}
+
+@media (max-width: 860px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+  }
+  .brand {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .social {
+    margin-top: 1.1rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .inner {
+    gap: 1.5rem;
+  }
+  .tag {
+    font-size: 1rem;
+    margin-top: 0.8rem;
+  }
+  .desc {
+    font-size: 0.92rem;
+  }
+  .col {
+    gap: 0.6rem;
+  }
+  .bottom {
+    padding-top: clamp(1.1rem, 3vw, 1.4rem);
+  }
+}
+
+@media (max-width: 600px) {
+  .inner {
+    gap: 1.25rem;
+  }
+  .desc {
+    font-size: 0.9rem;
+  }
+  .socialLink {
+    width: 44px;
+    height: 44px;
+  }
+  .bottom {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .inner {
+    gap: 1.1rem;
+  }
+  .tag {
+    margin-top: 0.7rem;
+  }
+  .colTitle {
+    letter-spacing: 0.12em;
+  }
+  .link {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .social {
+    margin-top: 1.2rem;
+  }
+  .bottom {
+    justify-content: flex-start;
+    padding-bottom: 1.6rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .footer {
+    padding-top: clamp(2.5rem, 8vw, 3.5rem);
+  }
+  .inner {
+    gap: 1.25rem;
+  }
+  .tag {
+    font-size: 0.95rem;
+  }
+  .desc {
+    font-size: 0.88rem;
+  }
+  .social {
+    gap: 0.5rem;
+  }
+  .socialLink {
+    width: 42px;
+    height: 42px;
+  }
+  .colTitle {
+    font-size: 0.78rem;
+  }
+  .bottom {
+    font-size: 0.82rem;
+  }
+}

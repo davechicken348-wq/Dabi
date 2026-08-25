@@ -1,0 +1,154 @@
+// Prisma schema for the Dabi backend.
+//
+// Covers the data used by the admin pages: Hostel, Owner, Enquiry, Deal,
+// plus the lookup tables (Facility, Admin) they depend on.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Availability {
+  Available
+  Limited
+  Full
+}
+
+enum EnquiryStatus {
+  New
+  Contacted
+  Resolved
+}
+
+enum TenancyStatus {
+  Pending
+  Active
+  Ended
+}
+
+model Hostel {
+  id              String       @id @default(cuid())
+  name            String
+  location        String
+  pricePerYear    Int // Ghana Cedis, per academic year
+  roomType        String
+  totalRooms      Int? // Total number of rooms in the hostel
+  availability    Availability @default(Available)
+  verified        Boolean      @default(false)
+  image           String       @default("/images/hostel-placeholder.svg")
+  photos          String[]     @default([])
+  note            String?
+  distanceFromSTU Float?
+  latitude        Float?
+  longitude       Float?
+  createdAt       DateTime     @default(now())
+
+  ownerId String?
+  owner   Owner?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  facilities Facility[] @relation("HostelFacilities")
+
+  enquiries Enquiry[]
+  tenancies Tenancy[]
+  deals     Deal[]
+
+  @@index([ownerId])
+  @@index([availability])
+  @@index([verified])
+}
+
+model Owner {
+  id       String   @id @default(cuid())
+  name     String
+  phone    String
+  email    String   @unique
+  joinedAt DateTime @default(now())
+  active   Boolean  @default(true)
+
+  hostels Hostel[]
+
+  @@index([active])
+}
+
+model Enquiry {
+  id         String        @id @default(cuid())
+  name       String
+  phone      String
+  school     String?
+  hostelId   String?
+  hostel     Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  hostelName String?
+  roomType   String?
+  moveInDate DateTime?
+  message    String?
+  status     EnquiryStatus @default(New)
+  createdAt  DateTime      @default(now())
+
+  @@index([hostelId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// A tenancy is a confirmed (or pending) room booking for a hostel. It is the
+// source of truth for "smart" availability: active tenancies reduce the free
+// bed count, ended tenancies free it back up. Dabi confirms a pending request.
+model Tenancy {
+  id            String        @id @default(cuid())
+  hostelId      String
+  hostel        Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelName    String
+  roomType      String
+  beds          Int           @default(1)
+  occupantName  String
+  phone         String
+  moveInDate    DateTime?
+  moveOutDate   DateTime?
+  status        TenancyStatus @default(Pending)
+  source        String        @default("self") // "self" (student) | "admin"
+  createdAt     DateTime      @default(now())
+
+  @@index([hostelId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Deal {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  code            String   @unique
+  discountPercent Int
+  hostelId        String?
+  hostel          Hostel?  @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  active          Boolean  @default(true)
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([hostelId])
+  @@index([active])
+}
+
+model Facility {
+  id      String   @id @default(cuid())
+  key     String   @unique
+  label   String
+  /// Icon key from the frontend icon registry (e.g. "wifi", "droplet").
+  iconKey String?
+  /// Grouping used in the UI (e.g. "Utilities", "Security", "Comfort").
+  category String?
+  hostels Hostel[] @relation("HostelFacilities")
+}
+
+// Admin accounts back the admin login (Login page). Passwords are stored
+// hashed; see auth work when the frontend is wired to the API.
+model Admin {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}

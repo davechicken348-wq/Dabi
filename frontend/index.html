@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#176B4D" />
+    <meta name="msapplication-TileColor" content="#176B4D" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Dabi — Find a place. Find it easier.</title>
+    <meta
+      name="description"
+      content="Dabi helps students at Sunyani Technical University discover verified hostels without walking campus all day. Browse real rooms, real prices, and real availability. Find a place. Find it easier."
+    />
+    <meta
+      name="keywords"
+      content="Dabi, hostels, Sunyani Technical University, STU, student accommodation, hostel finder, verified hostels, Ghana, Sunyani"
+    />
+    <meta name="author" content="Dabi" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://dabi.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Dabi" />
+    <meta property="og:title" content="Dabi — Find a place. Find it easier." />
+    <meta
+      property="og:description"
+      content="Verified hostels for students at Sunyani Technical University. Browse real rooms, real prices, real availability."
+    />
+    <meta property="og:image" content="/images/home_hero.jpg" />
+    <meta property="og:image:width" content="3024" />
+    <meta property="og:image:height" content="4032" />
+    <meta property="og:image:alt" content="A bright student hostel room" />
+    <meta property="og:url" content="https://dabi.app/" />
+    <meta property="og:locale" content="en_GH" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dabi — Find a place. Find it easier." />
+    <meta
+      name="twitter:description"
+      content="Verified hostels for students at Sunyani Technical University."
+    />
+    <meta name="twitter:image" content="/images/home_hero.jpg" />
+    <meta name="twitter:image:alt" content="A bright student hostel room" />
+
+    <!-- Icons & manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Fonts: preconnect, then load non-render-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=Permanent+Marker&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=Permanent+Marker&display=swap"
+      />
+    </noscript>
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Dabi",
+        "url": "https://dabi.app/",
+        "description": "Local hostel discovery platform for students at Sunyani Technical University.",
+        "areaServed": "Sunyani Technical University, Ghana",
+        "logo": "https://dabi.app/favicon.svg"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Dabi",
+        "url": "https://dabi.app/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://dabi.app/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <style>
+      :root {
+        --dabi-ivory: #f8f6ef;
+        --dabi-green: #176b4d;
+        --dabi-gold: #e9b949;
+        --dabi-charcoal: #18201b;
+        --dabi-font: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+
+      body {
+        background: var(--dabi-ivory);
+        font-family: var(--dabi-font);
+        color: var(--dabi-charcoal);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      /* Branded pre-hydration splash — shown until React mounts */
+      #splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.8rem;
+        background: var(--dabi-ivory);
+        z-index: 9999;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      #splash.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      #splash .word {
+        display: inline-flex;
+        align-items: baseline;
+        font-family: "ziclets", "Permanent Marker", var(--dabi-font);
+        font-weight: 500;
+        font-size: 1.8rem;
+        letter-spacing: 0;
+        line-height: 1;
+      }
+
+      #splash .word .a {
+        color: var(--dabi-charcoal);
+      }
+
+      #splash .word .b {
+        color: var(--dabi-green);
+      }
+
+      #splash .track {
+        width: 168px;
+        height: 3px;
+        border-radius: 999px;
+        background: rgba(24, 32, 27, 0.08);
+        overflow: hidden;
+      }
+
+      #splash .track::after {
+        content: "";
+        display: block;
+        width: 40%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--dabi-green), var(--dabi-gold));
+        animation: dabi-slide 1.2s var(--ease) infinite;
+      }
+
+      @keyframes dabi-slide {
+        0% {
+          transform: translateX(-120%);
+        }
+        100% {
+          transform: translateX(320%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #splash .track::after {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <div id="splash" aria-hidden="true">
+      <div class="word"><span class="a">Da</span><span class="b">bi</span></div>
+      <div class="track"></div>
+    </div>
+
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif">
+        <strong>Dabi needs JavaScript.</strong>
+        <p>Please enable JavaScript in your browser to browse verified hostels.</p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Hide the splash once React has rendered into #root.
+      (function () {
+        var splash = document.getElementById("splash");
+        var root = document.getElementById("root");
+        function hide() {
+          if (splash && root && root.childElementCount > 0) {
+            splash.classList.add("is-hidden");
+          }
+        }
+        var observer = new MutationObserver(hide);
+        if (root) observer.observe(root, { childList: true });
+        window.addEventListener("load", hide);
+        setTimeout(hide, 4000);
+      })();
+    </script>
+  </body>
+</html>

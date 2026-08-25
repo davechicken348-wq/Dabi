@@ -1,0 +1,35 @@
+.main {
+  min-height: 70vh;
+}
+
+.intro {
+  padding: 2.5rem 0 1.25rem;
+}
+
+.title {
+  font-family: var(--font);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  margin-top: 0.6rem;
+}
+
+.lead {
+  max-width: 640px;
+  margin-top: 0.75rem;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+.mapSection {
+  padding-bottom: 3rem;
+}
+
+.liveRow {
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  color: var(--dabi-muted);
+  font-size: 1rem;
+  padding: 3rem 1rem;
+}

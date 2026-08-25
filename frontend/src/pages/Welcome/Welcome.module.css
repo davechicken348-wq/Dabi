@@ -1,0 +1,197 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  color: var(--dabi-white);
+  background-color: var(--dabi-charcoal);
+  background-image:
+    linear-gradient(180deg, rgba(18, 32, 27, 0.42) 0%, rgba(18, 32, 27, 0.74) 100%),
+    url("/images/graffiti3.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Portrait image (graffiti3) fills phones nicely, but on wide laptop/desktop
+   screens it would crop heavily and feel zoomed. Swap to the landscape
+   graffiti (graffiti1) there so it fills the screen without cropping. */
+@media (min-aspect-ratio: 1/1) {
+  .page {
+    background-image:
+      linear-gradient(180deg, rgba(18, 32, 27, 0.42) 0%, rgba(18, 32, 27, 0.74) 100%),
+      url("/images/graffiti1.webp");
+  }
+}
+
+.topbar {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1.4rem var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.topCta {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--dabi-white);
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease),
+    transform 0.15s var(--ease);
+}
+
+.topCta:hover {
+  border-color: var(--dabi-white);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-block: clamp(1.5rem, 4vw, 3rem) clamp(2.5rem, 6vw, 4rem);
+}
+
+.panel {
+  width: 100%;
+  max-width: 600px;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  text-align: center;
+}
+
+.panel .eyebrow {
+  color: #fff;
+}
+
+.eyebrow::before {
+  background: var(--dabi-gold);
+}
+
+.title {
+  margin-top: 1rem;
+  font-size: clamp(2.6rem, 6vw, 4.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--dabi-white);
+}
+
+.accent {
+  color: var(--dabi-gold);
+}
+
+.lead {
+  margin-top: 1.2rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.86);
+  max-width: 44ch;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.note {
+  margin-top: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+}
+
+.noteIcon {
+  color: var(--dabi-gold);
+}
+
+@media (max-width: 880px) {
+  .topbar {
+    padding: 1.1rem var(--gutter);
+  }
+  .panel {
+    padding: clamp(1.5rem, 5vw, 2.25rem);
+  }
+  .title {
+    font-size: clamp(2.4rem, 7vw, 3.5rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 1rem var(--gutter);
+  }
+  .topCta {
+    font-size: 0.88rem;
+    padding: 0.5rem 0.95rem;
+  }
+  .panel {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-md);
+  }
+  .title {
+    font-size: clamp(2.1rem, 8.5vw, 3rem);
+  }
+  .lead {
+    font-size: 1.02rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0.85rem var(--gutter);
+  }
+  .panel {
+    padding: 1.35rem 1rem;
+  }
+  .title {
+    font-size: clamp(1.9rem, 9vw, 2.5rem);
+  }
+  .lead {
+    font-size: 0.98rem;
+  }
+  .actions {
+    margin-top: 1.5rem;
+    gap: 0.65rem;
+  }
+  .actions .dabi-btn {
+    width: 100%;
+  }
+  .note {
+    margin-top: 1.25rem;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .panel {
+    padding: 1.1rem 0.85rem;
+  }
+  .title {
+    font-size: 1.75rem;
+  }
+  .lead {
+    font-size: 0.92rem;
+  }
+  .topCta {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.8rem;
+  }
+}

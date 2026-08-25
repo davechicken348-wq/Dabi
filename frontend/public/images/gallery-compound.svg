@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Compound placeholder photo">
+  <rect width="800" height="600" fill="#f8f6ef"/>
+  <rect width="800" height="360" fill="#e8f1ec"/>
+  <path d="M0 360 Q400 300 800 360 V600 H0 Z" fill="#176B4D" opacity="0.12"/>
+  <g fill="#176B4D">
+    <circle cx="220" cy="250" r="56"/>
+    <rect x="206" y="300" width="28" height="60"/>
+    <circle cx="560" cy="240" r="48"/>
+    <rect x="548" y="284" width="24" height="56"/>
+  </g>
+  <path d="M400 600 L300 360 H500 Z" fill="#E9B949" opacity="0.5"/>
+  <text x="400" y="540" text-anchor="middle" font-family="Manrope, sans-serif" font-size="24" font-weight="700" fill="#68716B">Compound</text>
+</svg>

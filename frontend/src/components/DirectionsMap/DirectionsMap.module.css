@@ -1,0 +1,350 @@
+.shell {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  height: clamp(560px, 78vh, 880px);
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.startBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dabi-muted);
+}
+
+.startRow {
+  display: flex;
+  gap: 8px;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1;
+  min-width: 0;
+  padding: 11px 36px 11px 14px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--dabi-ivory)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23176b4d' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.select:focus {
+  border-color: var(--dabi-green);
+  box-shadow: 0 0 0 3px var(--dabi-green-50);
+}
+
+.gps {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--dabi-gold);
+  color: #3a2a00;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: filter 0.15s var(--ease);
+}
+
+.gps:hover {
+  filter: brightness(0.97);
+}
+
+.gps:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.searchBox {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dabi-muted);
+  pointer-events: none;
+}
+
+.search {
+  width: 100%;
+  padding: 11px 12px 11px 36px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--dabi-ivory);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.search:focus {
+  border-color: var(--dabi-green);
+  box-shadow: 0 0 0 3px var(--dabi-green-50);
+}
+
+.listMeta {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--dabi-muted);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--dabi-muted);
+  font-size: 0.88rem;
+  padding: 18px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+.item {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--dabi-ivory);
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
+}
+
+.item:hover {
+  border-color: var(--dabi-green);
+}
+
+.itemActive {
+  border-color: var(--dabi-green);
+  background: var(--dabi-green-50);
+  box-shadow: 0 0 0 3px var(--dabi-green-50);
+}
+
+.itemName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.itemName svg {
+  color: var(--dabi-green);
+  flex: none;
+}
+
+.itemMeta {
+  font-size: 0.8rem;
+  color: var(--dabi-muted);
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.badge_Available {
+  background: #e3f5ea;
+  color: #0f7a45;
+}
+
+.badge_Limited {
+  background: #fdf0d5;
+  color: #9a6b00;
+}
+
+.badge_Full {
+  background: #fde3e3;
+  color: #a33030;
+}
+
+/* Map + directions */
+.mapCol {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.map {
+  flex: 1 1 65%;
+  min-height: 240px;
+  background: #dfe7e4;
+}
+
+.panel {
+  flex: 1 1 35%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 3px solid var(--dabi-green);
+  background: var(--dabi-white);
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panelTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.summary {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--dabi-green);
+}
+
+.steps {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 6px 16px;
+  flex: 1;
+}
+
+.step {
+  display: flex;
+  gap: 12px;
+  padding: 12px 10px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+.num {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--dabi-green);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepBody {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.stepDist {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--dabi-muted);
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--dabi-muted);
+  font-size: 0.88rem;
+  padding: 28px 18px;
+  line-height: 1.5;
+}
+
+/* Mobile: stack, map first so it stays centered/visible */
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .mapCol {
+    order: -1;
+  }
+  .map {
+    height: 52vh;
+    flex: none;
+  }
+  .list {
+    max-height: 320px;
+  }
+}
+
+/* Hide Leaflet Routing Machine's own itinerary UI; we render our own. */
+.mapCol :global(.leaflet-routing-container),
+.mapCol :global(.leaflet-routing-alt),
+.mapCol :global(.leaflet-routing-geocoders) {
+  display: none !important;
+}
+
+.mapCol :global(.leaflet-routing-line) {
+  stroke-width: 6;
+}

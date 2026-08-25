@@ -1,0 +1,20 @@
+{
+  "name": "Dabi — Find a place. Find it easier.",
+  "short_name": "Dabi",
+  "description": "Verified hostels for students at Sunyani Technical University. Browse real rooms, real prices, and real availability.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f6ef",
+  "theme_color": "#176B4D",
+  "lang": "en-GH",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

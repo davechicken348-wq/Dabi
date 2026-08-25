@@ -1,0 +1,62 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.32rem 0.7rem 0.32rem 0.4rem;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--dabi-gold);
+  color: var(--dabi-green-700);
+}
+
+/* Light variant for dark backgrounds */
+.light {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--dabi-white);
+}
+
+.light .dot {
+  background: var(--dabi-gold);
+}
+
+/* On small screens the pill overwhelms the compact photo. Collapse it to a
+   minimal, photo-friendly verified check: drop the label, shrink to a small
+   green circle with a white ring so it reads over any image without shouting. */
+@media (max-width: 540px) {
+  .badge {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+  }
+  .light {
+    background: transparent;
+  }
+  .label {
+    display: none;
+  }
+  .dot {
+    width: 22px;
+    height: 22px;
+    background: var(--dabi-green);
+    color: var(--dabi-white);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.92), 0 2px 6px rgba(15, 40, 30, 0.28);
+  }
+  .light .dot {
+    background: var(--dabi-green);
+    color: var(--dabi-white);
+  }
+}

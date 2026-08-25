@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Campus View Lodge placeholder photo">
+  <rect width="800" height="600" fill="#fcfaf4"/>
+  <rect width="800" height="315" fill="#eaf3ee"/>
+  <circle cx="160" cy="120" r="48" fill="#f4b928" opacity="0.75"/>
+  <g fill="#0b5d3b">
+    <rect x="260" y="210" width="280" height="290" rx="10"/>
+  </g>
+  <g fill="#fcfaf4">
+    <rect x="295" y="245" width="80" height="80" rx="6"/>
+    <rect x="425" y="245" width="80" height="80" rx="6"/>
+    <rect x="295" y="355" width="80" height="80" rx="6"/>
+    <rect x="425" y="355" width="80" height="80" rx="6"/>
+  </g>
+  <rect x="380" y="430" width="40" height="70" rx="6" fill="#f4b928"/>
+  <rect x="260" y="500" width="280" height="14" fill="#d8d2c3"/>
+  <g fill="#094e31">
+    <rect x="610" y="445" width="13" height="65"/>
+    <circle cx="616" cy="435" r="28"/>
+  </g>
+  <text x="400" y="560" text-anchor="middle" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#6b7a70">Campus View Lodge · photo placeholder</text>
+</svg>

@@ -1,0 +1,147 @@
+.wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  min-height: 460px;
+  background: #eef2ec;
+}
+
+.canvas {
+  width: 100%;
+  height: 460px;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(248, 246, 239, 0.86);
+  color: var(--dabi-green);
+  font-weight: 700;
+}
+
+/* Bleed the image to the edges of the leaflet popup */
+.wrap :global(.leaflet-popup-content) {
+  margin: 0;
+  width: 240px !important;
+}
+
+.wrap :global(.leaflet-popup-content-wrapper) {
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+}
+
+.popupMedia {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--dabi-green-50);
+}
+
+.popupImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.popupStatus {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 12px rgba(24, 32, 27, 0.22);
+  backdrop-filter: blur(2px);
+}
+
+.popupStatusAvailable {
+  background: var(--dabi-green);
+}
+
+.popupStatusLimited {
+  background: var(--dabi-gold);
+  color: var(--dabi-green-700);
+}
+
+.popupStatusFull {
+  background: #c2453d;
+}
+
+.popupVerified {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--dabi-green-700);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 12px rgba(24, 32, 27, 0.18);
+}
+
+.popupBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 0.95rem 0.95rem;
+}
+
+.popupName {
+  font-size: 1.02rem;
+  color: var(--dabi-green-700);
+}
+
+.popupMeta {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.popupDist {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--dabi-green);
+  margin-top: 0.15rem;
+}
+
+.popupLink {
+  margin-top: 0.6rem;
+  align-self: flex-start;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--dabi-green);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.15s var(--ease);
+}
+
+.popupLink:hover {
+  background: var(--dabi-green-700);
+}
+
+@media (max-width: 540px) {
+  .wrap,
+  .canvas {
+    height: 380px;
+  }
+}

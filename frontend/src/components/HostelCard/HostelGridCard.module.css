@@ -1,0 +1,353 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--dabi-green);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--dabi-green-50);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+}
+
+.status {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.01em;
+}
+
+.available {
+  color: var(--status-available);
+}
+
+.limited {
+  color: var(--status-limited);
+}
+
+.full {
+  color: var(--status-full);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.9rem 0.95rem 1rem;
+  flex: 1;
+}
+
+.name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+}
+
+.locIcon {
+  color: var(--dabi-gold);
+}
+
+.dist {
+  color: var(--dabi-green);
+  font-weight: 700;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+.room {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.roomText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price {
+  flex: none;
+  white-space: nowrap;
+  font-weight: 800;
+  color: var(--dabi-green);
+  font-size: 1rem;
+}
+
+.price small {
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+.cta {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: var(--dabi-white);
+  background: var(--dabi-green);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  transition: background 0.15s var(--ease);
+}
+
+.cta:hover {
+  background: var(--dabi-green-700);
+}
+
+/* Progressive shrink — fine-grained steps so the grid card content scales
+   smoothly (and aggressively) down to the smallest phones. */
+@media (max-width: 760px) {
+  .body {
+    padding: 0.85rem 0.9rem 0.95rem;
+    gap: 0.42rem;
+  }
+  .name {
+    font-size: 1.02rem;
+  }
+  .loc {
+    font-size: 0.86rem;
+  }
+  .meta {
+    padding-top: 0.65rem;
+  }
+  .room {
+    font-size: 0.84rem;
+  }
+  .price {
+    font-size: 0.98rem;
+  }
+  .cta {
+    margin-top: 0.7rem;
+    padding: 0.58rem 0.78rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .body {
+    padding: 0.82rem 0.85rem 0.9rem;
+    gap: 0.4rem;
+  }
+  .name {
+    font-size: 1rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.84rem;
+  }
+  .meta {
+    padding-top: 0.6rem;
+  }
+  .cta {
+    margin-top: 0.68rem;
+    padding: 0.55rem 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .body {
+    padding: 0.8rem 0.82rem 0.88rem;
+    gap: 0.38rem;
+  }
+  .name {
+    font-size: 0.98rem;
+  }
+  .price {
+    font-size: 0.96rem;
+  }
+  .status {
+    font-size: 0.7rem;
+    padding: 0.24rem 0.52rem;
+  }
+  .cta {
+    margin-top: 0.65rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .body {
+    padding: 0.78rem 0.78rem 0.85rem;
+    gap: 0.36rem;
+  }
+  .name {
+    font-size: 0.96rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.82rem;
+  }
+  .meta {
+    padding-top: 0.58rem;
+  }
+  .price {
+    font-size: 0.94rem;
+  }
+  .cta {
+    margin-top: 0.62rem;
+    padding: 0.52rem 0.72rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .body {
+    padding: 0.75rem 0.72rem 0.8rem;
+    gap: 0.34rem;
+  }
+  .name {
+    font-size: 0.94rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.8rem;
+  }
+  .price {
+    font-size: 0.92rem;
+  }
+  .status {
+    font-size: 0.66rem;
+    padding: 0.2rem 0.48rem;
+  }
+  .cta {
+    margin-top: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .body {
+    padding: 0.7rem 0.68rem 0.75rem;
+    gap: 0.32rem;
+  }
+  .name {
+    font-size: 0.92rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.78rem;
+  }
+  .meta {
+    padding-top: 0.52rem;
+  }
+  .price {
+    font-size: 0.9rem;
+  }
+  .cta {
+    margin-top: 0.56rem;
+    padding: 0.48rem 0.68rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .body {
+    padding: 0.66rem 0.62rem 0.7rem;
+    gap: 0.3rem;
+  }
+  .name {
+    font-size: 0.9rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.76rem;
+  }
+  .price {
+    font-size: 0.88rem;
+  }
+  .status {
+    font-size: 0.64rem;
+    padding: 0.2rem 0.46rem;
+    bottom: 0.45rem;
+    right: 0.45rem;
+  }
+  .badge {
+    top: 0.45rem;
+    left: 0.45rem;
+  }
+  .cta {
+    margin-top: 0.52rem;
+    padding: 0.46rem 0.64rem;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .body {
+    padding: 0.6rem 0.56rem 0.64rem;
+    gap: 0.28rem;
+  }
+  .name {
+    font-size: 0.86rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.74rem;
+  }
+  .price {
+    font-size: 0.85rem;
+  }
+  .status {
+    font-size: 0.6rem;
+    padding: 0.18rem 0.42rem;
+  }
+  .cta {
+    margin-top: 0.48rem;
+    padding: 0.44rem 0.6rem;
+    font-size: 0.85rem;
+  }
+}

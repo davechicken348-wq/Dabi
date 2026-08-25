@@ -1,0 +1,408 @@
+.header {
+  position: sticky;
+  top: 0;
+  /* Above Leaflet's map panes/controls (which go up to z-index 1000) so the
+     sticky bar is never clipped by a map on scroll. */
+  z-index: 1200;
+  transition: background 0.3s var(--ease), box-shadow 0.3s var(--ease),
+    border-color 0.3s var(--ease), backdrop-filter 0.3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+
+/* Solid bar (always frosted). */
+.solid {
+  background: rgba(252, 250, 244, 0.86);
+  backdrop-filter: saturate(150%) blur(12px);
+  border-bottom-color: var(--line);
+  box-shadow: 0 10px 30px rgba(15, 40, 30, 0.06);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 78px;
+}
+
+/* --- Brand --- */
+.brand {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.25rem 0;
+  transition: transform 0.18s var(--ease);
+}
+
+.brand:hover {
+  transform: translateY(-1px);
+}
+
+/* --- Primary nav (centered between brand and actions) --- */
+.nav {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.link:hover {
+  color: var(--dabi-green);
+  background: rgba(23, 107, 77, 0.07);
+}
+
+.linkActive,
+.linkActive:hover {
+  color: var(--dabi-green-700);
+  background: rgba(23, 107, 77, 0.1);
+}
+
+.linkActive::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--dabi-gold);
+}
+
+/* --- "More" dropdown --- */
+.more {
+  position: relative;
+}
+
+.moreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.moreBtn:hover,
+.moreBtnOpen {
+  color: var(--dabi-green);
+  background: rgba(23, 107, 77, 0.07);
+}
+
+.moreCaret {
+  transition: transform 0.2s var(--ease);
+}
+
+.moreBtnOpen .moreCaret {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  right: 0;
+  min-width: 210px;
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  z-index: 60;
+}
+
+.menuLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.menuIcon {
+  color: var(--dabi-muted);
+  flex: none;
+  transition: color 0.15s var(--ease);
+}
+
+.menuLink:hover {
+  background: var(--dabi-green-50);
+  color: var(--dabi-green-700);
+}
+
+.menuLink:hover .menuIcon {
+  color: var(--dabi-green);
+}
+
+/* --- Right-side actions --- */
+.actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.schoolComing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--dabi-green-50);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  padding: 0.32rem 0.7rem 0.32rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--dabi-muted);
+  cursor: default;
+}
+
+.schoolIcon {
+  color: var(--dabi-green);
+  flex: none;
+}
+
+.bar .cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dabi-green-700);
+  background: transparent;
+  border: 1.5px solid var(--dabi-green);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 0 var(--dabi-green);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease),
+    border-color 0.18s var(--ease), box-shadow 0.18s var(--ease),
+    transform 0.18s var(--ease);
+}
+
+.bar .cta svg {
+  flex: none;
+}
+
+.bar .cta:hover {
+  color: var(--dabi-white);
+  background: var(--dabi-green);
+  border-color: var(--dabi-green);
+  box-shadow: 0 8px 20px rgba(23, 107, 77, 0.22);
+  transform: translateY(-1px);
+}
+
+.bar .cta:active {
+  transform: translateY(0);
+}
+
+.toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: var(--dabi-white);
+  color: var(--dabi-green);
+}
+
+/* --- Mobile panel --- */
+.mobile {
+  display: none;
+  overflow: hidden;
+  max-height: 0;
+  visibility: hidden;
+  border-top: 1px solid transparent;
+  background: var(--dabi-cream);
+  transition: max-height 0.28s var(--ease), visibility 0s linear 0.28s;
+}
+
+.mobileOpen {
+  visibility: visible;
+  /* Cover the viewport below the 78px bar; scroll instead of clipping so the
+     school picker is never cut off on short phones. */
+  max-height: calc(100vh - 78px);
+  max-height: calc(100dvh - 78px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--line);
+  transition: max-height 0.28s var(--ease), visibility 0s linear 0s;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem var(--gutter) 1.5rem;
+}
+
+.mobileLink {
+  padding: 0.85rem 0.5rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+
+.mobileNav .mobileCta {
+  margin-top: 1rem;
+  width: 100%;
+  color: var(--dabi-green-700);
+  background: transparent;
+  border: 1.5px solid var(--dabi-green);
+  border-radius: var(--radius-md);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+
+.mobileNav .mobileCta:hover {
+  color: var(--dabi-white);
+  background: var(--dabi-green);
+  border-color: var(--dabi-green);
+}
+
+.mobileSchoolComing {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.6rem 0.9rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--dabi-muted);
+  background: var(--dabi-green-50);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* --- Responsive --- */
+@media (max-width: 1080px) {
+  .schoolComing {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .bar {
+    justify-content: space-between;
+  }
+  .nav {
+    display: none;
+  }
+  .cta {
+    display: none;
+  }
+  .toggle {
+    display: inline-flex;
+  }
+  .mobile {
+    display: block;
+  }
+}
+
+/* Progressive shrink — keep the bar compact as the viewport narrows, stepping
+   down height, gaps, and the wordmark so nothing ever feels cramped. */
+@media (max-width: 720px) {
+  .bar {
+    height: 72px;
+    gap: 0.65rem;
+  }
+  .brand {
+    gap: 0.5rem;
+  }
+  .brand svg {
+    width: 24px;
+    height: 24px;
+  }
+  .brand :global(.dabi-wordmark) {
+    font-size: 1.35rem;
+  }
+  .toggle {
+    width: 42px;
+    height: 42px;
+  }
+  .mobileLink {
+    font-size: 1.05rem;
+    padding: 0.8rem 0.45rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bar {
+    height: 64px;
+    gap: 0.5rem;
+  }
+  .brand {
+    gap: 0.4rem;
+  }
+  .brand svg {
+    width: 22px;
+    height: 22px;
+  }
+  .brand :global(.dabi-wordmark) {
+    font-size: 1.2rem;
+  }
+  .toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .mobileLink {
+    font-size: 1rem;
+    padding: 0.75rem 0.4rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .bar {
+    height: 56px;
+    gap: 0.35rem;
+  }
+  .brand {
+    gap: 0.3rem;
+  }
+  .brand svg {
+    width: 20px;
+    height: 20px;
+  }
+  .brand :global(.dabi-wordmark) {
+    font-size: 1.08rem;
+  }
+  .toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+  .mobileLink {
+    font-size: 0.95rem;
+    padding: 0.7rem 0.35rem;
+  }
+  .mobileNav {
+    padding: 0.8rem var(--gutter) 1.1rem;
+  }
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Royal Heights placeholder photo">
+  <rect width="800" height="600" fill="#fcfaf4"/>
+  <rect width="800" height="330" fill="#eaf3ee"/>
+  <circle cx="680" cy="120" r="56" fill="#f4b928" opacity="0.8"/>
+  <g fill="#094e31">
+    <rect x="170" y="150" width="220" height="350" rx="10"/>
+    <rect x="400" y="220" width="220" height="280" rx="10" fill="#0b5d3b"/>
+  </g>
+  <g fill="#fcfaf4">
+    <rect x="195" y="185" width="55" height="66" rx="6"/>
+    <rect x="270" y="185" width="55" height="66" rx="6"/>
+    <rect x="345" y="185" width="30" height="66" rx="6"/>
+    <rect x="195" y="280" width="55" height="66" rx="6"/>
+    <rect x="270" y="280" width="55" height="66" rx="6"/>
+    <rect x="195" y="375" width="55" height="66" rx="6"/>
+    <rect x="270" y="375" width="55" height="66" rx="6"/>
+    <rect x="425" y="255" width="55" height="66" rx="6"/>
+    <rect x="500" y="255" width="55" height="66" rx="6"/>
+    <rect x="575" y="255" width="30" height="66" rx="6"/>
+    <rect x="425" y="350" width="55" height="66" rx="6"/>
+    <rect x="500" y="350" width="55" height="66" rx="6"/>
+  </g>
+  <rect x="250" y="455" width="60" height="45" rx="6" fill="#f4b928"/>
+  <rect x="170" y="500" width="450" height="14" fill="#d8d2c3"/>
+  <text x="400" y="560" text-anchor="middle" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#6b7a70">Royal Heights · photo placeholder</text>
+</svg>

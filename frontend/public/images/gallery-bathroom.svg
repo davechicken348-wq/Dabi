@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Bathroom placeholder photo">
+  <rect width="800" height="600" fill="#e8f1ec"/>
+  <rect x="250" y="150" width="300" height="300" rx="14" fill="#ffffff" stroke="#d8d2c4"/>
+  <path d="M330 260v-30a70 70 0 0 1 140 0v30" fill="none" stroke="#176B4D" stroke-width="12" stroke-linecap="round"/>
+  <path d="M310 260h180" stroke="#176B4D" stroke-width="12" stroke-linecap="round"/>
+  <g stroke="#176B4D" stroke-width="10" stroke-linecap="round">
+    <path d="M360 320v20M400 320v28M440 320v20"/>
+  </g>
+  <text x="400" y="540" text-anchor="middle" font-family="Manrope, sans-serif" font-size="24" font-weight="700" fill="#68716B">Bathroom</text>
+</svg>

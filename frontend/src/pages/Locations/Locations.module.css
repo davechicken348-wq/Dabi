@@ -1,0 +1,510 @@
+/* ---------- Shared section scaffolding ---------- */
+.section {
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+}
+
+.sectionTitle {
+  margin-top: 0.7rem;
+  font-size: clamp(1.85rem, 4.2vw, 2.9rem);
+  letter-spacing: -0.025em;
+  max-width: 18ch;
+}
+
+.sectionLead {
+  margin-top: 1rem;
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+  max-width: 56ch;
+  line-height: 1.6;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: linear-gradient(180deg, var(--dabi-cream) 0%, #f6f3ea 100%);
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(3rem, 7vw, 5.5rem);
+  overflow: hidden;
+}
+
+.heroDirections {
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------- Directions preview (map only) ---------- */
+.previewLink {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.previewMap {
+  width: 100%;
+  height: clamp(420px, 60vh, 620px);
+  background: #dfe7e4;
+  transition: filter 0.15s var(--ease);
+}
+
+.previewLink:hover .previewMap {
+  filter: saturate(1.05);
+}
+
+.previewOverlay {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: rgba(23, 107, 77, 0.95);
+  color: var(--dabi-white);
+  font-weight: 800;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.previewLink:hover .previewOverlay {
+  transform: translateY(-3px);
+  background: var(--dabi-green);
+}
+
+.heroCopy {
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroActions {
+  justify-content: center;
+}
+
+.heroTitle {
+  margin-top: 1rem;
+  font-size: clamp(2.4rem, 5.6vw, 4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.heroLead {
+  margin-top: 1.35rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--ink-soft);
+  max-width: 36ch;
+}
+
+.heroActions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.heroVisual {
+  position: relative;
+}
+
+/* ---------- Local map visual ---------- */
+.map {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 35% 40%, rgba(23, 107, 77, 0.06), transparent 60%),
+    linear-gradient(180deg, #f3f0e7 0%, #ece8db 100%);
+  min-height: 380px;
+  box-shadow: var(--shadow-lg);
+}
+
+.mapCanvas {
+  position: absolute;
+  inset: 0;
+}
+
+.mapLoading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: var(--ink-muted);
+  font-weight: 700;
+  background: var(--dabi-cream);
+}
+
+.mapInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-family: var(--font-admin, "Inter", system-ui, sans-serif);
+  min-width: 150px;
+}
+
+.mapInfo strong {
+  font-size: 0.95rem;
+  color: var(--dabi-charcoal);
+}
+
+.mapInfo span {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.mapInfo a {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--dabi-green);
+}
+
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(24, 32, 27, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 32, 27, 0.06) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+.mapRoad {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+}
+
+.mapRoadA {
+  top: 28%;
+  left: -5%;
+  width: 110%;
+  height: 14px;
+  transform: rotate(-8deg);
+}
+
+.mapRoadB {
+  top: 52%;
+  left: 18%;
+  width: 14px;
+  height: 70%;
+  transform: rotate(10deg);
+}
+
+.mapPin {
+  position: absolute;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--dabi-green);
+  transform: translate(-50%, -100%);
+}
+
+.mapPinGold {
+  color: var(--dabi-gold);
+}
+
+.mapPin span {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--dabi-white);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.mapPulse {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 6px rgba(23, 107, 77, 0.14);
+}
+
+.mapPinGold .mapPulse {
+  box-shadow: 0 0 0 6px rgba(233, 185, 73, 0.2);
+}
+
+.mapCaption {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+/* ---------- Get Directions hero card ---------- */
+.directionsCard {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.directionsCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(24, 32, 27, 0.18);
+}
+
+.directionsCardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.directionsCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.directionsCardText strong {
+  font-size: 1rem;
+  color: var(--dabi-charcoal);
+}
+
+.directionsCardText span {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+
+@media (max-width: 540px) {
+  .directionsCardText span {
+    display: none;
+  }
+}
+
+/* ---------- Areas index ---------- */
+.areas {
+  background: var(--dabi-white);
+}
+
+.liveRow {
+  margin-bottom: 1rem;
+}
+
+.areaIndex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.areaIndexChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--dabi-green);
+  background: var(--dabi-green-50);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1rem;
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.areaIndexChip:hover {
+  transform: translateY(-2px);
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.areaIndexCount {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--dabi-gold);
+}
+
+.areaIndexChip:hover .areaIndexCount {
+  color: var(--dabi-gold);
+}
+
+/* ---------- Area block ---------- */
+.area {
+  padding: clamp(2rem, 4vw, 3rem) 0;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 92px;
+}
+
+.area:first-of-type {
+  border-top: none;
+}
+
+.areaHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.areaName {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  letter-spacing: -0.02em;
+}
+
+.areaMeta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  font-weight: 700;
+  color: var(--dabi-green);
+  font-size: 0.95rem;
+}
+
+.areaMetaPin {
+  color: var(--dabi-gold);
+}
+
+.areaMetaDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.6;
+}
+
+.areaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+
+/* ---------- Coverage note ---------- */
+.coverage {
+  background: var(--dabi-cream);
+}
+
+.coverageInner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+  box-shadow: var(--shadow-sm);
+}
+
+.coverageIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 14px;
+  background: var(--dabi-green-50);
+  color: var(--dabi-green);
+}
+
+.coverageText {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 70ch;
+}
+
+/* ---------- Loading / empty fallback ---------- */
+.loading {
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 1.1rem;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.7rem;
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  background: var(--dabi-white);
+}
+
+.empty .dabi-btn:hover {
+  background: var(--dabi-green) !important;
+  color: var(--dabi-white) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.emptyArt {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  opacity: 0.95;
+}
+
+.emptyTitle {
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  margin: 0;
+}
+
+.emptyText {
+  color: var(--ink-soft);
+  max-width: 44ch;
+  margin: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1023px) {
+  .areaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 880px) {
+  .heroDirections {
+    margin-top: 2.5rem;
+  }
+}
+
+/* Keep the area grid at 2 columns on all mobile widths, including the
+   smallest phones, so the grid cards stay in a compact 2-up layout. */
+@media (max-width: 540px) {
+  .areaGrid {
+    gap: 0.8rem;
+  }
+  .heroActions .dabi-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .areaGrid {
+    gap: 0.65rem;
+  }
+}

@@ -1,0 +1,239 @@
+:root {
+  /* Brand palette — green is an accent, not the dominant color */
+  --dabi-ivory: #f8f6ef; /* dominant warm background */
+  --dabi-white: #ffffff; /* content surfaces */
+  --dabi-charcoal: #18201b; /* primary text */
+  --dabi-green: #176b4d; /* brand accent */
+  --dabi-green-700: #12573d; /* deep green — reserved sections only */
+  --dabi-green-600: #1c7a58; /* hover/active */
+  --dabi-green-50: #e8f1ec; /* light green tint, used sparingly */
+  --dabi-gold: #e9b949; /* personality accent */
+  --dabi-gold-soft: #f7e7c2;
+  --dabi-muted: #68716b; /* secondary text */
+
+  /* Aliases so existing references keep working */
+  --dabi-cream: var(--dabi-ivory);
+  --ink: var(--dabi-charcoal);
+  --ink-soft: #44504a;
+  --ink-muted: var(--dabi-muted);
+
+   /* Lines — neutral, low-noise (shared by admin + public) */
+   --line: #e4e5de;
+   --line-strong: #d6d9d2;
+
+  /* Status */
+  --status-available: #1f8a55;
+  --status-limited: #c98a0a;
+  --status-full: #b23b3b;
+
+  /* Shadows — soft and warm */
+  --shadow-sm: 0 1px 2px rgba(24, 32, 27, 0.05);
+  --shadow-md: 0 10px 30px rgba(24, 32, 27, 0.07);
+  --shadow-lg: 0 18px 48px rgba(24, 32, 27, 0.1);
+  --shadow-float: 0 22px 60px rgba(23, 107, 77, 0.16);
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --maxw: 1600px;
+  --gutter: 24px;
+
+  /* Type — playful, rounded, friendly */
+  --font: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-graffiti: "Permanent Marker", "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-brand: "ziclets", "Permanent Marker", "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-admin: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--dabi-cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--dabi-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Shared helpers */
+.dabi-container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.dabi-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dabi-green);
+}
+
+.dabi-eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--dabi-gold);
+}
+
+.dabi-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-brand);
+  font-weight: 500;
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.dabi-wordmark__a {
+  color: var(--dabi-charcoal);
+}
+
+.dabi-wordmark__b {
+  color: var(--dabi-green);
+}
+
+/* On the deep-green footer the wordmark flips to white + gold */
+.dabi-wordmark--invert .dabi-wordmark__a {
+  color: var(--dabi-white);
+}
+
+.dabi-wordmark--invert .dabi-wordmark__b {
+  color: var(--dabi-gold);
+}
+
+.dabi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition:
+    transform 0.18s var(--ease),
+    background-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.dabi-btn-primary {
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.dabi-btn-primary:hover {
+  background: var(--dabi-green-700);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dabi-btn-secondary {
+  background: var(--dabi-white);
+  color: var(--dabi-green);
+  border-color: var(--line-strong);
+}
+
+.dabi-btn-secondary:hover {
+  border-color: var(--dabi-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.dabi-btn-gold {
+  background: var(--dabi-gold);
+  color: var(--dabi-green-700);
+}
+
+.dabi-btn-gold:hover {
+  background: var(--dabi-gold-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dabi-btn-ghost-light {
+  background: transparent;
+  color: var(--dabi-white);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.dabi-btn-ghost-light:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

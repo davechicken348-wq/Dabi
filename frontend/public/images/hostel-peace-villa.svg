@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Peace Villa placeholder photo">
+  <rect width="800" height="600" fill="#fcfaf4"/>
+  <rect width="800" height="320" fill="#eaf3ee"/>
+  <circle cx="150" cy="110" r="50" fill="#f4b928" opacity="0.7"/>
+  <g fill="#0d6c45">
+    <rect x="220" y="200" width="360" height="300" rx="10"/>
+  </g>
+  <g fill="#fcfaf4">
+    <rect x="255" y="235" width="70" height="75" rx="6"/>
+    <rect x="350" y="235" width="70" height="75" rx="6"/>
+    <rect x="445" y="235" width="70" height="75" rx="6"/>
+    <rect x="255" y="335" width="70" height="75" rx="6"/>
+    <rect x="350" y="335" width="70" height="75" rx="6"/>
+    <rect x="445" y="335" width="70" height="75" rx="6"/>
+  </g>
+  <rect x="370" y="425" width="60" height="75" rx="6" fill="#f4b928"/>
+  <rect x="220" y="500" width="360" height="14" fill="#d8d2c3"/>
+  <g fill="#094e31">
+    <rect x="640" y="440" width="13" height="70"/>
+    <circle cx="646" cy="430" r="30"/>
+  </g>
+  <text x="400" y="560" text-anchor="middle" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#6b7a70">Peace Villa · photo placeholder</text>
+</svg>

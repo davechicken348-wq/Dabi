@@ -1,0 +1,359 @@
+/* ---------- Shared section scaffolding ---------- */
+.section {
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+}
+
+.sectionTitle {
+  margin-top: 0.7rem;
+  font-size: clamp(1.85rem, 4.2vw, 2.9rem);
+  letter-spacing: -0.025em;
+  max-width: 20ch;
+}
+
+.sectionLead {
+  margin-top: 1rem;
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+  max-width: 56ch;
+  line-height: 1.6;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: linear-gradient(180deg, var(--dabi-cream) 0%, #f6f3ea 100%);
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(3rem, 7vw, 5.5rem);
+  overflow: hidden;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.heroCopy {
+  max-width: 560px;
+}
+
+.heroTitle {
+  margin-top: 1rem;
+  font-size: clamp(2.4rem, 5.6vw, 4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.heroLead {
+  margin-top: 1.35rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--ink-soft);
+  max-width: 36ch;
+}
+
+.heroActions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.heroVisual {
+  position: relative;
+}
+
+.heroPhoto {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  background: var(--dabi-white);
+}
+
+.heroCard {
+  position: absolute;
+  left: -22px;
+  bottom: -26px;
+  width: min(290px, 84%);
+  background: var(--dabi-white);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-float);
+  border: 1px solid var(--line);
+}
+
+.heroCardText {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+
+.heroCardDot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dabi-gold);
+}
+
+.heroCardSub {
+  margin-top: 0.4rem;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Contact grid ---------- */
+.contact {
+  background: var(--dabi-white);
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.formCard {
+  background: var(--dabi-cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.control {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--dabi-white);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.control:focus {
+  outline: none;
+  border-color: var(--dabi-green);
+  box-shadow: 0 0 0 3px rgba(23, 107, 77, 0.15);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.submit {
+  margin-top: 0.3rem;
+  align-self: flex-start;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.successIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.successTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.successText {
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 44ch;
+}
+
+/* ---------- Channels ---------- */
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.channelHead {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+}
+
+.channelNote {
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.channel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--dabi-cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.channel:hover {
+  transform: translateY(-2px);
+  border-color: var(--dabi-green);
+}
+
+.channelIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.channelBody {
+  flex: 1;
+}
+
+.channelName {
+  font-weight: 800;
+  font-size: 1.02rem;
+}
+
+.channelText {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.channelArrow {
+  color: var(--dabi-green);
+  flex: none;
+}
+
+/* ---------- What happens next ---------- */
+.next {
+  background: var(--dabi-cream);
+}
+
+.nextHead {
+  max-width: 620px;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.nextGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.nextStep {
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.7rem 1.5rem;
+}
+
+.nextNum {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--dabi-gold);
+}
+
+.nextIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--dabi-green-50);
+  color: var(--dabi-green);
+  margin: 0.8rem 0 1rem;
+}
+
+.nextTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.nextText {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 880px) {
+  .heroGrid,
+  .contactGrid,
+  .nextGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroVisual {
+    margin-top: 2.5rem;
+  }
+
+  .heroPhoto {
+    max-height: 460px;
+    object-fit: cover;
+  }
+
+  .heroCard {
+    left: 12px;
+    bottom: -18px;
+  }
+
+  .nextGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .heroActions .dabi-btn,
+  .submit {
+    width: 100%;
+  }
+
+  .heroCard {
+    position: relative;
+    left: 0;
+    bottom: 0;
+    margin: -36px auto 0;
+    width: 92%;
+  }
+}

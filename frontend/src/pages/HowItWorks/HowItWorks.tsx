@@ -115,7 +115,7 @@ export default function HowItWorks() {
 
             <div className={styles.heroVisual}>
               <img
-                src="/images/how_it_works1.jpg"
+                src="/images/how_it_works1.webp"
                 alt="A student hostel near Sunyani Technical University"
                 className={styles.heroPhoto}
                 width={760}
@@ -288,7 +288,7 @@ export default function HowItWorks() {
 
             <Reveal className={styles.manualVisual} delay={120}>
               <img
-                src="/images/how_it_works2.jpg"
+                src="/images/how_it_works2.webp"
                 alt="Dabi helping bring a hostel online for students to discover"
                 className={styles.manualImg}
               />

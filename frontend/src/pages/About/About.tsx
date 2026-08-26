@@ -185,7 +185,7 @@ export default function About() {
 
             <div className={styles.heroVisual}>
               <img
-                src="/images/welcome_hostel.png"
+                src="/images/welcome_hostel.webp"
                 alt="A student hostel building near Sunyani Technical University"
                 className={styles.heroPhoto}
                 width={760}
@@ -220,7 +220,7 @@ export default function About() {
 
             <Reveal className={styles.problemVisual} delay={120}>
               <img
-                src="/images/about_hostel.png"
+                src="/images/about_hostel.webp"
                 alt="The surroundings students walk through when looking for a hostel"
                 className={styles.problemImg}
               />
@@ -360,7 +360,7 @@ export default function About() {
 
             <Reveal className={styles.manualVisual} delay={120}>
               <img
-                src="/images/about_hostel2.png"
+                src="/images/about_hostel2.webp"
                 alt="Dabi helping bring a hostel online for students"
                 className={styles.manualImg}
               />

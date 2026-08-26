@@ -34,7 +34,7 @@ const availabilityClass = {
   Full: styles.availFull,
 } as const;
 
-const FALLBACK_IMAGE = "/images/dorm2.jpg";
+const FALLBACK_IMAGE = "/images/dorm2.webp";
 
 function roomCapacityOf(name: string): number {
   const m = name.match(/(\d+)\s*-?\s*in\s*-?\s*1/i);

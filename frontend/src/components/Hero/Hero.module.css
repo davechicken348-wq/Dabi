@@ -4,7 +4,7 @@
       rgba(15, 40, 30, 0.55) 0%,
       rgba(15, 40, 30, 0.35) 100%
     ),
-    url("/images/home_hero.jpg");
+    url("/images/home_hero.webp");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

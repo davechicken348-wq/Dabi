@@ -25,7 +25,15 @@ export interface HostelDTO {
   createdAt: string;
 }
 
-export type HostelCreate = Omit<HostelDTO, "id" | "createdAt">;
+export type HostelCreate = Omit<HostelDTO, "id" | "createdAt"> & {
+  /**
+   * When a hostel is created from the admin UI, images are uploaded to a
+   * temporary folder before the hostel id exists. Passing that folder here lets
+   * the backend relocate the files into the new hostel's folder so they aren't
+   * orphaned in a temp folder.
+   */
+  tempFolder?: string;
+};
 export type HostelUpdate = Partial<HostelCreate>;
 
 export interface OwnerDTO {

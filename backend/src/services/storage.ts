@@ -105,3 +105,71 @@ export async function saveImage(
   // (the Vite dev server can't serve /uploads itself).
   return origin ? `${origin}/uploads/${objectPath}` : `/uploads/${objectPath}`;
 }
+
+/**
+ * Moves every file stored under `fromFolder` into `toFolder` (both must be
+ * valid, safe folder names and must differ). Used when a hostel created from
+ * the admin UI has its images uploaded to a temporary folder before the real
+ * hostel id exists — this relocates them into the hostel's own folder so the
+ * files don't linger orphaned in a temp folder.
+ *
+ * Returns the number of files that were successfully moved.
+ */
+export async function relocateImages(
+  fromFolder: string,
+  toFolder: string,
+): Promise<number> {
+  const from = sanitizeFolder(fromFolder);
+  const to = sanitizeFolder(toFolder);
+  if (!from || !to || from === to) return 0;
+
+  if (client) {
+    await ensureBucket();
+    const { data: listed } = await client.storage.from(bucket).list(from);
+    const names = (listed ?? []).map((f) => f.name);
+    let moved = 0;
+    for (const name of names) {
+      const src = `${from}/${name}`;
+      const dest = `${to}/${name}`;
+      const { data: downloaded } = await client.storage
+        .from(bucket)
+        .download(src);
+      if (!downloaded) continue;
+      const buffer = Buffer.from(await downloaded.arrayBuffer());
+      const { error: upErr } = await client.storage
+        .from(bucket)
+        .upload(dest, buffer, {
+          contentType: downloaded.type,
+          upsert: true,
+        });
+      if (upErr) {
+        // eslint-disable-next-line no-console
+        console.error(`[storage] Failed to relocate "${bucket}/${src}":`, upErr.message);
+        continue;
+      }
+      await client.storage.from(bucket).remove([src]);
+      moved++;
+    }
+    // eslint-disable-next-line no-console
+    console.log(`[storage] Relocated ${moved} file(s) from "${from}" -> "${to}"`);
+    return moved;
+  }
+
+  const fromPath = path.join(uploadDir, from);
+  const toPath = path.join(uploadDir, to);
+  const names = await fs.readdir(fromPath).catch(() => []);
+  await fs.mkdir(toPath, { recursive: true });
+  let moved = 0;
+  for (const name of names) {
+    const src = path.join(fromPath, name);
+    const dest = path.join(toPath, name);
+    const ok = await fs
+      .rename(src, dest)
+      .then(() => true)
+      .catch(() => false);
+    if (ok) moved++;
+  }
+  // eslint-disable-next-line no-console
+  console.log(`[storage] Relocated ${moved} file(s) from ./uploads/${from} -> ./uploads/${to}`);
+  return moved;
+}

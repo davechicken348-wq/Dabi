@@ -60,6 +60,8 @@ export interface HostelInput {
   longitude?: number;
   facilities: string[];
   ownerId?: string;
+  /** Temp folder used for images uploaded before the hostel id existed. */
+  tempFolder?: string;
 }
 
 export class ApiError extends Error {

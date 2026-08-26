@@ -350,6 +350,9 @@ export default function HostelManage() {
       latitude: lat ?? undefined,
       longitude: lng ?? undefined,
     };
+    // New hostels upload images to a temporary folder before they have a real
+    // id. Tell the backend so it can move them into the created hostel's folder.
+    if (!id) input.tempFolder = draftId;
     if (lat != null && lng != null) {
       input.distanceFromSTU = haversineKm(STU_COORDS[0], STU_COORDS[1], lat, lng);
     }

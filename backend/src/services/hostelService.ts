@@ -2,6 +2,7 @@ import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
 import { computeLiveAvailability } from "../utils/availability";
 import { cached } from "../utils/cache";
+import { relocateImages } from "./storage";
 import type { HostelCreate, HostelDTO, HostelUpdate } from "../types";
 
 async function resolveFacilities(keys: string[]) {
@@ -118,6 +119,29 @@ export async function createHostel(input: HostelCreate): Promise<HostelDTO> {
     },
     include: { facilities: true },
   });
+
+  // Images uploaded before the hostel existed live under a temporary folder.
+  // Move them into the hostel's own folder so they aren't orphaned, and
+  // rewrite the stored URLs to point at the new location.
+  const tempFolder = input.tempFolder?.trim();
+  if (tempFolder && tempFolder !== hostel.id) {
+    const moved = await relocateImages(tempFolder, hostel.id);
+    if (moved > 0) {
+      const rebase = (url: string) =>
+        url.includes(`${tempFolder}/`)
+          ? url.replace(`${tempFolder}/`, `${hostel.id}/`)
+          : url;
+      const photos = (input.photos ?? []).map(rebase);
+      const image = input.image ? rebase(input.image) : photos[0] ?? "";
+      const updated = await prisma.hostel.update({
+        where: { id: hostel.id },
+        data: { photos, image },
+        include: { facilities: true },
+      });
+      return toDTO(updated);
+    }
+  }
+
   return toDTO(hostel);
 }
 

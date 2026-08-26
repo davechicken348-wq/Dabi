@@ -188,11 +188,11 @@ export default function Enquiries() {
         </div>
         <div className={styles.dashHeroArt} aria-hidden="true">
           <img
-            src="/illustrations/I-Have-Question-1--Streamline-Brooklyn.png"
+            src="/illustrations/I-Have-Question-1--Streamline-Brooklyn.webp"
             alt=""
             width={138}
             height={138}
-          />
+           loading="lazy" decoding="async" />
         </div>
       </section>
 
@@ -292,7 +292,7 @@ export default function Enquiries() {
                   <td colSpan={6}>
                      <AdminEmptyState
                         variant="empty"
-                        illustration="/illustrations/Faq-1--Streamline-Brooklyn.png"
+                        illustration="/illustrations/Faq-1--Streamline-Brooklyn.webp"
                         eyebrow="Inbox empty"
                         title="No enquiries yet."
                         text="When students reach out about a hostel, their questions and contact details will land right here — ready for you to reply."

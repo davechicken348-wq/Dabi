@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import styles from "../admin.module.css";
 
-const EMPTY_ART = "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.png";
-const ERROR_ART = "/illustrations/No-Connection-1--Streamline-Brooklyn.png";
+const EMPTY_ART = "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.webp";
+const ERROR_ART = "/illustrations/No-Connection-1--Streamline-Brooklyn.webp";
 
 interface AdminEmptyStateProps {
   variant: "error" | "empty";
@@ -41,6 +41,8 @@ export default function AdminEmptyState({
         alt={illustrationAlt ?? ""}
         width={168}
         height={168}
+        loading="lazy"
+        decoding="async"
       />
       {eyebrow && <span className={styles.emptyEyebrow}>{eyebrow}</span>}
       <h3 className={styles.emptyTitle}>{title}</h3>

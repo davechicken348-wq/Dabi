@@ -182,7 +182,7 @@ export default function Facilities() {
       ) : filtered.length === 0 ? (
         <AdminEmptyState
           variant="empty"
-          illustration="/illustrations/Astronaut-Riding-Doge--Streamline-Brooklyn.png"
+          illustration="/illustrations/Astronaut-Riding-Doge--Streamline-Brooklyn.webp"
           title={query ? "No matches found" : "No facilities yet"}
           text={
             query

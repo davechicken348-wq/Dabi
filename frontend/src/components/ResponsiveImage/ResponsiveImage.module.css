@@ -1,0 +1,51 @@
+.wrap {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  background-color: var(--dabi-sand, #efe7d8);
+}
+
+.transparent {
+  background-color: transparent;
+}
+
+/* For art that must not be cropped to its container (e.g. about_hostel3). */
+.contain .img {
+  object-fit: contain;
+}
+
+.contain .lqip {
+  display: none;
+}
+
+.img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.loaded {
+  opacity: 1;
+}
+
+.lqip {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+  filter: blur(12px);
+  transition: opacity 0.4s ease;
+}
+
+.lqipHidden {
+  opacity: 0;
+}

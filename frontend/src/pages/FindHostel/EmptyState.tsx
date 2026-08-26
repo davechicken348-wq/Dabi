@@ -25,11 +25,13 @@ export default function EmptyState({ onClear, filtered, error }: EmptyStateProps
       <img
         className={styles.emptyArt}
         src={error
-          ? "/illustrations/No-Connection-1--Streamline-Brooklyn.png"
-          : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.png"}
+          ? "/illustrations/No-Connection-1--Streamline-Brooklyn.webp"
+          : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.webp"}
         alt=""
         width={180}
         height={180}
+        loading="lazy"
+        decoding="async"
       />
       <h3 className={styles.emptyTitle}>{title}</h3>
       <p className={styles.emptyText}>{text}</p>

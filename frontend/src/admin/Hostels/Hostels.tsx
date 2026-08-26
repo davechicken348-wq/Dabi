@@ -223,11 +223,11 @@ export default function Hostels() {
         </div>
         <div className={styles.dashHeroArt} aria-hidden="true">
           <img
-            src="/illustrations/Travel--Streamline-Manchester.png"
+            src="/illustrations/Travel--Streamline-Manchester.webp"
             alt=""
             width={138}
             height={138}
-          />
+           loading="lazy" decoding="async" />
         </div>
       </section>
 
@@ -369,7 +369,7 @@ export default function Hostels() {
           <div className={styles.panel}>
             <AdminEmptyState
               variant="empty"
-              illustration="/illustrations/Rest-3--Streamline-Brooklyn.png"
+              illustration="/illustrations/Rest-3--Streamline-Brooklyn.webp"
               title="No hostels match"
               text="Try clearing a filter, or add a new listing to get started."
               action={{
@@ -405,7 +405,7 @@ export default function Hostels() {
                     <tr key={h.id}>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <img className={styles.cellThumb} src={h.image} alt="" />
+                          <img className={styles.cellThumb} src={h.image} alt="" loading="lazy" decoding="async" />
                           <div>
                             <div className={styles.cellTitle}>{h.name}</div>
                             <div className={styles.cellSub}>
@@ -520,7 +520,7 @@ export default function Hostels() {
               return (
                 <div key={h.id} className={styles.hostelCard}>
                   <div className={styles.hostelCardMedia}>
-                    <img className={styles.hostelCardImg} src={h.image} alt="" />
+                    <img className={styles.hostelCardImg} src={h.image} alt="" loading="lazy" decoding="async" />
                     {h.verified && (
                       <span className={styles.hostelCardVerified}>
                         <IconCheck size={12} /> Verified

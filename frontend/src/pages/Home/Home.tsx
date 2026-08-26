@@ -13,6 +13,7 @@ import type { AdminHostel } from "../../admin/types";
 import { usePolling } from "../../admin/usePolling";
 import LiveControls from "../../admin/components/LiveControls";
 import styles from "./Home.module.css";
+import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
 export default function Home() {
   const [hostels, setHostels] = useState<AdminHostel[]>([]);
@@ -96,11 +97,13 @@ export default function Home() {
                 <img
                   className={styles.emptyArt}
                   src={status === "error"
-                    ? "/illustrations/No-Connection-1--Streamline-Brooklyn.png"
-                    : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.png"}
+                    ? "/illustrations/No-Connection-1--Streamline-Brooklyn.webp"
+                    : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.webp"}
                   alt=""
                   width={180}
                   height={180}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <h3 className={styles.emptyTitle}>
                   {status === "error" ? "We couldn’t load hostels" : "No hostels just yet"}
@@ -136,10 +139,11 @@ export default function Home() {
             </div>
 
             <div className={styles.problemVisual}>
-              <img
-                src="/images/hostel_illustration2.webp"
+              <ResponsiveImage
+                name="hostel_illustration2"
                 alt="Students searching for a hostel the hard way"
                 className={styles.problemImg}
+                transparent
               />
             </div>
           </div>

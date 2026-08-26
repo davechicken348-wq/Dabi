@@ -5,6 +5,16 @@
       rgba(15, 40, 30, 0.35) 100%
     ),
     url("/images/home_hero.webp");
+  background-image: linear-gradient(
+      0deg,
+      rgba(15, 40, 30, 0.55) 0%,
+      rgba(15, 40, 30, 0.35) 100%
+    ),
+    image-set(
+      url("/images/variants/home_hero-480.webp") type("image/webp") 480w,
+      url("/images/variants/home_hero-768.webp") type("image/webp") 768w,
+      url("/images/variants/home_hero-1008.webp") type("image/webp") 1008w
+    );
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

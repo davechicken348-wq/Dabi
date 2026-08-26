@@ -106,8 +106,10 @@ export default function EnquiryModal({ hostelId, hostelName, roomTypes, onClose 
           <div className={styles.successHero}>
             <img
               className={styles.successIllustration}
-              src="/illustrations/Welcome-5--Streamline-Brooklyn.png"
+              src="/illustrations/Welcome-5--Streamline-Brooklyn.webp"
               alt="A friendly welcome illustration"
+              loading="lazy"
+              decoding="async"
             />
             <span className={styles.successIcon}>
               <IconCheck size={30} />

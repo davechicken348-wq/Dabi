@@ -157,11 +157,11 @@ export default function Owners() {
         </div>
         <div className={styles.ownersHeroArt} aria-hidden="true">
           <img
-            src="/illustrations/Team-Building-3--Streamline-Brooklyn.png"
+            src="/illustrations/Team-Building-3--Streamline-Brooklyn.webp"
             alt=""
             width={124}
             height={124}
-          />
+           loading="lazy" decoding="async" />
         </div>
       </div>
 
@@ -189,7 +189,7 @@ export default function Owners() {
       ) : filtered.length === 0 ? (
         <AdminEmptyState
           variant="empty"
-          illustration="/illustrations/Astronaut-Riding-Doge--Streamline-Brooklyn.png"
+          illustration="/illustrations/Astronaut-Riding-Doge--Streamline-Brooklyn.webp"
           title={query ? "No matches found" : "No owners yet"}
           text={
             query

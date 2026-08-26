@@ -17,6 +17,7 @@ import {
   IconSparkles,
 } from "../../components/Icons/Icons";
 import styles from "./About.module.css";
+import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
 const pillars = [
   {
@@ -184,12 +185,12 @@ export default function About() {
             </div>
 
             <div className={styles.heroVisual}>
-              <img
-                src="/images/welcome_hostel.webp"
+              <ResponsiveImage
+                name="welcome_hostel"
                 alt="A student hostel building near Sunyani Technical University"
                 className={styles.heroPhoto}
-                width={760}
-                height={720}
+                priority
+                transparent
               />
             </div>
           </div>
@@ -219,10 +220,11 @@ export default function About() {
             </Reveal>
 
             <Reveal className={styles.problemVisual} delay={120}>
-              <img
-                src="/images/about_hostel.webp"
+              <ResponsiveImage
+                name="about_hostel"
                 alt="The surroundings students walk through when looking for a hostel"
                 className={styles.problemImg}
+                transparent
               />
             </Reveal>
           </div>
@@ -359,10 +361,12 @@ export default function About() {
             </Reveal>
 
             <Reveal className={styles.manualVisual} delay={120}>
-              <img
-                src="/images/about_hostel2.webp"
+              <ResponsiveImage
+                name="about_hostel3"
                 alt="Dabi helping bring a hostel online for students"
                 className={styles.manualImg}
+                transparent
+                contain
               />
             </Reveal>
           </div>

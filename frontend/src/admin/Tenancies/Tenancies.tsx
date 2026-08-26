@@ -222,11 +222,11 @@ export default function Tenancies() {
         </div>
         <div className={styles.dashHeroArt} aria-hidden="true">
           <img
-            src="/illustrations/Being-Happy-1--Streamline-Brooklyn.png"
+            src="/illustrations/Being-Happy-1--Streamline-Brooklyn.webp"
             alt=""
             width={138}
             height={138}
-          />
+           loading="lazy" decoding="async" />
         </div>
       </section>
 
@@ -326,7 +326,7 @@ export default function Tenancies() {
                   <td colSpan={6}>
                     <AdminEmptyState
                       variant="empty"
-                      illustration="/illustrations/Faq-1--Streamline-Brooklyn.png"
+                      illustration="/illustrations/Faq-1--Streamline-Brooklyn.webp"
                       eyebrow="No tenancies"
                       title="Nothing here yet."
                       text="When a student requests to reserve a room, the pending tenancy will appear here for you to confirm with the owner."

@@ -36,7 +36,7 @@ import {
 
 import styles from "../admin.module.css";
 
-const FALLBACK_IMAGE = "/illustrations/Photography-Fashion--Streamline-Bangalore.png";
+const FALLBACK_IMAGE = "/illustrations/Photography-Fashion--Streamline-Bangalore.webp";
 
 const AVAILABILITY: { id: Availability; label: string; color: string; desc: string }[] = [
   {
@@ -619,10 +619,10 @@ export default function HostelManage() {
                     src={image}
                     alt="Cover"
                     onError={onImgError}
-                  />
+                   loading="lazy" decoding="async" />
                 ) : (
                   <div className={styles.coverFallback}>
-                    <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt} />
+                    <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt}  loading="lazy" decoding="async" />
                     <span>No cover photo yet</span>
                   </div>
                 )}
@@ -687,7 +687,7 @@ export default function HostelManage() {
 
               {photos.length === 0 ? (
                 <div className={styles.galleryEmpty}>
-                  <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt} />
+                  <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt}  loading="lazy" decoding="async" />
                   <span>No photos yet — upload one above to get started.</span>
                 </div>
               ) : (
@@ -705,7 +705,7 @@ export default function HostelManage() {
                             src={src}
                             alt=""
                             onError={onImgError}
-                          />
+                           loading="lazy" decoding="async" />
                           {isCover && (
                             <span className={styles.photoCoverTag}>
                               <IconStar size={11} /> Cover

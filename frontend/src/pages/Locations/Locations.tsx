@@ -137,11 +137,13 @@ export default function Locations() {
                 <img
                   className={styles.emptyArt}
                   src={status === "error"
-                    ? "/illustrations/No-Connection-1--Streamline-Brooklyn.png"
-                    : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.png"}
+                    ? "/illustrations/No-Connection-1--Streamline-Brooklyn.webp"
+                    : "/illustrations/Drafts-Empty-No-Drafts--Streamline-Lagos.webp"}
                   alt=""
                   width={180}
                   height={180}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <h3 className={styles.emptyTitle}>
                   {status === "error" ? "We couldn’t load hostels" : "No hostels listed yet"}

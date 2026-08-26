@@ -21,6 +21,7 @@ export default function HostelGridCard({ hostel }: { hostel: Hostel }) {
           alt={`${hostel.name} in ${hostel.location}`}
           className={styles.image}
           loading="lazy"
+          decoding="async"
           width={400}
           height={300}
         />

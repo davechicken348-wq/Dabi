@@ -96,11 +96,11 @@ export default function Dashboard() {
       <div className={styles.empty}>
         <img
           className={styles.emptyArt}
-          src="/illustrations/Scientist-1--Streamline-Brooklyn.png"
+          src="/illustrations/Scientist-1--Streamline-Brooklyn.webp"
           alt="A scientist studying the dashboard"
           width={168}
           height={168}
-        />
+         loading="lazy" decoding="async" />
         <span className={styles.emptyStrong}>We couldn&rsquo;t load the dashboard</span>
         <p className={styles.emptyText}>{message}</p>
         {!isConnectionError && error && (
@@ -229,11 +229,11 @@ export default function Dashboard() {
         </div>
         <div className={styles.dashHeroArt} aria-hidden="true">
           <img
-            src="/illustrations/Welcome-5--Streamline-Brooklyn.png"
+            src="/illustrations/Welcome-5--Streamline-Brooklyn.webp"
             alt=""
             width={138}
             height={138}
-          />
+           loading="lazy" decoding="async" />
         </div>
       </div>
 
@@ -311,11 +311,11 @@ export default function Dashboard() {
               <div className={styles.emptyPanel}>
                 <div className={styles.emptyPanelArt}>
                   <img
-                    src="/illustrations/I-Have-Question-1--Streamline-Brooklyn.png"
+                    src="/illustrations/I-Have-Question-1--Streamline-Brooklyn.webp"
                     alt="A student with a question"
                     width={88}
                     height={88}
-                  />
+                   loading="lazy" decoding="async" />
                 </div>
                 <h4 className={styles.emptyPanelTitle}>No enquiries yet.</h4>
                 <p className={styles.emptyPanelText}>

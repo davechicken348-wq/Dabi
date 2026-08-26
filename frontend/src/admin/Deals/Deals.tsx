@@ -170,7 +170,7 @@ export default function Deals() {
                   <td colSpan={7}>
                     <AdminEmptyState
                       variant="empty"
-                      illustration="/illustrations/Deal-Failed-1--Streamline-New-York.png"
+                      illustration="/illustrations/Deal-Failed-1--Streamline-New-York.webp"
                       title="No deals yet"
                       text="Promotions and discount codes you create will appear here. Add your first deal when you’re ready."
                       action={{

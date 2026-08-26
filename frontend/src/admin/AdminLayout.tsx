@@ -251,11 +251,11 @@ export default function AdminLayout() {
                       <div className={styles.notifEmpty}>
                         <div className={styles.notifEmptyArt}>
                           <img
-                            src="/illustrations/No-Notifications-1--Streamline-Bruxelles.png"
+                            src="/illustrations/No-Notifications-1--Streamline-Bruxelles.webp"
                             alt="An empty notification tray"
                             width={92}
                             height={92}
-                          />
+                           loading="lazy" decoding="async" />
                         </div>
                         <span className={styles.notifEmptyTitle}>
                           You&rsquo;re all caught up.

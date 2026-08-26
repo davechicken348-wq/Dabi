@@ -16,6 +16,7 @@ import {
   IconCheck,
 } from "../../components/Icons/Icons";
 import styles from "./HowItWorks.module.css";
+import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
 const steps = [
   {
@@ -114,12 +115,11 @@ export default function HowItWorks() {
             </div>
 
             <div className={styles.heroVisual}>
-              <img
-                src="/images/how_it_works1.webp"
+              <ResponsiveImage
+                name="how_it_works1"
                 alt="A student hostel near Sunyani Technical University"
                 className={styles.heroPhoto}
-                width={760}
-                height={720}
+                priority
               />
               <div className={styles.heroCard}>
                 <div className={styles.heroCardTop}>
@@ -287,8 +287,8 @@ export default function HowItWorks() {
             </Reveal>
 
             <Reveal className={styles.manualVisual} delay={120}>
-              <img
-                src="/images/how_it_works2.webp"
+              <ResponsiveImage
+                name="how_it_works2"
                 alt="Dabi helping bring a hostel online for students to discover"
                 className={styles.manualImg}
               />

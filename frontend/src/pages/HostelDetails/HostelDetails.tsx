@@ -192,9 +192,12 @@ export default function HostelDetails() {
         <main className={styles.notFound}>
           <img
             className={styles.notFoundIllustration}
-            src="/illustrations/Page-Not-Found-1--Streamline-New-York.png"
+            src="/illustrations/Page-Not-Found-1--Streamline-New-York.webp"
             alt="Illustration of a missing page"
+            loading="lazy"
+            decoding="async"
           />
+
           <h1>We can&rsquo;t find that hostel</h1>
           <p>
             The listing you&rsquo;re looking for isn&rsquo;t here &mdash; it may have moved, been
@@ -347,8 +350,10 @@ export default function HostelDetails() {
                 <div className={styles.locationHeader}>
                   <img
                     className={styles.locationIllustration}
-                    src="/illustrations/Travel--Streamline-Manchester.png"
+                    src="/illustrations/Travel--Streamline-Manchester.webp"
                     alt="Illustration of travel and directions"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <h2 className={styles.blockTitle}>Where is it?</h2>
                 </div>
@@ -539,8 +544,10 @@ export default function HostelDetails() {
               <div className={styles.successHero}>
                 <img
                   className={styles.successIllustration}
-                  src="/illustrations/Post-It-3--Streamline-Brooklyn.png"
+                  src="/illustrations/Post-It-3--Streamline-Brooklyn.webp"
                   alt="A post-it note illustration"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <span className={styles.successIcon}>
                   <IconCheck size={30} />

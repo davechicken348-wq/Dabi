@@ -62,7 +62,7 @@ export default function Lightbox({ images, index, onClose, onPrev, onNext }: Lig
           <IconChevronLeft size={26} />
         </button>
 
-        <img src={current.src} alt={current.alt} className={styles.lightboxImg} />
+        <img src={current.src} alt={current.alt} className={styles.lightboxImg} decoding="async" />
 
         <button
           type="button"

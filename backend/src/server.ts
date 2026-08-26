@@ -21,6 +21,10 @@ import { clearCache } from "./utils/cache";
 // /api requires a valid admin token.
 const PUBLIC_GET = [/^\/hostels(\/[^/]+)?$/, /^\/facilities(\/[^/]+)?$/];
 
+// Public mutations that don't need an admin token — the enquiry form on the
+// public site is a lead-capture flow, so anonymous visitors must be able to POST.
+const PUBLIC_POST = [/^\/enquiries$/];
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.resolve(__dirname, "../uploads");
 
@@ -44,6 +48,9 @@ app.use("/uploads", express.static(uploadDir));
 app.use("/api", (req, res, next) => {
   if (req.path.startsWith("/auth")) return next();
   if (req.method === "GET" && PUBLIC_GET.some((re) => re.test(req.path))) {
+    return next();
+  }
+  if (req.method === "POST" && PUBLIC_POST.some((re) => re.test(req.path))) {
     return next();
   }
   if (req.method !== "GET") {

@@ -3756,6 +3756,34 @@
   margin: 0;
 }
 
+.uploadProgress {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--adm-green-700, #176b4d);
+  font-weight: 600;
+}
+
+.uploadProgress svg {
+  color: var(--adm-green);
+}
+
+/* Shimmer placeholder shown over an image until it has painted */
+.imgSkeleton {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: linear-gradient(
+    100deg,
+    var(--adm-green-tint, #e7f1ec) 30%,
+    rgba(255, 255, 255, 0.65) 50%,
+    var(--adm-green-tint, #e7f1ec) 70%
+  );
+  background-size: 200% 100%;
+  animation: adm-shimmer 1.3s ease-in-out infinite;
+  border-radius: inherit;
+}
+
 .galleryEmpty {
   display: flex;
   flex-direction: column;

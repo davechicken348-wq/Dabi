@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type CSSProperties, type FormEvent, type ReactEventHandler } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   fetchHostel,
@@ -27,6 +27,7 @@ import {
   IconUser,
   IconEye,
   IconUpload,
+  IconRefresh,
   IconSparkles,
   IconPhone,
   IconMail,
@@ -157,6 +158,8 @@ export default function HostelManage() {
   const [allHostels, setAllHostels] = useState<AdminHostel[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
   const suggestedPrice = useMemo(() => {
@@ -303,6 +306,40 @@ export default function HostelManage() {
     e.currentTarget.src = FALLBACK_IMAGE;
   }
 
+  // Renders an image with a shimmer placeholder until it has painted, so the
+  // user gets feedback while the (often large) uploaded photo loads back.
+  function LoadableImage({
+    src,
+    alt,
+    className,
+    onError,
+  }: {
+    src: string;
+    alt: string;
+    className?: string;
+    onError?: ReactEventHandler<HTMLImageElement>;
+  }) {
+    const [loaded, setLoaded] = useState(false);
+    return (
+      <>
+        {!loaded && <span className={styles.imgSkeleton} aria-hidden="true" />}
+        <img
+          src={src}
+          alt={alt}
+          className={className}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={(e) => {
+            setLoaded(true);
+            onError?.(e);
+          }}
+          style={loaded ? undefined : { opacity: 0 }}
+        />
+      </>
+    );
+  }
+
   async function handleFiles(fileList: FileList | null) {
     const files = fileList
       ? Array.from(fileList).filter((f) => f.type.startsWith("image/"))
@@ -332,7 +369,7 @@ export default function HostelManage() {
     e.target.value = "";
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const input: HostelInput = {
       name: name.trim(),
@@ -356,8 +393,20 @@ export default function HostelManage() {
     if (lat != null && lng != null) {
       input.distanceFromSTU = haversineKm(STU_COORDS[0], STU_COORDS[1], lat, lng);
     }
-    const done = id ? updateHostel(id, input) : createHostel(input);
-    done.then(() => navigate("/admin/hostels"));
+    if (saving) return;
+    setSaveError(null);
+    setSaving(true);
+    try {
+      if (id) {
+        await updateHostel(id, input);
+      } else {
+        await createHostel(input);
+      }
+      navigate("/admin/hostels");
+    } catch (err) {
+      setSaving(false);
+      setSaveError(err instanceof Error ? err.message : "Could not save the hostel");
+    }
   }
 
   const owner = owners.find((o) => o.id === ownerId);
@@ -407,12 +456,22 @@ export default function HostelManage() {
           {isEdit && (
             <Badge variant={availability}>{availability}</Badge>
           )}
-          <button type="submit" form="hostel-form" className={`dabi-btn dabi-btn-primary ${styles.btnPrimary}`}>
-            <IconCheck size={16} />
-            {isEdit ? "Save changes" : "Publish hostel"}
+          <button
+            type="submit"
+            form="hostel-form"
+            className={`dabi-btn dabi-btn-primary ${styles.btnPrimary}`}
+            disabled={saving}
+          >
+            {saving ? (
+              <IconRefresh size={16} className={styles.liveSpin} />
+            ) : (
+              <IconCheck size={16} />
+            )}
+            {saving ? (isEdit ? "Saving…" : "Publishing…") : isEdit ? "Save changes" : "Publish hostel"}
           </button>
         </div>
       </div>
+      {saveError && <p className={styles.error}>{saveError}</p>}
 
       <div className={styles.tabs} role="tablist">
         {TABS.map((t) => {
@@ -617,12 +676,12 @@ export default function HostelManage() {
               </div>
               <div className={styles.coverPreview}>
                 {image ? (
-                  <img
+                  <LoadableImage
                     className={styles.coverImg}
                     src={image}
                     alt="Cover"
                     onError={onImgError}
-                   loading="lazy" decoding="async" />
+                  />
                 ) : (
                   <div className={styles.coverFallback}>
                     <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt}  loading="lazy" decoding="async" />
@@ -685,7 +744,12 @@ export default function HostelManage() {
                   disabled={uploading}
                 />
               </label>
-              {uploading && <p className={styles.uploadHint}>Uploading photos…</p>}
+              {uploading && (
+                <p className={`${styles.uploadHint} ${styles.uploadProgress}`}>
+                  <IconRefresh size={15} className={styles.liveSpin} />
+                  Uploading photos… this can take a moment for large files.
+                </p>
+              )}
               {uploadError && <p className={styles.error}>{uploadError}</p>}
 
               {photos.length === 0 ? (
@@ -703,12 +767,12 @@ export default function HostelManage() {
                         className={`${styles.photoCard} ${isCover ? styles.photoCardCover : ""}`}
                       >
                         <div className={styles.photoMedia}>
-                          <img
+                          <LoadableImage
                             className={styles.photoThumb}
                             src={src}
                             alt=""
                             onError={onImgError}
-                           loading="lazy" decoding="async" />
+                          />
                           {isCover && (
                             <span className={styles.photoCoverTag}>
                               <IconStar size={11} /> Cover

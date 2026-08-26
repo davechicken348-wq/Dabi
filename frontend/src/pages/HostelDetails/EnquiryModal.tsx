@@ -40,8 +40,18 @@ export default function EnquiryModal({ hostelId, hostelName, roomTypes, onClose 
   const [submittedRoom, setSubmittedRoom] = useState<RoomType | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [moveIn, setMoveIn] = useState("");
+  const [moveInError, setMoveInError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const firstField = useRef<HTMLInputElement>(null);
+
+  const minMoveIn = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }, []);
 
   useEffect(() => {
     firstField.current?.focus();
@@ -71,6 +81,12 @@ export default function EnquiryModal({ hostelId, hostelName, roomTypes, onClose 
     if (!form) return;
     const data = new FormData(form);
     const room = selectedRoom();
+    const moveInValue = String(data.get("moveIn") ?? "");
+    if (moveInValue && moveInValue < minMoveIn) {
+      setMoveInError("Please choose today or a later date.");
+      setSubmitting(false);
+      return;
+    }
     setSubmitting(true);
     setError(null);
     createEnquiry({
@@ -80,7 +96,7 @@ export default function EnquiryModal({ hostelId, hostelName, roomTypes, onClose 
       hostelId,
       hostelName,
       roomType: room?.name,
-      moveInDate: data.get("moveIn") ? String(data.get("moveIn")) : undefined,
+      moveInDate: moveInValue || undefined,
       message: data.get("message") ? String(data.get("message")) : undefined,
     })
       .then(() => {
@@ -227,10 +243,34 @@ export default function EnquiryModal({ hostelId, hostelName, roomTypes, onClose 
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="enq-date">
-              <IconCalendar size={15} /> Preferred move-in date
-            </label>
-            <input id="enq-date" name="moveIn" type="date" />
+            <label htmlFor="enq-date">Preferred move-in date</label>
+            <div className={styles.dateWrap}>
+              <input
+                id="enq-date"
+                name="moveIn"
+                type="date"
+                min={minMoveIn}
+                value={moveIn}
+                onChange={(e) => {
+                  setMoveIn(e.target.value);
+                  if (moveInError) setMoveInError(null);
+                }}
+                aria-invalid={moveInError ? "true" : undefined}
+                aria-describedby={moveInError ? "enq-date-error" : undefined}
+                className={styles.dateInput}
+              />
+              <span className={styles.dateIcon} aria-hidden="true">
+                <IconCalendar size={18} />
+              </span>
+            </div>
+            <span className={styles.dateHint}>
+              Earliest: {new Date(`${minMoveIn}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+            {moveInError && (
+              <p id="enq-date-error" className={styles.fieldError}>
+                {moveInError}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>

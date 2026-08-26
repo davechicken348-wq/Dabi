@@ -221,11 +221,17 @@ export async function uploadHostelImage(
   const form = new FormData();
   form.append("image", file);
   if (hostelId) form.append("hostelId", hostelId);
+  // The upload route requires admin auth like every other mutating endpoint,
+  // so the token must be attached (other calls go through apiSend/apiFetch).
+  const token = load<string | null>("token", null);
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api/upload`, {
       method: "POST",
       body: form,
+      headers,
     });
   } catch {
     throw new ApiError(0, "Could not reach the server. Is the backend running?");

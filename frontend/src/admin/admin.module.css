@@ -3724,6 +3724,54 @@
   width: min(390px, 100%);
 }
 
+.welcomeMsg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 18px;
+  animation: welcomeIn 0.5s var(--adm-ease) both;
+}
+
+.welcomeWave {
+  font-family: var(--font-brand);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--adm-green-700);
+  text-transform: uppercase;
+}
+
+.welcomeSub {
+  font-size: 0.85rem;
+  color: var(--adm-muted);
+}
+
+@keyframes welcomeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .loginCard h2 {
   font-family: var(--font-admin);
   font-size: 1.6rem;

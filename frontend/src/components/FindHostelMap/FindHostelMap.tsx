@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Hostel } from "../../data/hostels";
-import { areaCoords, haversineKm } from "../../data/geo";
+import { areaCoords, matchArea, nearestArea } from "../../data/geo";
 import { useSchool } from "../../context/SchoolContext";
 import { IconDirections } from "../Icons/Icons";
 import styles from "./FindHostelMap.module.css";
 
-function pinIcon(color: string): L.DivIcon {
+function schoolIcon(): L.DivIcon {
   const svg = `<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17 2C9 2 3 8 3 16c0 10 14 26 14 26s14-16 14-26C31 8 25 2 17 2z" fill="${color}" stroke="#ffffff" stroke-width="2"/>
+    <path d="M17 2C9 2 3 8 3 16c0 10 14 26 14 26s14-16 14-26C31 8 25 2 17 2z" fill="#176b4d" stroke="#ffffff" stroke-width="2"/>
     <circle cx="17" cy="16" r="6" fill="#ffffff"/>
   </svg>`;
   return L.divIcon({
@@ -22,20 +22,37 @@ function pinIcon(color: string): L.DivIcon {
   });
 }
 
-const SCHOOL_ICON = pinIcon("#176b4d");
-const HOSTEL_ICON = pinIcon("#e9b949");
+const SCHOOL_ICON = schoolIcon();
+
+// Structured, styled popup content for the school marker. The outer class is
+// passed to Leaflet so the module CSS can target it; the inner markup carries
+// the school name and a "Your school" tag.
+function schoolPopupHtml(name: string): string {
+  return `<div class="${styles.schoolPopupInner}">
+    <div class="${styles.schoolPopupName}">${name}</div>
+    <div class="${styles.schoolPopupTag}">Your school</div>
+  </div>`;
+}
+
+// Bubble marker showing how many hostels are in an area. Clicking it opens that
+// area's hostel list in the page's side panel (handled by `onAreaSelect`).
+function areaIcon(count: number): L.DivIcon {
+  return L.divIcon({
+    html: `<div class="${styles.areaBubble}">${count}</div>`,
+    className: "",
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+  });
+}
 
 interface Props {
   hostels: Hostel[];
+  big?: boolean;
+  fill?: boolean;
+  onAreaSelect?: (area: string, hostels: Hostel[]) => void;
 }
 
-function resolveCoords(h: Hostel): [number, number] | null {
-  const lat = h.lat ?? areaCoords(h.location)?.[0];
-  const lng = h.lng ?? areaCoords(h.location)?.[1];
-  return lat != null && lng != null ? [lat, lng] : null;
-}
-
-export default function FindHostelMap({ hostels }: Props) {
+export default function FindHostelMap({ hostels, big = false, fill = false, onAreaSelect }: Props) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const groupRef = useRef<L.LayerGroup | null>(null);
@@ -61,15 +78,30 @@ export default function FindHostelMap({ hostels }: Props) {
     const group = L.layerGroup().addTo(map);
     const schoolMarker = L.marker([school.lat, school.lng], { icon: SCHOOL_ICON })
       .addTo(map)
-      .bindPopup(`<strong>${school.name}</strong><br>Your school`);
+      .bindPopup(schoolPopupHtml(school.name), {
+        className: styles.schoolPopup,
+        closeButton: false,
+      });
 
     groupRef.current = group;
     schoolMarkerRef.current = schoolMarker;
     mapRef.current = map;
     setState("ready");
-    setTimeout(() => map.invalidateSize(), 200);
+
+    // Leaflet measures its container once at init; if the box is still settling
+    // (e.g. the full-screen fixed parent or the dynamic mobile viewport), the
+    // tiles only fill part of it. Keep correcting the size as the container
+    // changes so the map always fills its box.
+    const syncSize = () => map.invalidateSize();
+    const raf = requestAnimationFrame(syncSize);
+    const timer = setTimeout(syncSize, 200);
+    const ro = new ResizeObserver(syncSize);
+    if (elRef.current) ro.observe(elRef.current);
 
     return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      ro.disconnect();
       map.remove();
       mapRef.current = null;
       groupRef.current = null;
@@ -79,77 +111,83 @@ export default function FindHostelMap({ hostels }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-plot hostels (and the school pin) whenever the list or school changes.
+  // Re-plot hostels as one marker per area (count bubble). Clicking a marker
+  // opens that area's hostel list in the page's side panel. The precise door
+  // coordinates are never plotted.
   useEffect(() => {
     const map = mapRef.current;
     const group = groupRef.current;
     if (!map || !group) return;
 
+    map.invalidateSize();
+
     if (schoolMarkerRef.current) {
       schoolMarkerRef.current.setLatLng([school.lat, school.lng]);
-      schoolMarkerRef.current.setPopupContent(
-        `<strong>${school.name}</strong><br>Your school`,
-      );
+      schoolMarkerRef.current.setPopupContent(schoolPopupHtml(school.name));
     }
 
     group.clearLayers();
     const points: [number, number][] = [[school.lat, school.lng]];
 
-    hostels.forEach((h) => {
-      const coord = resolveCoords(h);
+    // Group hostels into areas using their exact pinned coordinates, so each
+    // hostel lands in the area it actually sits in (the same source of truth as
+    // the add-hostel form). Falls back to name matching only for hostels that
+    // have no coordinates yet.
+    const byArea = new Map<string, Hostel[]>();
+    for (const h of hostels) {
+      const ckey =
+        typeof h.lat === "number" && typeof h.lng === "number"
+          ? nearestArea(h.lat, h.lng)
+          : matchArea(h.location);
+      if (!ckey) continue;
+      const list = byArea.get(ckey) ?? [];
+      list.push(h);
+      byArea.set(ckey, list);
+    }
+
+    byArea.forEach((list, ckey) => {
+      // Position the area bubble at the real coordinates of its hostels — the
+      // exact pin dropped in the add-hostel form (latitude/longitude). When an
+      // area has several hostels we average their coordinates so the bubble sits
+      // where the hostels actually are. Falls back to the canonical area
+      // centroid only when no hostel carries coordinates yet.
+      const coords = list
+        .map((h) =>
+          typeof h.lat === "number" && typeof h.lng === "number"
+            ? ([h.lat, h.lng] as [number, number])
+            : null,
+        )
+        .filter((c): c is [number, number] => c !== null);
+
+      let coord: [number, number] | null = null;
+      if (coords.length > 0) {
+        const sum = coords.reduce(
+          (acc, c) => [acc[0] + c[0], acc[1] + c[1]] as [number, number],
+          [0, 0] as [number, number],
+        );
+        coord = [sum[0] / coords.length, sum[1] / coords.length];
+      } else {
+        coord = areaCoords(ckey);
+      }
       if (!coord) return;
       points.push(coord);
 
-      const distance = haversineKm(coord[0], coord[1], school.lat, school.lng);
-      const price = h.pricePerYear.toLocaleString("en-GH");
-      const cover = h.photos?.[0] ?? h.image;
-      const statusClass =
-        h.availability === "Available"
-          ? styles.popupStatusAvailable
-          : h.availability === "Limited"
-            ? styles.popupStatusLimited
-            : styles.popupStatusFull;
-
-      const marker = L.marker(coord, {
-        icon: HOSTEL_ICON,
-      }).bindPopup(
-        `<div class="${styles.popup}">
-           <div class="${styles.popupMedia}">
-             <img src="${cover}" alt="${h.name}" class="${styles.popupImage}" />
-             <span class="${styles.popupStatus} ${statusClass}">${h.availability}</span>
-             ${h.verified ? `<span class="${styles.popupVerified}">✓ Verified</span>` : ""}
-           </div>
-           <div class="${styles.popupBody}">
-             <strong class="${styles.popupName}">${h.name}</strong>
-             <span class="${styles.popupMeta}">${h.location}</span>
-              <span class="${styles.popupMeta}">GH₵ ${price} / year</span>
-             <span class="${styles.popupDist}">${distance.toFixed(1)} km from ${school.short} (straight line)</span>
-             <a class="${styles.popupLink}" href="/hostel/${h.id}">View details</a>
-           </div>
-          </div>`,
-        { maxWidth: 268, minWidth: 240, autoPanPadding: [40, 40] },
-      );
-
-      marker.on("popupopen", (e) => {
-        const link = e.popup.getElement()?.querySelector("a");
-        link?.addEventListener("click", (ev) => {
-          ev.preventDefault();
-          navigate(`/hostel/${h.id}`);
-        });
+      const marker = L.marker(coord, { icon: areaIcon(list.length) }).on("click", () => {
+        onAreaSelect?.(ckey, list);
       });
 
       marker.addTo(group);
     });
 
     if (points.length > 1) {
-      map.fitBounds(L.latLngBounds(points), { padding: [50, 50], maxZoom: 15 });
+      map.fitBounds(L.latLngBounds(points), { padding: [50, 50], maxZoom: 14 });
     } else {
       map.setView([school.lat, school.lng], 13);
     }
-  }, [hostels, school, navigate]);
+  }, [hostels, school, navigate, onAreaSelect]);
 
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap} ${big ? styles.big : ""} ${fill ? styles.fill : ""}`}>
       <div ref={elRef} className={styles.canvas} />
       {state === "loading" && (
         <div className={styles.loadingOverlay}>

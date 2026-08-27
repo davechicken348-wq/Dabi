@@ -386,12 +386,6 @@ export default function HostelDetails() {
                   </div>
                   <div className={styles.locationCard}>
                     <span className={styles.locationLabel}>
-                      <IconPin size={14} /> Town
-                    </span>
-                    <span className={styles.locationValue}>{detail.location}</span>
-                  </div>
-                  <div className={styles.locationCard}>
-                    <span className={styles.locationLabel}>
                       <IconMap size={14} /> From {school.short}
                     </span>
                     <span className={styles.locationValue}>{fromSchoolLabel}</span>

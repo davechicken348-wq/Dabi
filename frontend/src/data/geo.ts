@@ -88,7 +88,7 @@ export function hostelDistanceKm(
 // Approximate coordinates for the areas students stay in around Sunyani.
 // Used as a fallback when a hostel listing has no precise lat/lng yet.
 export const AREA_COORDS: Record<string, [number, number]> = {
-  "around-stu": [7.345, -2.317],
+  "around-stu": [7.3201, -2.3175],
   fiapre: [7.3667, -2.35],
   "new-dormaa": [7.318, -2.272],
   abesim: [7.3167, -2.25],
@@ -103,7 +103,7 @@ export const AREA_COORDS: Record<string, [number, number]> = {
   "dormaa-ahenkro": [7.2833, -2.45],
 };
 
-const AREA_ALIASES: Record<string, string> = {
+export const AREA_ALIASES: Record<string, string> = {
   "around stu": "around-stu",
   fiapre: "fiapre",
   "new dormaa": "new-dormaa",
@@ -126,8 +126,92 @@ export function areaCoords(area: string): [number, number] | null {
   return key ? AREA_COORDS[key] : null;
 }
 
+// Friendly labels for the known areas, for use in dropdowns (e.g. the admin
+// "add hostel" form). The `value` is the canonical area key.
+export const AREA_OPTIONS: { value: string; label: string }[] = Object.keys(AREA_COORDS).map(
+  (k) => ({
+    value: k,
+    label: k.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+  }),
+);
+
+// Deterministic pseudo-random in [-1, 1) from a string seed (FNV-1a hash).
+function hashUnit(seed: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 0xffffffff * 2 - 1;
+}
+
+// Spread coordinates by a small, stable offset (±~280 m) so multiple hostels
+// in the same area don't stack on one point, while always staying within the
+// area — never revealing the exact door.
+export function spreadCoords(
+  base: [number, number],
+  seed: string,
+): [number, number] {
+  return [
+    base[0] + 0.0025 * hashUnit(seed + "lat"),
+    base[1] + 0.0025 * hashUnit(seed + "lng"),
+  ];
+}
+
+// Public-facing pin for a hostel: the area centroid plus a stable spread. This
+// deliberately ignores the precise `latitude`/`longitude` (the agent's private
+// door coordinate) so students see the area, not the exact building.
+export function hostelPublicCoords(h: {
+  id?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+}): [number, number] | null {
+  const area = h.location ? areaCoords(h.location) : null;
+  if (area) return spreadCoords(area, h.id ?? h.location ?? "");
+  if (typeof h.latitude === "number" && typeof h.longitude === "number") {
+    return [h.latitude, h.longitude];
+  }
+  return null;
+}
+
 // Authoritative coordinates for the towns around Sunyani. This is the single
 // source of truth for town pins, distance lookups, and coordinate validation.
+
+// Map a free-text place name (e.g. a suburb from a reverse-geocode result) to
+// a canonical area key. Tries exact aliases, then label equality, then a
+// contains match in either direction. Returns `null` when nothing fits.
+export function matchArea(text: string | undefined | null): string | null {
+  if (!text) return null;
+  const norm = text.trim().toLowerCase();
+  if (!norm) return null;
+  if (AREA_ALIASES[norm]) return AREA_ALIASES[norm];
+  const byLabel = AREA_OPTIONS.find((o) => o.label.toLowerCase() === norm);
+  if (byLabel) return byLabel.value;
+  for (const [alias, key] of Object.entries(AREA_ALIASES)) {
+    if (norm.includes(alias) || alias.includes(norm)) return key;
+  }
+  for (const o of AREA_OPTIONS) {
+    const l = o.label.toLowerCase();
+    if (norm.includes(l) || l.includes(norm)) return o.value;
+  }
+  return null;
+}
+
+// Nearest known area to a coordinate (great-circle distance). Returns the
+// canonical area key, or `null` if none are close enough / none exist.
+export function nearestArea(lat: number, lng: number): string | null {
+  let best: string | null = null;
+  let bestKm = Infinity;
+  for (const [key, coord] of Object.entries(AREA_COORDS)) {
+    const d = haversineKm(lat, lng, coord[0], coord[1]);
+    if (d < bestKm) {
+      bestKm = d;
+      best = key;
+    }
+  }
+  return bestKm <= 8 ? best : null;
+}
 export interface Town {
   id: string;
   name: string;

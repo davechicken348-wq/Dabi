@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import HostelCard from "../../components/HostelCard/HostelGridCard";
@@ -9,6 +10,7 @@ import {
   IconList,
   IconClose,
   IconChevronDown,
+  IconSearch,
 } from "../../components/Icons/Icons";
 import type { Hostel } from "../../data/hostels";
 import { fetchHostels } from "../../services/api";
@@ -31,6 +33,12 @@ import FindHostelMap from "../../components/FindHostelMap/FindHostelMap";
 import EmptyState from "./EmptyState";
 import HostelSkeleton from "./HostelSkeleton";
 import styles from "./FindHostel.module.css";
+
+function areaLabel(key: string): string {
+  return key
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 const PAGE_SIZE = 6;
 
@@ -233,13 +241,25 @@ function LocationSearch({
 }
 
 export default function FindHostel() {
+  const [searchParams] = useSearchParams();
+
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState("recommended");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">(
+    searchParams.get("view") === "map" ? "map" : "list",
+  );
   const [hostels, setHostels] = useState<Hostel[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  // When an area bubble is clicked on the map, hold that area's hostels so the
+  // side drawer shows them as a list (instead of the filter controls).
+  const [areaHostels, setAreaHostels] = useState<{ area: string; hostels: Hostel[] } | null>(null);
+
+  const handleAreaSelect = useCallback((area: string, hs: Hostel[]) => {
+    setAreaHostels({ area, hostels: hs });
+  }, []);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const { school } = useSchool();
   const { label: facilityLabel } = useFacilities();
@@ -341,224 +361,348 @@ export default function FindHostel() {
     runSearch(DEFAULT_FILTERS);
   };
 
+  const searchBarEl = (
+    <section className={styles.searchBar} aria-label="Search hostels">
+      <div className={styles.searchFields}>
+        {view === "map" && (
+          <div className={styles.field}>
+            <label htmlFor="f-dist" className={styles.label}>
+              <IconMap size={16} className={styles.fieldIcon} /> Distance from STU
+            </label>
+            <select
+              id="f-dist"
+              className={styles.control}
+              value={filters.distance}
+              onChange={(e) => patch({ distance: e.target.value })}
+            >
+              {DISTANCE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div className={`${styles.field} ${styles.fieldGrow}`}>
+          <label htmlFor="f-loc" className={styles.label}>
+            <IconPin size={16} className={styles.fieldIcon} /> Location
+          </label>
+          <LocationSearch
+            value={filters.location}
+            suggestions={locationSuggestions}
+            onChange={(v) => patch({ location: v })}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="f-budget" className={styles.label}>
+            Budget
+          </label>
+          <select
+            id="f-budget"
+            className={styles.control}
+            value={filters.budget}
+            onChange={(e) => patch({ budget: e.target.value })}
+          >
+            {BUDGET_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="f-room" className={styles.label}>
+            <IconList size={16} className={styles.fieldIcon} /> Room type
+          </label>
+          <select
+            id="f-room"
+            className={styles.control}
+            value={filters.roomType}
+            onChange={(e) => patch({ roomType: e.target.value })}
+          >
+            {ROOM_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </section>
+  );
+
+  const filterButtonEl = (
+    <button
+      type="button"
+      className={`${styles.filterBtn} ${advancedActive > 0 ? styles.filterBtnActive : ""}`}
+      onClick={() => setModalOpen(true)}
+    >
+      <IconSliders size={18} /> More filters
+      {advancedActive > 0 && <span className={styles.filterCount}>{advancedActive}</span>}
+    </button>
+  );
+
+  const chipsEl =
+    chips.length > 0 ? (
+      <div className={styles.chips}>
+        {chips.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className={styles.chip}
+            onClick={c.onClear}
+          >
+            {c.label}
+            <IconClose size={14} className={styles.chipX} />
+          </button>
+        ))}
+      </div>
+    ) : null;
+
+  const viewToggleEl = (
+    <div className={styles.viewToggle} role="group" aria-label="Switch between list and map">
+      <button
+        type="button"
+        className={`${styles.viewBtn} ${view === "list" ? styles.viewBtnActive : ""}`}
+        aria-pressed={view === "list"}
+        onClick={() => setView("list")}
+      >
+        <IconList size={18} />
+        <span className={styles.viewLabel}>List</span>
+      </button>
+      <button
+        type="button"
+        className={`${styles.viewBtn} ${view === "map" ? styles.viewBtnActive : ""}`}
+        aria-pressed={view === "map"}
+        onClick={() => setView("map")}
+      >
+        <IconMap size={18} />
+        <span className={styles.viewLabel}>Map</span>
+      </button>
+    </div>
+  );
+
+  const toolbarEl = (
+    <div className={styles.toolbar}>
+      <div className={styles.toolbarLeft}>
+        {filterButtonEl}
+        {chipsEl}
+      </div>
+      {viewToggleEl}
+    </div>
+  );
+
   return (
     <>
       <Navbar />
-      <main className={styles.page}>
-        <div className="dabi-container">
-          <header className={styles.header}>
-            <span className="dabi-eyebrow">Find a Hostel</span>
-            <h1 className={styles.title}>Find your next place.</h1>
-            <p className={styles.subtitle}>
-              Explore hostels around STU and find one that fits your location, budget and needs.
-            </p>
-          </header>
+      {view === "map" ? (
+        <div className={styles.mapMode}>
+          <FindHostelMap hostels={results} fill onAreaSelect={handleAreaSelect} />
 
-          <section className={styles.searchBar} aria-label="Search hostels">
-            <div className={styles.searchFields}>
-              {view === "map" && (
-                <div className={styles.field}>
-                  <label htmlFor="f-dist" className={styles.label}>
-                    <IconMap size={16} className={styles.fieldIcon} /> Distance from STU
-                  </label>
-                  <select
-                    id="f-dist"
-                    className={styles.control}
-                    value={filters.distance}
-                    onChange={(e) => patch({ distance: e.target.value })}
+          <div className={styles.mapOverlay}>
+            <div className="dabi-container">
+              <div className={styles.mapTop}>
+                <button
+                  type="button"
+                  className={styles.searchPill}
+                  onClick={() => setPanelOpen(true)}
+                  aria-label="Open filters"
+                >
+                  <IconSearch size={18} className={styles.pillIcon} />
+                  <span className={styles.pillText}>
+                    {filters.location === "any" ? "Search area, budget…" : filters.location}
+                  </span>
+                  <span className={styles.pillCount}>
+                    {results.length} {results.length === 1 ? "place" : "places"}
+                  </span>
+                </button>
+                {viewToggleEl}
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`${styles.drawer} ${(panelOpen || areaHostels) ? styles.drawerOpen : ""}`}
+            aria-hidden={!(panelOpen || areaHostels)}
+          >
+            {areaHostels ? (
+              <div className={styles.drawerInner}>
+                <div className={styles.drawerHead}>
+                  <h2 className={styles.drawerTitle}>
+                    {areaLabel(areaHostels.area)}
+                    <span className={styles.drawerCount}>{areaHostels.hostels.length}</span>
+                  </h2>
+                  <button
+                    type="button"
+                    className={styles.drawerClose}
+                    onClick={() => setAreaHostels(null)}
+                    aria-label="Close area list"
                   >
-                    {DISTANCE_OPTIONS.map((o) => (
+                    <IconClose size={18} />
+                  </button>
+                </div>
+                <div className={styles.areaList}>
+                  {areaHostels.hostels.map((h) => (
+                    <Link
+                      key={h.id}
+                      to={`/hostel/${h.id}`}
+                      className={styles.areaCard}
+                      onClick={() => setAreaHostels(null)}
+                    >
+                      <img
+                        src={h.photos?.[0] ?? h.image}
+                        alt={h.name}
+                        className={styles.areaCardImg}
+                        loading="lazy"
+                      />
+                      <div className={styles.areaCardBody}>
+                        <div className={styles.areaCardName}>{h.name}</div>
+                        <div className={styles.areaCardMeta}>
+                          GH₵ {h.pricePerYear.toLocaleString("en-GH")} / yr
+                        </div>
+                        <div className={styles.areaCardSub}>
+                          {h.location}
+                          {h.verified ? " · ✓ Verified" : ""}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.drawerInner}>
+                <div className={styles.drawerHead}>
+                  <h2 className={styles.drawerTitle}>Filters</h2>
+                  <button
+                    type="button"
+                    className={styles.drawerClose}
+                    onClick={() => setPanelOpen(false)}
+                    aria-label="Close filters"
+                  >
+                    <IconClose size={18} />
+                  </button>
+                </div>
+                {searchBarEl}
+                <div className={styles.drawerTools}>
+                  {filterButtonEl}
+                  {chipsEl}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {(panelOpen || areaHostels) && (
+            <button
+              type="button"
+              className={styles.drawerScrim}
+              aria-label="Close"
+              onClick={() => {
+                setPanelOpen(false);
+                setAreaHostels(null);
+              }}
+            />
+          )}
+        </div>
+      ) : (
+        <main className={styles.page}>
+          <div className="dabi-container">
+            <header className={styles.header}>
+              <span className="dabi-eyebrow">Find a Hostel</span>
+              <h1 className={styles.title}>Find your next place.</h1>
+              <p className={styles.subtitle}>
+                Explore hostels around STU and find one that fits your location, budget and needs.
+              </p>
+            </header>
+
+            {searchBarEl}
+            {toolbarEl}
+
+            <section className={styles.resultsHead} aria-live="polite">
+              <div className={styles.resultsIntro}>
+                <span className={styles.resultsBadge}>
+                  <IconPin size={15} className={styles.resultsBadgeIcon} />
+                  {status === "loading"
+                    ? "Searching…"
+                    : `${results.length} ${results.length === 1 ? "place" : "places"}`}
+                </span>
+                <h2 className={styles.resultsTitle}>Places worth checking out.</h2>
+                <p className={styles.resultsCount}>
+                  {status === "loading"
+                    ? "Looking for hostels near campus…"
+                    : "Hand-picked stays around STU, sorted by what fits you best."}
+                </p>
+              </div>
+
+              <div className={styles.resultsTools}>
+                <LiveControls
+                  lastUpdated={lastUpdated}
+                  loading={status === "loading"}
+                  onRefresh={() => loadHostels()}
+                  dark
+                />
+
+                <div className={styles.sortWrap}>
+                <label htmlFor="sort" className={styles.sortLabel}>
+                  Sort by
+                </label>
+                <div className={styles.selectShell}>
+                  <select
+                    id="sort"
+                    className={styles.sortSelect}
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                  >
+                    {SORT_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
                         {o.label}
                       </option>
                     ))}
                   </select>
+                  <IconChevronDown size={16} className={styles.selectChevron} />
                 </div>
-              )}
-
-              <div className={`${styles.field} ${styles.fieldGrow}`}>
-                <label htmlFor="f-loc" className={styles.label}>
-                  <IconPin size={16} className={styles.fieldIcon} /> Location
-                </label>
-                <LocationSearch
-                  value={filters.location}
-                  suggestions={locationSuggestions}
-                  onChange={(v) => patch({ location: v })}
-                />
-              </div>
-
-              <div className={styles.field}>
-                <label htmlFor="f-budget" className={styles.label}>
-                  Budget
-                </label>
-                <select
-                  id="f-budget"
-                  className={styles.control}
-                  value={filters.budget}
-                  onChange={(e) => patch({ budget: e.target.value })}
-                >
-                  {BUDGET_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.field}>
-                <label htmlFor="f-room" className={styles.label}>
-                  <IconList size={16} className={styles.fieldIcon} /> Room type
-                </label>
-                <select
-                  id="f-room"
-                  className={styles.control}
-                  value={filters.roomType}
-                  onChange={(e) => patch({ roomType: e.target.value })}
-                >
-                  {ROOM_TYPE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <div className={styles.toolbar}>
-            <div className={styles.toolbarLeft}>
-              <button
-                type="button"
-                className={`${styles.filterBtn} ${advancedActive > 0 ? styles.filterBtnActive : ""}`}
-                onClick={() => setModalOpen(true)}
-              >
-                <IconSliders size={18} /> More filters
-                {advancedActive > 0 && <span className={styles.filterCount}>{advancedActive}</span>}
-              </button>
-
-              {chips.length > 0 && (
-                <div className={styles.chips}>
-                  {chips.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      className={styles.chip}
-                      onClick={c.onClear}
-                    >
-                      {c.label}
-                      <IconClose size={14} className={styles.chipX} />
-                    </button>
-                  ))}
                 </div>
-              )}
-            </div>
-
-            <div className={styles.viewToggle} role="group" aria-label="Switch between list and map">
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === "list" ? styles.viewBtnActive : ""}`}
-                aria-pressed={view === "list"}
-                onClick={() => setView("list")}
-              >
-                <IconList size={18} />
-                <span className={styles.viewLabel}>List</span>
-              </button>
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === "map" ? styles.viewBtnActive : ""}`}
-                aria-pressed={view === "map"}
-                onClick={() => setView("map")}
-              >
-                <IconMap size={18} />
-                <span className={styles.viewLabel}>Map</span>
-              </button>
-            </div>
-          </div>
-
-          <section className={styles.resultsHead} aria-live="polite">
-            <div className={styles.resultsIntro}>
-              <span className={styles.resultsBadge}>
-                <IconPin size={15} className={styles.resultsBadgeIcon} />
-                {status === "loading"
-                  ? "Searching…"
-                  : `${results.length} ${results.length === 1 ? "place" : "places"}`}
-              </span>
-              <h2 className={styles.resultsTitle}>Places worth checking out.</h2>
-              <p className={styles.resultsCount}>
-                {status === "loading"
-                  ? "Looking for hostels near campus…"
-                  : "Hand-picked stays around STU, sorted by what fits you best."}
-              </p>
-            </div>
-
-            <div className={styles.resultsTools}>
-              <LiveControls
-                lastUpdated={lastUpdated}
-                loading={status === "loading"}
-                onRefresh={() => loadHostels()}
-                dark
-              />
-
-              <div className={styles.sortWrap}>
-              <label htmlFor="sort" className={styles.sortLabel}>
-                Sort by
-              </label>
-              <div className={styles.selectShell}>
-                <select
-                  id="sort"
-                  className={styles.sortSelect}
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                >
-                  {SORT_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-                <IconChevronDown size={16} className={styles.selectChevron} />
               </div>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          {view === "map" ? (
-            <FindHostelMap hostels={results} />
-          ) : status === "loading" ? (
-            <div className={styles.grid}>
-              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <HostelSkeleton key={i} />
-              ))}
-            </div>
-          ) : results.length === 0 ? (
-            <EmptyState
-              onClear={status === "error" ? loadHostels : clearAll}
-              filtered={chips.length > 0}
-              error={status === "error"}
-            />
-          ) : (
-            <>
+            {status === "loading" ? (
               <div className={styles.grid}>
-                {shown.map((h) => (
-                  <HostelCard key={h.id} hostel={h} />
+                {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                  <HostelSkeleton key={i} />
                 ))}
               </div>
-              {hasMore && (
-                <div className={styles.loadMoreWrap}>
-                  <button
-                    type="button"
-                    className="dabi-btn dabi-btn-secondary"
-                    onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  >
-                    Load More
-                  </button>
+            ) : results.length === 0 ? (
+              <EmptyState
+                onClear={status === "error" ? loadHostels : clearAll}
+                filtered={chips.length > 0}
+                error={status === "error"}
+              />
+            ) : (
+              <>
+                <div className={styles.grid}>
+                  {shown.map((h) => (
+                    <HostelCard key={h.id} hostel={h} />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
-      </main>
-      <Footer />
+                {hasMore && (
+                  <div className={styles.loadMoreWrap}>
+                    <button
+                      type="button"
+                      className="dabi-btn dabi-btn-secondary"
+                      onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </main>
+      )}
+      {view !== "map" && <Footer />}
       <FilterModal
         open={modalOpen}
         value={filters}

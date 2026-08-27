@@ -14,6 +14,7 @@ import type { Hostel } from "../../data/hostels";
 import { useFacilities } from "../../context/FacilitiesContext";
 import { FacilityGlyph } from "../../services/facilityIcons";
 import LocationPicker from "../../components/LocationPicker/LocationPicker";
+import { getSchool } from "../../data/geo";
 import Badge from "../components/Badge";
 import {
   IconChevronLeft,
@@ -101,7 +102,7 @@ function ownerInitials(name: string): string {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const STU_COORDS: [number, number] = [7.339, -2.327];
+const STU = getSchool("stu");
 
 function haversineKm(
   lat1: number,
@@ -390,7 +391,7 @@ export default function HostelManage() {
     // id. Tell the backend so it can move them into the created hostel's folder.
     if (!id) input.tempFolder = draftId;
     if (lat != null && lng != null) {
-      input.distanceFromSTU = haversineKm(STU_COORDS[0], STU_COORDS[1], lat, lng);
+      input.distanceFromSTU = haversineKm(STU.lat, STU.lng, lat, lng);
     }
     if (saving) return;
     setSaveError(null);
@@ -505,18 +506,6 @@ export default function HostelManage() {
                     className={styles.input}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.fieldLabel} htmlFor="h-loc">
-                    Location
-                  </label>
-                  <input
-                    id="h-loc"
-                    className={styles.input}
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
                     required
                   />
                 </div>
@@ -890,9 +879,8 @@ export default function HostelManage() {
             <div className={styles.formSection}>
               <div className={styles.formSectionTitle}>Hostel location</div>
               <div className={styles.formSectionHint}>
-                Drop a pin on the map to mark exactly where this hostel is.
-                Search an address, or use your current location — the area name
-                fills in automatically and the distance to STU is calculated.
+                Drop a pin on the map to mark exactly where the hostel is. The
+                area name fills in automatically, or type it below.
               </div>
 
               <LocationPicker
@@ -902,21 +890,31 @@ export default function HostelManage() {
                   setLat(la);
                   setLng(ln);
                 }}
-                onAddress={(addr) => setLocation(addr)}
+                onArea={(area) => setLocation(area)}
               />
 
-              <div className={styles.field} style={{ marginTop: 14 }}>
+              <div className={styles.field} style={{ marginTop: 16 }}>
                 <label className={styles.fieldLabel} htmlFor="h-loc">
-                  Area / address (auto-filled from the pin)
+                  Location
                 </label>
                 <input
                   id="h-loc"
                   className={styles.input}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Ayeduase"
                   required
                 />
               </div>
+
+              {lat != null && lng != null && (
+                <p className={styles.coords}>
+                  <IconMap size={14} style={{ verticalAlign: "-2px" }} /> Pinned at{" "}
+                  {lat.toFixed(5)}, {lng.toFixed(5)} ·{" "}
+                  {Math.round(haversineKm(STU.lat, STU.lng, lat, lng))} km
+                  from STU
+                </p>
+              )}
             </div>
           </div>
         )}

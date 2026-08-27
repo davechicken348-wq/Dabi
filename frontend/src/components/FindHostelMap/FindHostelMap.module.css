@@ -12,6 +12,53 @@
   height: 460px;
 }
 
+/* Big / full-bleed mode used when the page view is toggled to "Map". */
+.big {
+  min-height: calc(100vh - 250px);
+  height: calc(100vh - 250px);
+}
+
+.big .canvas {
+  height: calc(100vh - 250px);
+}
+
+/* Full-page mode: the map absolutely fills its positioned parent so the
+   search bar + toolbar can float on top of it. The z-index establishes a
+   stacking context so Leaflet's high internal pane z-indexes stay contained
+   beneath the overlay. */
+.fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: none;
+}
+
+.fill .canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Count bubble marking an area (one per area on the public map). */
+.areaBubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--dabi-green);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: 2px solid #ffffff;
+  box-shadow: 0 6px 16px rgba(24, 32, 27, 0.3);
+  cursor: pointer;
+}
+
 .loadingOverlay {
   position: absolute;
   inset: 0;
@@ -139,9 +186,67 @@
   background: var(--dabi-green-700);
 }
 
+/* School marker popup — branded pill that shows the campus name and a
+   "Your school" tag. The class is applied to Leaflet's popup container, and
+   these rules neutralise the default white box so our styling shows through. */
+.schoolPopup {
+  z-index: 600;
+}
+
+.schoolPopup :global(.leaflet-popup-content-wrapper) {
+  background: var(--dabi-green);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 22px rgba(24, 32, 27, 0.28);
+  padding: 0;
+}
+
+.schoolPopup :global(.leaflet-popup-content) {
+  margin: 0;
+  width: auto !important;
+}
+
+.schoolPopup :global(.leaflet-popup-tip) {
+  background: var(--dabi-green);
+}
+
+.schoolPopupInner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.6rem 0.85rem;
+}
+
+.schoolPopupName {
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.schoolPopupTag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.82;
+}
+
 @media (max-width: 540px) {
-  .wrap,
-  .canvas {
+  /* Don't collapse the full-bleed map — only shrink the embedded/inline
+     variants. The .fill map must keep filling its positioned parent (the
+     fixed, edge-to-edge .mapMode) so it stays immersive on small screens.
+     Scope the canvas rule to inside a non-fill wrap so .fill .canvas keeps
+     height: 100%. */
+  .wrap:not(.fill) {
     height: 380px;
+  }
+  .wrap:not(.fill) .canvas {
+    height: 380px;
+  }
+  .big,
+  .big .canvas {
+    height: 78vh;
+    min-height: 460px;
   }
 }

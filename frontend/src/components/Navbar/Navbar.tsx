@@ -38,7 +38,7 @@ const primaryLinks: PrimaryLink[] = [
     to: "/find-hostel",
     menu: [
       { label: "Search hostels", to: "/find-hostel", desc: "Filter by price, area & facilities", Icon: IconSearch },
-      { label: "Browse the map", to: "/locations", desc: "See what's near campus", Icon: IconMap },
+      { label: "Browse the map", to: "/find-hostel?view=map", desc: "See what's near campus", Icon: IconMap },
     ],
   },
   {

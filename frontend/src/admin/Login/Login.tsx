@@ -16,6 +16,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (user) {
     return <Navigate to="/admin" replace />;
@@ -23,7 +24,10 @@ export default function Login() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
     const ok = await login(email, password);
+    setLoading(false);
     if (!ok) {
       setError("Those credentials don't match our records. Try again.");
       return;
@@ -52,7 +56,11 @@ export default function Login() {
 
       <section className={styles.loginPanel}>
         <div className={styles.loginCard}>
-          <h2>Welcome back</h2>
+          <div className={styles.welcomeMsg}>
+              <span className={styles.welcomeWave}>👋 Welcome</span>
+            <span className={styles.welcomeSub}>to the Dabi admin console</span>
+          </div>
+          <h2>Sign in to continue</h2>
           <p>Sign in with your administrator account.</p>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
@@ -92,9 +100,22 @@ export default function Login() {
               />
             </div>
             {error && <div className={styles.error}>{error}</div>}
-            <button type="submit" className={`dabi-btn dabi-btn-primary ${styles.btnSm}`}>
-              <IconLock size={16} />
-              Sign in
+            <button
+              type="submit"
+              className={`dabi-btn dabi-btn-primary ${styles.btnSm} ${styles.btnBlock}`}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className={styles.spinner} aria-hidden="true" />
+                  Signing in…
+                </>
+              ) : (
+                <>
+                  <IconLock size={16} />
+                  Sign in
+                </>
+              )}
             </button>
           </form>
 

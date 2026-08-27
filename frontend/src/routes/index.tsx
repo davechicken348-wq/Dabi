@@ -16,9 +16,11 @@ import Hostels from "../admin/Hostels/Hostels";
 import HostelManage from "../admin/Hostels/HostelManage";
 import Enquiries from "../admin/Enquiries/Enquiries";
 import Owners from "../admin/Owners/Owners";
+import ManagedHostels from "../admin/Owners/ManagedHostels";
 import Deals from "../admin/Deals/Deals";
 import Tenancies from "../admin/Tenancies/Tenancies";
 import Facilities from "../admin/Facilities/Facilities";
+import Docs from "../admin/Docs/Docs";
 
 export const routes: RouteObject[] = [
   { path: "/", element: <Welcome /> },
@@ -45,8 +47,10 @@ export const routes: RouteObject[] = [
       { path: "enquiries", element: <Enquiries /> },
       { path: "tenancies", element: <Tenancies /> },
       { path: "owners", element: <Owners /> },
+      { path: "managed-hostels", element: <ManagedHostels /> },
       { path: "deals", element: <Deals /> },
-      { path: "facilities", element: <Facilities /> },
+       { path: "facilities", element: <Facilities /> },
+       { path: "docs", element: <Docs /> },
     ],
   },
   { path: "*", element: <Navigate to="/" replace /> },

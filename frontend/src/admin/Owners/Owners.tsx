@@ -1,13 +1,19 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type CSSProperties,
+} from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   fetchOwners,
-  fetchHostels,
   createOwner,
   updateOwner,
   deleteOwner,
   type OwnerInput,
 } from "../../services/api";
-import type { Owner, AdminHostel } from "../types";
+import type { Owner } from "../types";
 import { usePolling } from "../usePolling";
 import Badge from "../components/Badge";
 import Modal from "../components/Modal";
@@ -16,12 +22,19 @@ import AdminEmptyState from "../components/AdminEmptyState";
 import {
   IconUsers,
   IconPlus,
-  IconEdit,
   IconTrash,
   IconMail,
+  IconUser,
   IconPhone,
+  IconCheck,
+  IconChevronDown,
+  IconSearch,
+  IconSliders,
+  IconArrow,
+  IconRefresh,
 } from "../../components/Icons/Icons";
 import styles from "../admin.module.css";
+import OwnerSection from "./OwnerSection";
 
 function ownerInitials(name: string): string {
   return name
@@ -48,17 +61,53 @@ function describeError(err: unknown): string {
   return msg;
 }
 
+/* Column model — mirrors the Supabase Users data grid layout. */
+type ColumnKey = "uid" | "name" | "email" | "phone" | "hostels" | "status";
+
+const COLUMNS: { key: ColumnKey; label: string; always: boolean; width: string }[] = [
+  { key: "uid", label: "UID", always: true, width: "150px" },
+  { key: "name", label: "Display name", always: true, width: "minmax(180px, 1.6fr)" },
+  { key: "email", label: "Email", always: true, width: "minmax(200px, 1.8fr)" },
+  { key: "phone", label: "Phone", always: false, width: "160px" },
+  { key: "hostels", label: "Hostels", always: false, width: "150px" },
+  { key: "status", label: "Status", always: false, width: "130px" },
+];
+
+const SEARCH_FIELDS = [
+  { value: "name", label: "Name" },
+  { value: "email", label: "Email address" },
+  { value: "phone", label: "Phone number" },
+] as const;
+
+type SearchField = (typeof SEARCH_FIELDS)[number]["value"];
+
+const SORTS = [
+  { value: "name", label: "Name" },
+  { value: "email", label: "Email" },
+  { value: "hostels", label: "Hostels" },
+  { value: "newest", label: "Date joined (newest)" },
+  { value: "oldest", label: "Date joined (oldest)" },
+] as const;
+
+type SortKey = (typeof SORTS)[number]["value"];
+
 export default function Owners() {
   const [owners, setOwners] = useState<Owner[]>([]);
-  const [hostels, setHostels] = useState<AdminHostel[]>([]);
   const [state, setState] = useState<"loading" | "error" | "ready">("loading");
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
   const [query, setQuery] = useState("");
+  const [searchField, setSearchField] = useState<SearchField>("email");
+  const [sort, setSort] = useState<SortKey>("name");
+  const [hidden, setHidden] = useState<Set<ColumnKey>>(new Set());
+
+  const [searchMenu, setSearchMenu] = useState(false);
+  const [columnsMenu, setColumnsMenu] = useState(false);
+  const [sortMenu, setSortMenu] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Owner | null>(null);
-  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   async function refresh(showLoading = true) {
     if (showLoading) {
@@ -66,9 +115,8 @@ export default function Owners() {
       setError(null);
     }
     try {
-      const [o, h] = await Promise.all([fetchOwners(), fetchHostels()]);
+      const o = await fetchOwners();
       setOwners(o);
-      setHostels(h);
       setLastUpdated(new Date());
       setState("ready");
     } catch (err) {
@@ -86,16 +134,47 @@ export default function Owners() {
     refresh();
   }, []);
 
-  const hostelName = useMemo(() => {
-    const map = new Map<string, string>();
-    hostels.forEach((h) => map.set(h.id, h.name));
-    return map;
-  }, [hostels]);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get("new") === "1") {
+      setEditing(null);
+      setFormOpen(true);
+      params.delete("new");
+      setParams(params, { replace: true });
+    }
+  }, [params, setParams, setEditing, setFormOpen]);
 
-  const filtered = owners.filter((o) => {
+  const visibleColumns = useMemo(
+    () => COLUMNS.filter((c) => c.always || !hidden.has(c.key)),
+    [hidden],
+  );
+
+  const gridTemplate = visibleColumns.map((c) => c.width).join(" ");
+
+  const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return !q || o.name.toLowerCase().includes(q) || o.email.toLowerCase().includes(q);
-  });
+    const list = owners.filter((o) => {
+      if (!q) return true;
+      const field = o[searchField];
+      return field?.toLowerCase().includes(q) ?? false;
+    });
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      switch (sort) {
+        case "email":
+          return a.email.localeCompare(b.email);
+        case "hostels":
+          return b.hostelIds.length - a.hostelIds.length;
+        case "newest":
+          return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+        case "oldest":
+          return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+    return sorted;
+  }, [owners, query, searchField, sort]);
 
   function openCreate() {
     setEditing(null);
@@ -105,10 +184,9 @@ export default function Owners() {
     setEditing(o);
     setFormOpen(true);
   }
-  async function handleDelete() {
-    if (!confirmId) return;
-    await deleteOwner(confirmId);
-    setConfirmId(null);
+  async function handleDelete(id: string) {
+    await deleteOwner(id);
+    setFormOpen(false);
     refresh();
   }
 
@@ -131,161 +209,256 @@ export default function Owners() {
     );
   }
 
+  const searchLabel =
+    SEARCH_FIELDS.find((f) => f.value === searchField)?.label ?? "Email address";
+  const sortLabel = SORTS.find((s) => s.value === sort)?.label ?? "Name";
+
   return (
-    <div>
-      <div className={styles.ownersHero}>
-        <div className={styles.ownersHeroMain}>
-          <span className={styles.ownersHeroEyebrow}>
-            <IconUsers size={14} /> People
-          </span>
-          <h1 className={styles.ownersHeroTitle}>Owners</h1>
-          <p className={styles.ownersHeroSub}>
-            {owners.length} hostel manager{owners.length === 1 ? "" : "s"} in the
-            Dabi network. Keep their details and listings up to date.
-          </p>
+    <OwnerSection title="Owner management">
+      <div className={styles.sbPage}>
+        <div className={styles.sbHeader}>
+          <h2 className={styles.sbTitle}>Owners</h2>
+          <div className={styles.sbHeaderActions} />
         </div>
-        <div className={styles.ownersHeroActions}>
-          <LiveControls
-            lastUpdated={lastUpdated}
-            loading={state === "loading"}
-            onRefresh={() => refresh()}
-          />
-          <button className="dabi-btn dabi-btn-primary" onClick={openCreate}>
-            <IconPlus size={18} />
-            Add owner
-          </button>
-        </div>
-        <div className={styles.ownersHeroArt} aria-hidden="true">
-          <img
-            src="/illustrations/Team-Building-3--Streamline-Brooklyn.webp"
-            alt=""
-            width={124}
-            height={124}
-           loading="lazy" decoding="async" />
-        </div>
-      </div>
 
-      <div className={styles.toolbar}>
-        <label className={styles.search}>
-          <IconUsers size={17} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search owners…"
-          />
-        </label>
-      </div>
-
-      <p className={styles.resultsLine}>
-        Showing <b>{filtered.length}</b> of <b>{owners.length}</b> owners
-      </p>
-
-      {state === "loading" ? (
-        <div className={styles.ownersGrid}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className={styles.ownerSkeleton} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <AdminEmptyState
-          variant="empty"
-          illustration="/illustrations/Astronaut-Riding-Doge--Streamline-Brooklyn.webp"
-          title={query ? "No matches found" : "No owners yet"}
-          text={
-            query
-              ? `We couldn't find any owners matching “${query}”. Try a different name or email.`
-              : "Owners manage hostels on Dabi. Add your first owner to start assigning listings."
-          }
-          action={{
-            label: (
+      <div className={styles.sbToolbar}>
+        <div className={styles.sbSearchGroup}>
+          <div className={styles.sbColWrap}>
+            <button
+              type="button"
+              className={styles.sbColSelect}
+              onClick={() => setSearchMenu((v) => !v)}
+              aria-haspopup="listbox"
+              aria-expanded={searchMenu}
+            >
+              <span>{searchLabel}</span>
+              <IconChevronDown size={14} />
+            </button>
+            {searchMenu && (
               <>
-                <IconPlus size={16} /> Add owner
+                <button
+                  className={styles.scrim}
+                  style={{ position: "fixed", inset: 0, zIndex: 35 }}
+                  aria-label="Close menu"
+                  onClick={() => setSearchMenu(false)}
+                />
+                <div className={`${styles.dropdown} ${styles.sbMenu}`}>
+                  {SEARCH_FIELDS.map((f) => (
+                    <button
+                      key={f.value}
+                      className={`${styles.menuItem} ${
+                        searchField === f.value ? styles.menuItemActive : ""
+                      }`}
+                      onClick={() => {
+                        setSearchField(f.value);
+                        setSearchMenu(false);
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
               </>
-            ),
-            onClick: openCreate,
-          }}
-        />
-      ) : (
-        <div className={styles.ownersGrid}>
-          {filtered.map((o) => {
-            const shown = o.hostelIds.slice(0, 3);
-            const extra = o.hostelIds.length - shown.length;
-            return (
-              <div key={o.id} className={styles.ownerTile}>
-                <div className={styles.ownerTileHead}>
-                  <span className={styles.ownerTileAvatar}>
-                    {ownerInitials(o.name)}
-                  </span>
-                  <div className={styles.ownerTileId}>
-                    <span className={styles.ownerTileName}>{o.name}</span>
-                    <Badge variant={o.active ? "Active" : "Inactive"}>
-                      {o.active ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-                </div>
-                <div className={styles.ownerTileBody}>
-                  <div className={styles.ownerTileRow}>
-                    <IconMail size={16} />
-                    <span className={styles.ownerTileRowText}>{o.email}</span>
-                  </div>
-                  <div className={styles.ownerTileRow}>
-                    <IconPhone size={16} />
-                    <span className={styles.ownerTileRowText}>
-                      {o.phone || "No phone added"}
-                    </span>
-                  </div>
-                  <div className={styles.ownerTileHostels}>
-                    {o.hostelIds.length === 0 ? (
-                      <span className={styles.ownerTileFootMeta}>
-                        No hostels assigned
-                      </span>
-                    ) : (
-                      <>
-                        {shown.map((id) => (
-                          <span key={id} className={styles.ownerChip}>
-                            {hostelName.get(id) ?? id}
-                          </span>
-                        ))}
-                        {extra > 0 && (
-                          <span className={styles.ownerChip}>+{extra} more</span>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className={styles.ownerTileFoot}>
-                  <span className={styles.ownerTileFootMeta}>
-                    {o.hostelIds.length}{" "}
-                    {o.hostelIds.length === 1 ? "hostel" : "hostels"}
-                  </span>
-                  <div className={styles.rowActions}>
-                    <button
-                      className={styles.btnIcon}
-                      onClick={() => openEdit(o)}
-                      aria-label={`Edit ${o.name}`}
-                    >
-                      <IconEdit size={16} />
-                    </button>
-                    <button
-                      className={`${styles.btnIcon} ${styles.btnIconDanger}`}
-                      onClick={() => setConfirmId(o.id)}
-                      aria-label={`Delete ${o.name}`}
-                    >
-                      <IconTrash size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+            )}
+          </div>
+          <div className={styles.sbSearchDivider} />
+          <div className={styles.sbSearchField}>
+            <IconSearch size={15} />
+            <input
+              className={styles.sbSearchInput}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`Search by ${searchLabel.toLowerCase()}`}
+            />
+          </div>
         </div>
-      )}
 
+        <div className={styles.sbToolbarDivider} />
+
+        <div className={styles.sbMenuWrap}>
+          <button
+            type="button"
+            className={styles.sbToolBtn}
+            onClick={() => setColumnsMenu((v) => !v)}
+            aria-haspopup="true"
+            aria-expanded={columnsMenu}
+          >
+            <IconSliders size={14} />
+            <span>All columns</span>
+            <IconChevronDown size={14} />
+          </button>
+          {columnsMenu && (
+            <>
+              <button
+                className={styles.scrim}
+                style={{ position: "fixed", inset: 0, zIndex: 35 }}
+                aria-label="Close menu"
+                onClick={() => setColumnsMenu(false)}
+              />
+              <div className={`${styles.dropdown} ${styles.sbMenu}`}>
+                <div className={styles.menuDivider} style={{ margin: "6px 6px 0" }} />
+                {COLUMNS.filter((c) => !c.always).map((c) => {
+                  const on = !hidden.has(c.key);
+                  return (
+                    <button
+                      key={c.key}
+                      className={styles.menuItem}
+                      onClick={() =>
+                        setHidden((prev) => {
+                          const next = new Set(prev);
+                          if (on) next.add(c.key);
+                          else next.delete(c.key);
+                          return next;
+                        })
+                      }
+                    >
+                      <span
+                        className={`${styles.sbCheck} ${on ? styles.sbCheckOn : ""}`}
+                      />
+                      {c.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className={styles.sbMenuWrap}>
+          <button
+            type="button"
+            className={styles.sbToolBtn}
+            onClick={() => setSortMenu((v) => !v)}
+            aria-haspopup="true"
+            aria-expanded={sortMenu}
+          >
+            <IconArrow size={14} />
+            <span>Sorted by {sortLabel}</span>
+            <IconChevronDown size={14} />
+          </button>
+          {sortMenu && (
+            <>
+              <button
+                className={styles.scrim}
+                style={{ position: "fixed", inset: 0, zIndex: 35 }}
+                aria-label="Close menu"
+                onClick={() => setSortMenu(false)}
+              />
+              <div className={`${styles.dropdown} ${styles.sbMenu}`}>
+                {SORTS.map((s) => (
+                  <button
+                    key={s.value}
+                    className={`${styles.menuItem} ${
+                      sort === s.value ? styles.menuItemActive : ""
+                    }`}
+                    onClick={() => {
+                      setSort(s.value);
+                      setSortMenu(false);
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+          </>
+        )}
+        </div>
+
+        <span className={styles.sbSpacer} />
+
+        <LiveControls
+          lastUpdated={lastUpdated}
+          loading={state === "loading"}
+          onRefresh={() => refresh()}
+        />
+        <button className={styles.sbAddBtn} onClick={openCreate}>
+          <IconPlus size={16} />
+          <span>Add owner</span>
+          <IconChevronDown size={14} />
+        </button>
+      </div>
+
+      <div className={styles.sbScroll}>
+        <div className={styles.sbGrid}>
+          <div className={styles.sbGridHeader} style={{ gridTemplateColumns: gridTemplate }}>
+            {visibleColumns.map((c) => (
+              <div key={c.key} className={styles.sbTh}>
+                {c.label}
+              </div>
+            ))}
+          </div>
+
+          {state === "loading" ? (
+            <div className={styles.sbBody}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={styles.sbRow}
+                  style={{ gridTemplateColumns: gridTemplate }}
+                >
+                  {visibleColumns.map((c) => (
+                    <div key={c.key} className={styles.sbTd}>
+                      <div className={styles.sbSkeleton} />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className={styles.sbEmpty}>
+              <span className={styles.sbEmptyIcon}>
+                <IconUsers size={28} />
+              </span>
+              <p className={styles.sbEmptyTitle}>
+                {query ? "No owners match your search" : "No owners in your network"}
+              </p>
+              <p className={styles.sbEmptyText}>
+                {query
+                  ? `We couldn't find any owners matching “${query}”. Try a different ${searchLabel.toLowerCase()}.`
+                  : "There are currently no owners managing hostels on Dabi."}
+              </p>
+            </div>
+          ) : (
+            <div className={styles.sbBody}>
+              {filtered.map((o) => (
+                <div
+                  key={o.id}
+                  className={styles.sbRow}
+                  style={{ gridTemplateColumns: gridTemplate }}
+                  onClick={() => openEdit(o)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") openEdit(o);
+                  }}
+                >
+                  {visibleColumns.map((c) => (
+                    <div key={c.key} className={styles.sbTd}>
+                      {renderCell(c.key, o, styles)}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.sbFooter}>
+        <span>
+          Showing <b>{filtered.length}</b> of <b>{owners.length}</b> owners
+        </span>
+        {state === "loading" && (
+          <span className={styles.sbLoading}>
+            <IconRefresh size={13} className={styles.sbSpin} />
+            Loading…
+          </span>
+        )}
+      </div>
 
       {formOpen && (
         <OwnerForm
           initial={editing}
-          hostels={hostels}
           onClose={() => setFormOpen(false)}
           onSubmit={async (input) => {
             if (editing) await updateOwner(editing.id, input);
@@ -293,50 +466,79 @@ export default function Owners() {
             setFormOpen(false);
             refresh();
           }}
+          onDelete={editing ? () => handleDelete(editing.id) : undefined}
         />
       )}
-
-      {confirmId && (
-        <Modal title="Remove owner?" onClose={() => setConfirmId(null)}>
-          <p className={styles.muted} style={{ marginBottom: 18 }}>
-            The owner will be removed and their hostels unassigned. This
-            can&rsquo;t be undone.
-          </p>
-          <div className={styles.formActions}>
-            <button className="dabi-btn dabi-btn-ghost" onClick={() => setConfirmId(null)}>
-              Cancel
-            </button>
-            <button className="dabi-btn dabi-btn-danger" onClick={handleDelete}>
-              <IconTrash size={16} />
-              Remove
-            </button>
-          </div>
-        </Modal>
-      )}
-    </div>
+      </div>
+    </OwnerSection>
   );
+}
+
+function renderCell(
+  key: ColumnKey,
+  o: Owner,
+  styles: Record<string, string>,
+) {
+  switch (key) {
+    case "uid":
+      return (
+        <span className={styles.sbUid} title={o.id}>
+          {o.id.slice(0, 8)}
+        </span>
+      );
+    case "name":
+      return (
+        <div className={styles.sbName}>
+          <span
+            className={styles.sbAvatar}
+            style={{ "--av": "var(--adm-gold)" } as CSSProperties}
+          >
+            {ownerInitials(o.name)}
+          </span>
+          <span className={styles.sbNameText}>{o.name}</span>
+        </div>
+      );
+    case "email":
+      return (
+        <span className={styles.sbEmail}>
+          <IconMail size={14} />
+          {o.email}
+        </span>
+      );
+    case "phone":
+      return <span className={styles.sbMuted}>{o.phone || "—"}</span>;
+    case "hostels":
+      return (
+        <span className={styles.sbMuted}>
+          {o.hostelIds.length === 0
+            ? "No hostels"
+            : `${o.hostelIds.length} ${o.hostelIds.length === 1 ? "hostel" : "hostels"}`}
+        </span>
+      );
+    case "status":
+      return (
+        <Badge variant={o.active ? "Active" : "Inactive"}>
+          {o.active ? "Active" : "Inactive"}
+        </Badge>
+      );
+    default:
+      return null;
+  }
 }
 
 interface FormProps {
   initial: Owner | null;
-  hostels: AdminHostel[];
   onClose: () => void;
   onSubmit: (input: OwnerInput) => void | Promise<void>;
+  onDelete?: () => void | Promise<void>;
 }
 
-function OwnerForm({ initial, hostels, onClose, onSubmit }: FormProps) {
+function OwnerForm({ initial, onClose, onSubmit, onDelete }: FormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [phone, setPhone] = useState(initial?.phone ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
   const [active, setActive] = useState(initial?.active ?? true);
-  const [hostelIds, setHostelIds] = useState<string[]>(initial?.hostelIds ?? []);
   const [error, setError] = useState<string | null>(null);
-
-  function toggle(id: string) {
-    setHostelIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -347,7 +549,7 @@ function OwnerForm({ initial, hostels, onClose, onSubmit }: FormProps) {
         phone: phone.trim(),
         email: email.trim(),
         active,
-        hostelIds,
+        hostelIds: initial?.hostelIds ?? [],
       });
     } catch (err) {
       setError(describeError(err));
@@ -357,141 +559,127 @@ function OwnerForm({ initial, hostels, onClose, onSubmit }: FormProps) {
   const emailError = !!error && /email|duplicate/i.test(error);
   const phoneError = !!error && /phone|required/i.test(error);
 
-
   return (
     <Modal
-      title={initial ? "Edit owner" : "Add owner"}
+      title={initial ? "Edit owner" : "Create a new owner"}
       onClose={onClose}
-      wide
+      narrow
     >
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.ownerFormHero}>
-          <span className={styles.ownerFormAvatar}>
-            <IconUsers size={24} />
-          </span>
-          <div>
-            <span className={styles.ownerFormEyebrow}>
-              {initial ? "Edit profile" : "New person"}
-            </span>
-            <p className={styles.ownerFormLead}>
-              {initial
-                ? `Update ${initial.name}'s details and the hostels they look after.`
-                : "Add a manager's details and the hostels they'll be responsible for."}
-            </p>
-          </div>
-        </div>
+      <form className={styles.ownerForm} onSubmit={handleSubmit}>
+        <div className={styles.ownerFormDivider} />
+        <div className={styles.ownerFormBody}>
+          {error && (
+            <div className={styles.formError} role="alert">
+              {error}
+            </div>
+          )}
 
-        {error && (
-          <div className={styles.formError} role="alert">
-            {error}
-          </div>
-        )}
-
-        <div className={styles.formSection}>
-          <div className={styles.formSectionTitle}>Details</div>
-          <div className={styles.formRow}>
-            <div className={styles.field}>
-              <label className={styles.fieldLabel} htmlFor="o-name">
-                Name
-              </label>
+          <div className={styles.ownerField}>
+            <label className={styles.ownerFieldLabel} htmlFor="o-name">
+              Name
+            </label>
+            <div className={styles.ownerFieldWrap}>
+              <span className={styles.ownerFieldIcon}>
+                <IconUser size={18} />
+              </span>
               <input
                 id="o-name"
-                className={styles.input}
+                className={`${styles.input} ${styles.ownerInputIcon}`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Ama Owusu"
                 required
               />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.fieldLabel} htmlFor="o-phone">
-                Phone
-              </label>
-              <input
-                id="o-phone"
-                className={`${styles.input} ${phoneError ? styles.inputError : ""}`}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              {phoneError && (
-                <span className={styles.fieldError}>Phone number is required.</span>
-              )}
             </div>
           </div>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="o-email">
-              Email
+
+          <div className={styles.ownerField}>
+            <label className={styles.ownerFieldLabel} htmlFor="o-phone">
+              Phone number
             </label>
-            <input
-              id="o-email"
-              className={`${styles.input} ${emailError ? styles.inputError : ""}`}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <div className={styles.ownerFieldWrap}>
+              <span className={styles.ownerFieldIcon}>
+                <IconPhone size={18} />
+              </span>
+              <input
+                id="o-phone"
+                className={`${styles.input} ${styles.ownerInputIcon} ${
+                  phoneError ? styles.inputError : ""
+                }`}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+233 00 000 0000"
+                required
+              />
+            </div>
+            {phoneError && (
+              <span className={styles.fieldError}>Phone number is required.</span>
+            )}
+          </div>
+
+          <div className={styles.ownerField}>
+            <label className={styles.ownerFieldLabel} htmlFor="o-email">
+              Email address
+            </label>
+            <div className={styles.ownerFieldWrap}>
+              <span className={styles.ownerFieldIcon}>
+                <IconMail size={18} />
+              </span>
+              <input
+                id="o-email"
+                type="email"
+                className={`${styles.input} ${styles.ownerInputIcon} ${
+                  emailError ? styles.inputError : ""
+                }`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="owner@example.com"
+                required
+              />
+            </div>
             {emailError && (
               <span className={styles.fieldError}>This email is already in use.</span>
             )}
           </div>
-        </div>
 
-        <div className={styles.formSection}>
-          <div className={styles.formSectionTitle}>Managed hostels</div>
-          <p className={styles.formSectionHint}>
-            Select every hostel this person is responsible for.
-          </p>
-          <div className={styles.ownerPickGrid}>
-            {hostels.map((h) => {
-              const on = hostelIds.includes(h.id);
-              return (
-                <label
-                  key={h.id}
-                  className={`${styles.ownerPick} ${on ? styles.ownerPickOn : ""}`}
-                >
-                  <input
-                    type="checkbox"
-                    className={styles.ownerPickInput}
-                    checked={on}
-                    onChange={() => toggle(h.id)}
-                  />
-                  <span className={styles.ownerPickDot} />
-                  {h.name}
-                </label>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className={styles.formSection}>
-          <div className={styles.formSectionTitle}>Status</div>
-          <div className={styles.ownerStatus}>
-            <div className={styles.ownerStatusText}>
-              <span className={styles.ownerStatusTitle}>Active manager</span>
-              <span className={styles.ownerStatusHint}>
-                {active
-                  ? "Visible and can be assigned hostels."
-                  : "Hidden from assignments."}
-              </span>
-            </div>
+          <div className={styles.ownerCheckRow}>
             <button
               type="button"
-              className={`${styles.ownerSwitch} ${active ? styles.ownerSwitchOn : ""}`}
+              className={`${styles.ownerCheck} ${active ? styles.ownerCheckOn : ""}`}
               onClick={() => setActive(!active)}
               aria-pressed={active}
-              aria-label="Toggle active manager"
+              aria-label="Toggle active owner"
             >
-              <span className={styles.ownerSwitchKnob} />
+              <IconCheck size={14} />
             </button>
+            <label
+              className={styles.ownerCheckLabel}
+              onClick={() => setActive(!active)}
+            >
+              Active owner
+            </label>
           </div>
-        </div>
+          <p className={styles.ownerHelper}>
+            {active
+              ? "Active owners are visible in the owners list."
+              : "Inactive owners are hidden from the owners list."}
+          </p>
 
-        <div className={styles.formActions}>
-          <button type="button" className="dabi-btn dabi-btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="dabi-btn dabi-btn-primary">
-            <IconUsers size={16} />
+          {onDelete && (
+            <button
+              type="button"
+              className={`${styles.ownerBtn} ${styles.ownerBtnDanger} ${styles.ownerDelete}`}
+              onClick={onDelete}
+            >
+              <IconTrash size={16} />
+              Remove owner
+            </button>
+          )}
+
+          <button
+            type="submit"
+            className={`${styles.ownerBtn} ${styles.ownerBtnPrimary} ${styles.ownerBtnBlock}`}
+          >
             {initial ? "Save changes" : "Create owner"}
           </button>
         </div>

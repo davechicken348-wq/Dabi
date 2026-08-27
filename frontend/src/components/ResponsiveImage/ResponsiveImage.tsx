@@ -72,6 +72,9 @@ export default function ResponsiveImage({
         className={`${styles.lqip} ${loaded ? styles.lqipHidden : ""}`}
       />
       <picture>
+        {entry.avif.length > 0 && (
+          <source type="image/avif" srcSet={buildSrcSet(entry.avif)} sizes={sizes} />
+        )}
         <source type="image/webp" srcSet={buildSrcSet(entry.webp)} sizes={sizes} />
         <img
           src={entry.webp[entry.webp.length - 1].src}

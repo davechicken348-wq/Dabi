@@ -1,0 +1,155 @@
+/* =========================================================
+   RecordModal — calm, data-first detail panel that matches
+   the reworked Advisors-style admin (Supabase-like, dark,
+   low-noise). No loud gradient hero; the focus is the data.
+   ========================================================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 9, 8, 0.62);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 60;
+  animation: rec-fade 0.18s var(--adm-ease);
+}
+
+@keyframes rec-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-line-strong);
+  border-radius: 14px;
+  box-shadow: var(--adm-shadow-lg);
+  overflow: hidden;
+  animation: rec-pop 0.18s var(--adm-ease);
+}
+
+.wide {
+  width: min(720px, 100%);
+}
+
+@keyframes rec-pop {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------- Header (calm, not a gradient hero) ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--adm-line);
+  background: var(--adm-surface);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--adm-font);
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), var(--adm-shadow-sm);
+}
+
+.titleBlock {
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  font-family: var(--adm-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  color: var(--adm-charcoal);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.sub {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--adm-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub b {
+  color: var(--adm-charcoal);
+  font-weight: 600;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.recordStatus {
+  display: inline-flex;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--adm-line);
+  background: var(--adm-bg);
+  color: var(--adm-muted);
+  cursor: pointer;
+  transition: color 0.16s var(--adm-ease), border-color 0.16s var(--adm-ease),
+    background-color 0.16s var(--adm-ease);
+}
+
+.close:hover {
+  color: var(--adm-charcoal);
+  border-color: var(--adm-line-strong);
+  background: var(--adm-surface-2);
+}
+
+/* ---------- Body (data lives here) ---------- */
+.body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+@media (max-width: 520px) {
+  .header {
+    padding: 16px;
+  }
+  .body {
+    padding: 16px;
+  }
+}

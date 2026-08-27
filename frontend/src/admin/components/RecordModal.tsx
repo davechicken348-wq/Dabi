@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { IconClose } from "../../components/Icons/Icons";
 import Badge from "./Badge";
-import styles from "../admin.module.css";
+import styles from "./RecordModal.module.css";
 
 interface RecordStatus {
   label: string;
@@ -25,7 +25,7 @@ interface RecordModalProps {
   status?: RecordStatus;
   /** Initials shown in the avatar. */
   avatarText: string;
-  /** Background colour of the avatar (and hero accent). */
+  /** Background colour of the avatar. */
   avatarColor: string;
   onClose: () => void;
   children: ReactNode;
@@ -56,40 +56,40 @@ export default function RecordModal({
 
   return (
     <div
-      className={styles.modalOverlay}
+      className={styles.overlay}
       role="dialog"
       aria-modal="true"
       aria-label={name}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <div
-        className={`${styles.modal} ${wide ? styles.modalWide : ""} ${styles.recordModal}`}
-      >
-        <div className={styles.recordHero} style={{ ["--rec" as string]: avatarColor }}>
-          <button
-            type="button"
-            className={styles.recordClose}
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <IconClose size={20} />
-          </button>
-          <span
-            className={styles.recordAvatar}
-            style={{ background: avatarColor }}
-          >
+      <div className={`${styles.card} ${wide ? styles.wide : ""}`}>
+        <div className={styles.header}>
+          <span className={styles.avatar} style={{ background: avatarColor }}>
             {avatarText}
           </span>
-          <div className={styles.recordHeroText}>
-            <h2 className={styles.recordName}>{name}</h2>
-            {sub && <p className={styles.recordSub}>{sub}</p>}
+          <div className={styles.titleBlock}>
+            <h2 className={styles.name}>{name}</h2>
+            {sub && <p className={styles.sub}>{sub}</p>}
           </div>
-          {status && (
-            <span className={styles.recordStatus}>
-              <Badge variant={status.variant}>{status.label}</Badge>
-            </span>
-          )}
+          <div className={styles.headerRight}>
+            {status && (
+              <span className={styles.recordStatus}>
+                <Badge variant={status.variant}>{status.label}</Badge>
+              </span>
+            )}
+            <button
+              type="button"
+              className={styles.close}
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <IconClose size={18} />
+            </button>
+          </div>
         </div>
-        <div className={styles.recordBody}>{children}</div>
+        <div className={styles.body}>{children}</div>
       </div>
     </div>
   );

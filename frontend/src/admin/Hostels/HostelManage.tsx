@@ -13,7 +13,6 @@ import type { Owner, Availability, AdminHostel } from "../types";
 import type { Hostel } from "../../data/hostels";
 import { useFacilities } from "../../context/FacilitiesContext";
 import { FacilityGlyph } from "../../services/facilityIcons";
-import HostelCard from "../../components/HostelCard/HostelCard";
 import LocationPicker from "../../components/LocationPicker/LocationPicker";
 import Badge from "../components/Badge";
 import {
@@ -35,7 +34,7 @@ import {
   IconTag,
 } from "../../components/Icons/Icons";
 
-import styles from "../admin.module.css";
+import styles from "./HostelManage.module.css";
 
 const FALLBACK_IMAGE = "/illustrations/Photography-Fashion--Streamline-Bangalore.webp";
 
@@ -459,7 +458,7 @@ export default function HostelManage() {
           <button
             type="submit"
             form="hostel-form"
-            className={`dabi-btn dabi-btn-primary ${styles.btnPrimary}`}
+            className={styles.btnPrimary}
             disabled={saving}
           >
             {saving ? (
@@ -875,7 +874,7 @@ export default function HostelManage() {
               {isEdit && (
                 <button
                   type="button"
-                  className={`dabi-btn dabi-btn-secondary ${styles.btnSecondary} ${styles.btnSm}`}
+                  className={`${styles.btnSecondary} ${styles.btnSm}`}
                   style={{ marginTop: 12 }}
                   onClick={() => updateHostel(id!, { availability }).then(() => navigate("/admin/hostels"))}
                 >
@@ -993,7 +992,7 @@ export default function HostelManage() {
               </div>
 
               <div className={styles.verifPanel}>
-                <div className={styles.verifSummary}>
+                <div className={`${styles.verifSummary} ${verified && verifComplete ? styles.verifSummaryDone : ""}`}>
                   <div
                     className={styles.verifRing}
                     style={{ "--verif-pct": verifPct } as CSSProperties}
@@ -1036,7 +1035,7 @@ export default function HostelManage() {
                         onClick={() => toggleCheck(c.key)}
                         aria-pressed={on}
                       >
-                        <span className={styles.verifItemIcon}>
+                        <span className={styles.verifIconWrap}>
                           <Icon size={18} />
                         </span>
                         <span className={styles.verifItemBody}>
@@ -1054,7 +1053,7 @@ export default function HostelManage() {
                 <div className={styles.verifActions}>
                   <button
                     type="button"
-                    className={`dabi-btn dabi-btn-primary ${styles.btnPrimary} ${styles.btnSm}`}
+                    className={`${styles.btnPrimary} ${styles.btnSm}`}
                     onClick={markVerified}
                     disabled={!verifComplete || verified}
                   >
@@ -1086,7 +1085,7 @@ export default function HostelManage() {
         )}
 
         <div className={styles.formActions} style={{ marginTop: 8 }}>
-          <Link to="/admin/hostels" className="dabi-btn dabi-btn-ghost">
+          <Link to="/admin/hostels" className={styles.btnGhost}>
             Cancel
           </Link>
         </div>
@@ -1098,7 +1097,67 @@ export default function HostelManage() {
           <IconEye size={15} /> Live preview
         </div>
         <div className={styles.previewCard}>
-          <HostelCard hostel={previewHostel} />
+          <div className={styles.previewMedia}>
+            <img
+              className={styles.previewImg}
+              src={previewHostel.image}
+              alt={previewHostel.name}
+              onError={onImgError}
+            />
+            <div className={styles.previewBadges}>
+              <span className={styles.previewStatus}>
+                <span
+                  className={styles.previewStatusDot}
+                  style={{
+                    background:
+                      AVAILABILITY.find((a) => a.id === previewHostel.availability)?.color ??
+                      "#1f8a55",
+                  }}
+                />
+                {previewHostel.availability}
+              </span>
+              {previewHostel.verified && (
+                <span className={styles.previewVerified}>
+                  <IconCheck size={12} /> Verified
+                </span>
+              )}
+            </div>
+          </div>
+          <div className={styles.previewBody}>
+            <h3 className={styles.previewName}>{previewHostel.name}</h3>
+            <p className={styles.previewLoc}>
+              <IconMap size={14} /> {previewHostel.location}
+            </p>
+            {previewHostel.note && (
+              <p className={styles.previewNote}>{previewHostel.note}</p>
+            )}
+            <div className={styles.previewMeta}>
+              <span className={styles.previewRoom}>
+                <IconBed size={14} /> {previewHostel.roomType}
+              </span>
+              <span className={styles.previewPrice}>
+                GH₵{previewHostel.pricePerYear.toLocaleString("en-GH")}{" "}
+                <small>/yr</small>
+              </span>
+            </div>
+            {facilities.length > 0 && (
+              <div className={styles.previewFacilities}>
+                {facilities.slice(0, 4).map((f) => {
+                  const fac = facilityCatalog.find((x) => x.key === f);
+                  return (
+                    <span key={f} className={styles.previewChip}>
+                      {fac ? fac.label : f}
+                    </span>
+                  );
+                })}
+                {facilities.length > 4 && (
+                  <span className={styles.previewChip}>
+                    +{facilities.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <p className={styles.previewHint}>
           This is how the listing appears to students on Dabi.

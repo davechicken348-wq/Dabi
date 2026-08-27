@@ -51,12 +51,67 @@
 
   /* Motion */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Scrollbar — shared by admin (dark) + public (light) surfaces.
+     Neutral thumb stays visible on both themes; brand green on interaction. */
+  --scrollbar-size: 12px;
+  --scrollbar-thumb: rgba(120, 130, 125, 0.5);
+  --scrollbar-thumb-hover: var(--dabi-green-600, #1c7a58);
+  --scrollbar-thumb-active: var(--dabi-green, #176b4d);
+  --scrollbar-track: transparent;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* =========================================================
+   Unified scrollbar — applied globally to every scroll
+   container, inspired by the admin list-grid design. Works
+   on light (public) and dark (admin) surfaces alike.
+   ========================================================= */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.15s var(--ease);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+  background-clip: padding-box;
+}
+
+/* When the admin area is mounted, the page scrollbar adapts to the
+   dark admin theme: a lighter neutral thumb on the near-black surface,
+   with the brighter Dabi green on interaction. */
+html.adm-theme {
+  --scrollbar-thumb: rgba(150, 160, 155, 0.4);
+  --scrollbar-thumb-hover: var(--adm-green-600, #34c893);
+  --scrollbar-thumb-active: var(--adm-green, #2bbd86);
+  --scrollbar-track: transparent;
 }
 
 html {

@@ -45,11 +45,16 @@ function optimizePhotos() {
     }
 
     const webp = [];
+    const avif = [];
 
     for (const width of widths) {
       const wPath = join(VARIANTS_DIR, `${base}-${width}.webp`);
       run(`convert "${src}" -resize ${width} -quality ${WEBP_QUALITY} "${wPath}"`);
       webp.push({ w: width, src: `/images/variants/${base}-${width}.webp` });
+
+      const aPath = join(VARIANTS_DIR, `${base}-${width}.avif`);
+      run(`convert "${src}" -resize ${width} -quality ${AVIF_QUALITY} "${aPath}"`);
+      avif.push({ w: width, src: `/images/variants/${base}-${width}.avif` });
     }
 
     // Low-quality image placeholder for blur-up.
@@ -61,7 +66,7 @@ function optimizePhotos() {
       height: h,
       lqip: `/images/variants/${base}-lqip.webp`,
       webp,
-      avif: [],
+      avif,
     };
   }
 

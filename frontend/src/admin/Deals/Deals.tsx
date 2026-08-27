@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { NavLink, useSearchParams } from "react-router-dom";
 import {
   fetchDeals,
   fetchHostels,
@@ -18,6 +19,9 @@ import {
   IconPlus,
   IconEdit,
   IconTrash,
+  IconCheck,
+  IconBed,
+  IconCalendar,
 } from "../../components/Icons/Icons";
 import styles from "../admin.module.css";
 
@@ -57,6 +61,16 @@ export default function Deals() {
   useEffect(() => {
     refresh();
   }, []);
+
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get("new") === "1") {
+      setEditing(null);
+      setFormOpen(true);
+      params.delete("new");
+      setParams(params, { replace: true });
+    }
+  }, [params, setParams, setEditing, setFormOpen]);
 
   const hostelName = useMemo(() => {
     const map = new Map<string, string>();
@@ -108,43 +122,84 @@ export default function Deals() {
   }
 
   return (
-    <div>
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>Deals</h1>
-          <p className={styles.pageSubtitle}>Promotions and discount codes.</p>
+    <div className={styles.sbShell}>
+      <aside className={styles.sbSubNav}>
+        <div className={styles.sbSubNavHeader}>
+          <h4 className={styles.sbSubNavTitle}>Deals</h4>
         </div>
-        <div className={styles.headerActions}>
-          <LiveControls
-            lastUpdated={lastUpdated}
-            loading={state === "loading"}
-            onRefresh={() => refresh()}
-          />
-          <button className="dabi-btn dabi-btn-primary" onClick={openCreate}>
-            <IconPlus size={18} />
-            Add deal
-          </button>
-        </div>
-      </div>
+        <nav className={styles.sbSubNavNav}>
+          <div className={styles.sbSubGroup}>
+            <div className={styles.sbSubGroupLabel}>Manage</div>
+            <div className={styles.sbSubGroupItems}>
+              <NavLink
+                to="/admin/deals"
+                end
+                className={({ isActive }) =>
+                  `${styles.sbSubItem} ${isActive ? styles.sbSubItemActive : ""}`
+                }
+              >
+                <span className={styles.sbSubItemIcon}>
+                  <IconTag size={16} />
+                </span>
+                <span className={styles.sbSubItemLabel}>All deals</span>
+              </NavLink>
+            </div>
+          </div>
+          <div className={styles.sbSubDivider} />
+          <div className={styles.sbSubGroup}>
+            <div className={styles.sbSubGroupLabel}>Resources</div>
+            <div className={styles.sbSubGroupItems}>
+              <button type="button" className={styles.sbSubItem} onClick={openCreate}>
+                <span className={styles.sbSubItemIcon}>
+                  <IconPlus size={16} />
+                </span>
+                <span className={styles.sbSubItemLabel}>Add deal</span>
+              </button>
+            </div>
+          </div>
+        </nav>
+      </aside>
 
-      <div className={styles.statGrid} style={{ marginBottom: 22 }}>
-        <div className={styles.statCard}>
-          <span className={styles.statLabel}>Total deals</span>
-          <span className={styles.statValue}>{summary.total}</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statLabel}>Active</span>
-          <span className={styles.statValue}>{summary.active}</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statLabel}>Avg. discount</span>
-          <span className={styles.statValue}>{summary.avg}%</span>
-        </div>
-      </div>
+      <div className={styles.sbContent}>
+        <div className={styles.dealsTop}>
+          <div className={styles.pageHeader}>
+            <div>
+              <h1 className={styles.pageTitle}>Deals</h1>
+              <p className={styles.pageSubtitle}>Promotions and discount codes.</p>
+            </div>
+            <div className={styles.headerActions}>
+              <LiveControls
+                lastUpdated={lastUpdated}
+                loading={state === "loading"}
+                onRefresh={() => refresh()}
+              />
+              <button className={styles.addBtn} onClick={openCreate}>
+                <IconPlus size={14} />
+                Add deal
+              </button>
+            </div>
+          </div>
 
-      <div className={styles.panel}>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
+          <div className={styles.statGrid} style={{ marginBottom: 22 }}>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Total deals</span>
+              <span className={styles.statValue}>{summary.total}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Active</span>
+              <span className={styles.statValue}>{summary.active}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Avg. discount</span>
+              <span className={styles.statValue}>{summary.avg}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.dealsScroll}>
+          <div className={styles.panel}>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
             <thead>
               <tr>
                 <th>Deal</th>
@@ -233,6 +288,7 @@ export default function Deals() {
           </table>
         </div>
       </div>
+      </div>
 
       {formOpen && (
         <DealForm
@@ -264,6 +320,7 @@ export default function Deals() {
           </div>
         </Modal>
       )}
+    </div>
     </div>
   );
 }
@@ -299,110 +356,142 @@ function DealForm({ initial, hostels, onClose, onSubmit }: FormProps) {
 
   return (
     <Modal title={initial ? "Edit deal" : "Add deal"} onClose={onClose} wide>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor="d-title">
-            Title
-          </label>
-          <input
-            id="d-title"
-            className={styles.input}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor="d-desc">
-            Description
-          </label>
-          <textarea
-            id="d-desc"
-            className={styles.textarea}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        <div className={styles.formRow}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="d-code">
-              Code
+      <form className={styles.ownerForm} onSubmit={handleSubmit}>
+        <div className={styles.ownerFormDivider} />
+        <div className={styles.ownerFormBody}>
+          <div className={styles.ownerField}>
+            <label className={styles.ownerFieldLabel} htmlFor="d-title">
+              Title
             </label>
-            <input
-              id="d-code"
-              className={styles.input}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="SUMMER10"
-              required
+            <div className={styles.ownerFieldWrap}>
+              <span className={styles.ownerFieldIcon}>
+                <IconTag size={18} />
+              </span>
+              <input
+                id="d-title"
+                className={`${styles.input} ${styles.ownerInputIcon}`}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Summer Special"
+                required
+              />
+            </div>
+          </div>
+
+          <div className={styles.ownerField}>
+            <label className={styles.ownerFieldLabel} htmlFor="d-desc">
+              Description
+            </label>
+            <textarea
+              id="d-desc"
+              className={styles.textarea}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What's this promotion about?"
             />
           </div>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="d-discount">
-              Discount %
-            </label>
-            <input
-              id="d-discount"
-              className={styles.input}
-              type="number"
-              min={0}
-              max={100}
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              required
-            />
-          </div>
-        </div>
 
-        <div className={styles.formRow}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="d-hostel">
-              Applies to
-            </label>
-            <select
-              id="d-hostel"
-              className={styles.select}
-              value={hostelId}
-              onChange={(e) => setHostelId(e.target.value)}
+          <div className={styles.formRow}>
+            <div className={styles.ownerField}>
+              <label className={styles.ownerFieldLabel} htmlFor="d-code">
+                Code
+              </label>
+              <input
+                id="d-code"
+                className={styles.input}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="SUMMER10"
+                required
+              />
+            </div>
+            <div className={styles.ownerField}>
+              <label className={styles.ownerFieldLabel} htmlFor="d-discount">
+                Discount %
+              </label>
+              <input
+                id="d-discount"
+                className={styles.input}
+                type="number"
+                min={0}
+                max={100}
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.ownerField}>
+              <label className={styles.ownerFieldLabel} htmlFor="d-hostel">
+                Applies to
+              </label>
+              <div className={styles.ownerFieldWrap}>
+                <span className={styles.ownerFieldIcon}>
+                  <IconBed size={18} />
+                </span>
+                <select
+                  id="d-hostel"
+                  className={`${styles.select} ${styles.ownerInputIcon}`}
+                  value={hostelId}
+                  onChange={(e) => setHostelId(e.target.value)}
+                >
+                  <option value="">All hostels</option>
+                  {hostels.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className={styles.ownerField}>
+              <label className={styles.ownerFieldLabel} htmlFor="d-expires">
+                Expires
+              </label>
+              <div className={styles.ownerFieldWrap}>
+                <span className={styles.ownerFieldIcon}>
+                  <IconCalendar size={18} />
+                </span>
+                <input
+                  id="d-expires"
+                  className={`${styles.input} ${styles.ownerInputIcon}`}
+                  type="date"
+                  value={expiresAt}
+                  onChange={(e) => setExpiresAt(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.ownerCheckRow}>
+            <button
+              type="button"
+              className={`${styles.ownerCheck} ${active ? styles.ownerCheckOn : ""}`}
+              onClick={() => setActive(!active)}
+              aria-pressed={active}
+              aria-label="Toggle active promotion"
             >
-              <option value="">All hostels</option>
-              {hostels.map((h) => (
-                <option key={h.id} value={h.id}>
-                  {h.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="d-expires">
-              Expires
+              <IconCheck size={14} />
+            </button>
+            <label
+              className={styles.ownerCheckLabel}
+              onClick={() => setActive(!active)}
+            >
+              Active promotion
             </label>
-            <input
-              id="d-expires"
-              className={styles.input}
-              type="date"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
-            />
           </div>
-        </div>
+          <p className={styles.ownerHelper}>
+            {active
+              ? "Active deals are live and can be applied at checkout."
+              : "Inactive deals are hidden from customers."}
+          </p>
 
-        <label className={styles.checkRow}>
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
-          />
-          Active promotion
-        </label>
-
-        <div className={styles.formActions}>
-          <button type="button" className="dabi-btn dabi-btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="dabi-btn dabi-btn-primary">
+          <button
+            type="submit"
+            className={`${styles.ownerBtn} ${styles.ownerBtnPrimary} ${styles.ownerBtnBlock}`}
+          >
             <IconTag size={16} />
             {initial ? "Save changes" : "Create deal"}
           </button>

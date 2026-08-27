@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, NavLink, useSearchParams } from "react-router-dom";
+import shared from "../admin.module.css";
 import {
   fetchHostels,
   fetchOwners,
@@ -8,12 +9,10 @@ import {
 } from "../../services/api";
 import type { AdminHostel, Owner, Availability } from "../types";
 import { usePolling } from "../usePolling";
-import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import LiveControls from "../components/LiveControls";
 import AdminEmptyState from "../components/AdminEmptyState";
 import {
-  IconSearch,
   IconPlus,
   IconEdit,
   IconTrash,
@@ -22,12 +21,17 @@ import {
   IconMore,
   IconCheck,
   IconShield,
-  IconBolt,
   IconBed,
-  IconList,
-  IconGrid,
 } from "../../components/Icons/Icons";
-import styles from "../admin.module.css";
+import {
+  IconGrid,
+  IconBook,
+  IconSquarePlus,
+  IconSearch,
+  IconChevronDown,
+  IconList,
+} from "./hostelPageIcons";
+import styles from "./Hostels.module.css";
 
 const AVAILABILITY: Availability[] = ["Available", "Limited", "Full"];
 
@@ -37,19 +41,69 @@ const ghs = new Intl.NumberFormat("en-GH", {
   maximumFractionDigits: 0,
 });
 
-const dateFmt = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
+function availabilityBadge(a: Availability): string {
+  if (a === "Available") return styles.badgeAvailable;
+  if (a === "Limited") return styles.badgeLimited;
+  return styles.badgeFull;
+}
 
-function ownerInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+function Dropdown({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: readonly { value: string; label: string }[];
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+  const current = options.find((o) => o.value === value);
+  return (
+    <div className={styles.dropdownWrap} ref={ref}>
+      <button
+        type="button"
+        className={styles.filterBtn}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <span className={styles.filterBtnText}>
+          {label}: <span className={styles.filterValue}>{current?.label ?? value}</span>
+        </span>
+        <span className={styles.filterChevron}>
+          <IconChevronDown size={14} />
+        </span>
+      </button>
+      {open && (
+        <div className={styles.menu} role="menu">
+          {options.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              role="menuitem"
+              className={`${styles.menuItem} ${o.value === value ? styles.menuItemActive : ""}`}
+              onClick={() => {
+                onChange(o.value);
+                setOpen(false);
+              }}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Hostels() {
@@ -68,16 +122,46 @@ export default function Hostels() {
   const [menuId, setMenuId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
-  type ViewMode = "table" | "grid";
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      const t = e.target as HTMLElement;
+      if (!t.closest("[data-kebab]")) setMenuId(null);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuId(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  type ViewMode = "grid" | "list";
   const VIEW_KEY = "dabi.admin.hostels.view";
   const [view, setView] = useState<ViewMode>(() => {
     const saved = localStorage.getItem(VIEW_KEY);
-    return saved === "grid" || saved === "table" ? saved : "table";
+    return saved === "grid" || saved === "list" ? saved : "grid";
   });
   function changeView(next: ViewMode) {
     setView(next);
     localStorage.setItem(VIEW_KEY, next);
   }
+
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const avail = params.get("avail");
+    const verified = params.get("verified");
+    if (avail === "Limited" || avail === "Full") setAvailFilter(avail);
+    if (verified === "Verified" || verified === "Unverified")
+      setVerifiedFilter(verified);
+    if (avail || verified) {
+      if (avail) params.delete("avail");
+      if (verified) params.delete("verified");
+      setParams(params, { replace: true });
+    }
+  }, [params, setParams, setAvailFilter, setVerifiedFilter]);
 
   async function refresh(showLoading = true) {
     if (showLoading) {
@@ -114,13 +198,13 @@ export default function Hostels() {
   const counts = useMemo(() => {
     let available = 0;
     let needsAttention = 0;
-    let unverified = 0;
+    let verified = 0;
     for (const h of hostels) {
       if (h.availability === "Available") available++;
       if (h.availability === "Limited" || h.availability === "Full") needsAttention++;
-      if (!h.verified) unverified++;
+      if (h.verified) verified++;
     }
-    return { total: hostels.length, available, needsAttention, unverified };
+    return { total: hostels.length, available, needsAttention, verified };
   }, [hostels]);
 
   const filtered = useMemo(() => {
@@ -153,6 +237,16 @@ export default function Hostels() {
     });
     return sorted;
   }, [hostels, query, availFilter, verifiedFilter, ownerFilter, sort, ownerName]);
+
+  const verifiedHostels = useMemo(
+    () => hostels.filter((h) => h.verified),
+    [hostels]
+  );
+  const featured = useMemo(() => {
+    const base = verifiedHostels.length > 0 ? verifiedHostels : hostels;
+    return base.slice(0, 3);
+  }, [verifiedHostels, hostels]);
+  const [wide, ...wideRest] = featured;
 
   async function handleDelete() {
     if (!confirmId) return;
@@ -187,429 +281,503 @@ export default function Hostels() {
   }
 
   return (
-    <div>
-      <section className={styles.dashHero}>
-        <div className={styles.dashHeroMain}>
-          <span className={styles.dashEyebrow}>
-            <IconBed size={14} /> Listings
-          </span>
-          <h1 className={styles.dashGreeting}>
-            Every hostel is a home waiting to happen.
-          </h1>
-          <p className={styles.dashGreetingSub}>
-            You&rsquo;re caring for <b>{counts.total}</b>{" "}
-            {counts.total === 1 ? "listing" : "listings"}
-            {counts.needsAttention > 0
-              ? `, and ${counts.needsAttention} ${counts.needsAttention === 1 ? "needs" : "need"} your attention.`
-              : ". All looking healthy — lovely."}
-          </p>
-          <div
-            className={styles.dashHeroLive}
-            style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}
-          >
-            <LiveControls
-              lastUpdated={lastUpdated}
-              loading={state === "loading"}
-              onRefresh={() => refresh()}
-            />
-            <button
-              className={`dabi-btn dabi-btn-primary ${styles.btnPrimary}`}
-              onClick={() => navigate("/admin/hostels/new")}
-            >
-              <IconPlus size={18} />
-              Add hostel
-            </button>
+    <div className={shared.sbShell}>
+      {/* Internal sub-sidebar — mirrors the Owners' sbSubNav */}
+      <aside className={shared.sbSubNav}>
+        <div className={shared.sbSubNavHeader}>
+          <h4 className={shared.sbSubNavTitle}>Hostels</h4>
+        </div>
+        <nav className={shared.sbSubNavNav}>
+          <div className={shared.sbSubGroup}>
+            <div className={shared.sbSubGroupLabel}>Manage</div>
+            <div className={shared.sbSubGroupItems}>
+              <NavLink
+                to="/admin/hostels"
+                end
+                className={({ isActive }) =>
+                  `${shared.sbSubItem} ${isActive ? shared.sbSubItemActive : ""}`
+                }
+              >
+                <span className={shared.sbSubItemIcon}>
+                  <IconGrid size={16} />
+                </span>
+                <span className={shared.sbSubItemLabel}>Explore all</span>
+              </NavLink>
+            </div>
           </div>
-        </div>
-        <div className={styles.dashHeroArt} aria-hidden="true">
-          <img
-            src="/illustrations/Travel--Streamline-Manchester.webp"
-            alt=""
-            width={138}
-            height={138}
-           loading="lazy" decoding="async" />
-        </div>
-      </section>
 
-      <div className={styles.statGrid}>
-        <div className={`${styles.statCard} ${styles.toneGreen}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Total listings</span>
-            <span className={styles.statIcon}>
-              <IconBed size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{counts.total}</div>
-          <div className={styles.statHint}>Homes on Dabi</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneEmerald}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Available</span>
-            <span className={styles.statIcon}>
-              <IconCheck size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{counts.available}</div>
-          <div className={styles.statHint}>Ready for students</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneGold}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Needs attention</span>
-            <span className={styles.statIcon}>
-              <IconBolt size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{counts.needsAttention}</div>
-          <div className={styles.statHint}>Limited or full</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneBlue}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Unverified</span>
-            <span className={styles.statIcon}>
-              <IconShield size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{counts.unverified}</div>
-          <div className={styles.statHint}>Awaiting your review</div>
-        </div>
-      </div>
+          <div className={shared.sbSubDivider} />
 
-      <div className={styles.toolbar}>
-        <label className={styles.search}>
-          <IconSearch size={17} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, location or owner…"
-          />
-        </label>
-        <div className={styles.filterGroup}>
-          {(["All", ...AVAILABILITY] as const).map((a) => (
-            <button
-              key={a}
-              className={`${styles.chip} ${availFilter === a ? styles.chipActive : ""}`}
-              onClick={() => setAvailFilter(a)}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
-        <select
-          className={styles.selectInline}
-          value={verifiedFilter}
-          onChange={(e) => setVerifiedFilter(e.target.value as typeof verifiedFilter)}
-          aria-label="Filter by verification"
-        >
-          <option value="All">All listings</option>
-          <option value="Verified">Verified</option>
-          <option value="Unverified">Needs review</option>
-        </select>
-        <span className={styles.spacer} />
-        <select
-          className={styles.selectInline}
-          value={ownerFilter}
-          onChange={(e) => setOwnerFilter(e.target.value)}
-          aria-label="Filter by owner"
-        >
-          <option value="all">All owners</option>
-          {owners.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className={styles.selectInline}
-          value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
-          aria-label="Sort hostels"
-        >
-          <option value="name">Name A–Z</option>
-          <option value="price-asc">Price: low to high</option>
-          <option value="price-desc">Price: high to low</option>
-          <option value="newest">Newest first</option>
-        </select>
-        <div className={styles.viewToggle} role="group" aria-label="List layout">
-          <button
-            type="button"
-            className={`${styles.viewBtn} ${view === "table" ? styles.viewBtnActive : ""}`}
-            onClick={() => changeView("table")}
-            aria-pressed={view === "table"}
-            aria-label="Table view"
-            title="Table view"
-          >
-            <IconList size={17} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.viewBtn} ${view === "grid" ? styles.viewBtnActive : ""}`}
-            onClick={() => changeView("grid")}
-            aria-pressed={view === "grid"}
-            aria-label="Grid view"
-            title="Grid view"
-          >
-            <IconGrid size={17} />
-          </button>
-        </div>
-      </div>
-
-      <p className={styles.resultsLine}>
-        Showing <b>{filtered.length}</b> of <b>{hostels.length}</b> hostels
-      </p>
-
-      {state === "loading" ? (
-        <div className={styles.panel}>
-          <div className={styles.panelBody}>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={styles.skTableRow} />
-            ))}
+          <div className={shared.sbSubGroup}>
+            <div className={shared.sbSubGroupLabel}>Verified · {counts.verified}</div>
+            <div className={shared.sbSubGroupItems}>
+              {verifiedHostels.slice(0, 8).map((h) =>
+                h.image ? (
+                  <NavLink
+                    key={h.id}
+                    to={`/admin/hostels/${h.id}/edit`}
+                    className={({ isActive }) =>
+                      `${shared.sbSubItem} ${isActive ? shared.sbSubItemActive : ""}`
+                    }
+                  >
+                    <img
+                      src={h.image}
+                      alt=""
+                      loading="lazy"
+                      className={shared.sbSubItemIcon}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: 4,
+                        objectFit: "cover",
+                        border: "1px solid var(--adm-line-strong)",
+                        background: "var(--adm-white)",
+                      }}
+                    />
+                    <span className={shared.sbSubItemLabel}>{h.name}</span>
+                  </NavLink>
+                ) : (
+                  <NavLink
+                    key={h.id}
+                    to={`/admin/hostels/${h.id}/edit`}
+                    className={({ isActive }) =>
+                      `${shared.sbSubItem} ${isActive ? shared.sbSubItemActive : ""}`
+                    }
+                  >
+                    <span className={shared.sbSubItemIcon}>
+                      <IconBed size={16} />
+                    </span>
+                    <span className={shared.sbSubItemLabel}>{h.name}</span>
+                  </NavLink>
+                )
+              )}
+            </div>
           </div>
-        </div>
-      ) : filtered.length === 0 ? (
-          <div className={styles.panel}>
-            <AdminEmptyState
-              variant="empty"
-              illustration="/illustrations/Rest-3--Streamline-Brooklyn.webp"
-              title="No hostels match"
-              text="Try clearing a filter, or add a new listing to get started."
-              action={{
-                label: (
-                  <>
-                    <IconPlus size={16} /> Add hostel
-                  </>
-                ),
-                onClick: () => navigate("/admin/hostels/new"),
-              }}
-            />
+
+          <div className={shared.sbSubDivider} />
+
+          <div className={shared.sbSubGroup}>
+            <div className={shared.sbSubGroupLabel}>Resources</div>
+            <div className={shared.sbSubGroupItems}>
+              <NavLink
+                to="/admin/hostels/new"
+                className={({ isActive }) =>
+                  `${shared.sbSubItem} ${isActive ? shared.sbSubItemActive : ""}`
+                }
+              >
+                <span className={shared.sbSubItemIcon}>
+                  <IconSquarePlus size={16} />
+                </span>
+                <span className={shared.sbSubItemLabel}>Add listing</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-arrow-up-right opacity-50"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+              </NavLink>
+              <NavLink
+                to="/admin/hostels/new"
+                className={({ isActive }) =>
+                  `${shared.sbSubItem} ${isActive ? shared.sbSubItemActive : ""}`
+                }
+              >
+                <span className={shared.sbSubItemIcon}>
+                  <IconSquarePlus size={16} />
+                </span>
+                <span className={shared.sbSubItemLabel}>Add listing</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-arrow-up-right opacity-50"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+              </NavLink>
+            </div>
           </div>
-      ) : (
-        <div className={styles.listArea} data-view={view}>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Hostel</th>
-                  <th>Price</th>
-                  <th>Room</th>
-                  <th>Availability</th>
-                  <th>Verified</th>
-                  <th>Owner</th>
-                  <th>Updated</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <div className={shared.sbContent}>
+          <header className={styles.pageHeader}>
+            <div className={styles.pageHeaderMeta}>
+              <div className={styles.pageHeaderSummary}>
+                <h1 className={styles.title}>Your hostels</h1>
+                <div className={styles.sub}>
+                  Explore and manage every Dabi listing from one place — {counts.total}{" "}
+                  {counts.total === 1 ? "home" : "homes"} on the map.
+                </div>
+              </div>
+              <div className={styles.pageHeaderActions}>
+                <button className={styles.docsBtn} type="button" onClick={() => navigate("/admin/docs")}>
+                  <span className={styles.docsBtnIcon}>
+                    <IconBook size={14} />
+                  </span>
+                  Docs
+                </button>
+                <button className={styles.addBtn} type="button" onClick={() => navigate("/admin/hostels/new")}>
+                  <IconPlus size={16} />
+                  Add hostel
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div className={styles.contentPad}>
+            {state === "ready" && featured.length > 0 && (
+              <section className={styles.featured}>
+                <div className={styles.featuredHead}>
+                  <h2 className={styles.sectionTitle}>Featured hostels</h2>
+                </div>
+                <div className={styles.featuredGrid}>
+                  <div className={`${styles.featCard} ${styles.featCardWide}`}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className={styles.featWideInner}
+                      onClick={() => navigate(`/admin/hostels/${wide.id}/edit`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") navigate(`/admin/hostels/${wide.id}/edit`);
+                      }}
+                    >
+                      <div className={styles.featWideBody}>
+                        <div className={styles.featWideName}>{wide.name}</div>
+                        <p className={styles.featWideDesc}>
+                          {wide.location} · {wide.roomType}
+                          {wide.totalRooms != null ? ` · ${wide.totalRooms} rooms` : ""}
+                        </p>
+                        <div className={styles.featWideFoot}>
+                          <span className={`${styles.badge} ${availabilityBadge(wide.availability)}`}>
+                            {wide.availability}
+                          </span>
+                          {wide.verified && (
+                            <span className={`${styles.badge} ${styles.badgeVerified}`}>Verified</span>
+                          )}
+                          <span className={styles.builtBy}>
+                            {ghs.format(wide.pricePerYear)} <span>/yr</span>
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={styles.featWideCover}
+                        style={{ backgroundImage: `url(${wide.image})` }}
+                      />
+                    </div>
+                  </div>
+                  {wideRest.map((h) => (
+                    <div key={h.id} className={styles.featCard}>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className={styles.featSmallInner}
+                        onClick={() => navigate(`/admin/hostels/${h.id}/edit`)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") navigate(`/admin/hostels/${h.id}/edit`);
+                        }}
+                      >
+                        <div className={styles.featSmallTop}>
+                          {h.image ? (
+                            <img className={styles.cardThumb} src={h.image} alt="" loading="lazy" />
+                          ) : (
+                            <span className={styles.cardThumbFallback}>
+                              <IconBed size={20} />
+                            </span>
+                          )}
+                        </div>
+                        <div className={styles.featSmallName}>{h.name}</div>
+                        <p className={styles.featSmallDesc}>{h.location}</p>
+                        <div className={styles.featSmallFoot}>
+                          <span className={`${styles.badge} ${availabilityBadge(h.availability)}`}>
+                            {h.availability}
+                          </span>
+                          <span className={styles.builtBy}>
+                            {ghs.format(h.pricePerYear)} <span>/yr</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <div className={styles.toolbar}>
+              <div className={styles.searchWrap}>
+                <span className={styles.searchIcon}>
+                  <IconSearch size={14} />
+                </span>
+                <input
+                  className={styles.searchInput}
+                  placeholder="Search name, location or owner…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <Dropdown
+                label="Availability"
+                value={availFilter}
+                options={[
+                  { value: "All", label: "All" },
+                  ...AVAILABILITY.map((a) => ({ value: a, label: a })),
+                ]}
+                onChange={(v) => setAvailFilter(v as typeof availFilter)}
+              />
+              <Dropdown
+                label="Status"
+                value={verifiedFilter}
+                options={[
+                  { value: "All", label: "All" },
+                  { value: "Verified", label: "Verified" },
+                  { value: "Unverified", label: "Needs review" },
+                ]}
+                onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
+              />
+              <Dropdown
+                label="Owner"
+                value={ownerFilter}
+                options={[
+                  { value: "all", label: "All owners" },
+                  ...owners.map((o) => ({ value: o.id, label: o.name })),
+                ]}
+                onChange={setOwnerFilter}
+              />
+              <Dropdown
+                label="Sort"
+                value={sort}
+                options={[
+                  { value: "name", label: "Name A–Z" },
+                  { value: "price-asc", label: "Price ↑" },
+                  { value: "price-desc", label: "Price ↓" },
+                  { value: "newest", label: "Newest" },
+                ]}
+                onChange={(v) => setSort(v as typeof sort)}
+              />
+              <LiveControls
+                lastUpdated={lastUpdated}
+                loading={state === "loading"}
+                onRefresh={() => refresh()}
+              />
+              <div className={styles.spacer} />
+              <div className={styles.viewToggle} role="group" aria-label="List layout">
+                <button
+                  type="button"
+                  className={`${styles.viewBtn} ${view === "grid" ? styles.viewBtnActive : ""}`}
+                  onClick={() => changeView("grid")}
+                  aria-pressed={view === "grid"}
+                  aria-label="Grid view"
+                  title="Grid view"
+                >
+                  <IconGrid size={13} />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.viewBtn} ${view === "list" ? styles.viewBtnActive : ""}`}
+                  onClick={() => changeView("list")}
+                  aria-pressed={view === "list"}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  <IconList size={13} />
+                </button>
+              </div>
+            </div>
+
+            {state === "loading" ? (
+              <div className={styles.loadingGrid}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className={styles.skeleton} />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className={styles.empty}>
+                <div className={styles.emptyTitle}>No hostels match</div>
+                <div className={styles.emptyText}>
+                  Try clearing a filter, or add a new listing to get started.
+                </div>
+              </div>
+            ) : view === "grid" ? (
+              <div className={styles.grid}>
                 {filtered.map((h) => {
                   const owner = h.ownerId ? ownerName.get(h.ownerId) : undefined;
                   return (
-                    <tr key={h.id}>
-                      <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <img className={styles.cellThumb} src={h.image} alt="" loading="lazy" decoding="async" />
-                          <div>
-                            <div className={styles.cellTitle}>{h.name}</div>
-                            <div className={styles.cellSub}>
-                              <IconPin size={12} style={{ verticalAlign: "-2px" }} /> {h.location}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className={styles.priceCell}>
-                        {ghs.format(h.pricePerYear)} <small>/yr</small>
-                      </td>
-                       <td className={styles.cellSub}>
-                         {h.roomType}
-                         {h.totalRooms != null ? ` · ${h.totalRooms} rooms` : ""}
-                       </td>
-                      <td>
-                        <Badge variant={h.availability}>{h.availability}</Badge>
-                      </td>
-                      <td>
-                        {h.verified ? (
-                          <span className={styles.verifiedCell}>
-                            <IconCheck size={14} /> Yes
-                          </span>
+                    <div key={h.id} className={styles.card}>
+                      <div className={styles.cardTop}>
+                        {h.image ? (
+                          <img className={styles.cardThumb} src={h.image} alt="" loading="lazy" />
                         ) : (
-                          <span className={styles.verifiedNo}>—</span>
-                        )}
-                      </td>
-                      <td>
-                        {owner ? (
-                          <span className={styles.ownerCell}>
-                            <span className={styles.ownerDot}>
-                              {ownerInitials(owner.name)}
-                            </span>
-                            {owner.name}
+                          <span className={styles.cardThumbFallback}>
+                            <IconBed size={20} />
                           </span>
-                        ) : (
-                          <span className={styles.cellSub}>Unassigned</span>
                         )}
-                      </td>
-                      <td className={styles.cellSub}>{dateFmt.format(new Date(h.createdAt))}</td>
-                      <td>
-                        <div className={styles.rowActions}>
-                          <a
-                            className={styles.btnIcon}
-                            href={`/hostel/${h.id}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label={`View ${h.name}`}
-                            title="View on site"
-                          >
-                            <IconEye size={16} />
-                          </a>
-                          <div className={styles.actionMenuWrap}>
+                        <button
+                          className={styles.cardKebab}
+                          type="button"
+                          data-kebab
+                          aria-label={`Actions for ${h.name}`}
+                          onClick={() => setMenuId(menuId === h.id ? null : h.id)}
+                        >
+                          <IconMore size={16} />
+                        </button>
+                        {menuId === h.id && (
+                          <div className={styles.kebabMenu} data-kebab>
                             <button
-                              className={styles.btnIcon}
-                              onClick={() => setMenuId(menuId === h.id ? null : h.id)}
-                              aria-label={`Actions for ${h.name}`}
+                              className={styles.kebabItem}
+                              type="button"
+                              onClick={() => {
+                                setMenuId(null);
+                                window.open(`/hostel/${h.id}`, "_blank", "noreferrer");
+                              }}
                             >
-                              <IconMore size={16} />
+                              <IconEye size={16} /> View on site
                             </button>
-                            {menuId === h.id && (
-                              <>
-                                <button
-                                  className={styles.scrim}
-                                  style={{ position: "fixed", zIndex: 35 }}
-                                  aria-label="Close menu"
-                                  onClick={() => setMenuId(null)}
-                                />
-                                <div className={styles.actionMenu}>
-                                  <div className={styles.actionMenuLabel}>Manage</div>
-                                  <button
-                                    className={styles.actionMenuItem}
-                                    onClick={() => {
-                                      setMenuId(null);
-                                      navigate(`/admin/hostels/${h.id}/edit`);
-                                    }}
-                                  >
-                                    <IconEdit size={16} /> Edit details
-                                  </button>
-                                  <button
-                                    className={styles.actionMenuItem}
-                                    onClick={() => toggleVerify(h)}
-                                  >
-                                    <IconShield size={16} />
-                                    {h.verified ? "Remove verification" : "Mark verified"}
-                                  </button>
-                                  <button
-                                    className={`${styles.actionMenuItem} ${styles.actionMenuItemDanger}`}
-                                    onClick={() => {
-                                      setMenuId(null);
-                                      setConfirmId(h.id);
-                                    }}
-                                  >
-                                    <IconTrash size={16} /> Delete
-                                  </button>
-                                </div>
-                              </>
-                            )}
+                            <button
+                              className={styles.kebabItem}
+                              type="button"
+                              onClick={() => {
+                                setMenuId(null);
+                                navigate(`/admin/hostels/${h.id}/edit`);
+                              }}
+                            >
+                              <IconEdit size={16} /> Edit details
+                            </button>
+                            <button
+                              className={styles.kebabItem}
+                              type="button"
+                              onClick={() => toggleVerify(h)}
+                            >
+                              <IconShield size={16} />
+                              {h.verified ? "Remove verification" : "Mark verified"}
+                            </button>
+                            <button
+                              className={`${styles.kebabItem} ${styles.kebabItemDanger}`}
+                              type="button"
+                              onClick={() => {
+                                setMenuId(null);
+                                setConfirmId(h.id);
+                              }}
+                            >
+                              <IconTrash size={16} /> Delete
+                            </button>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <div className={styles.hostelGrid}>
-            {filtered.map((h) => {
-              const owner = h.ownerId ? ownerName.get(h.ownerId) : undefined;
-              return (
-                <div key={h.id} className={styles.hostelCard}>
-                  <div className={styles.hostelCardMedia}>
-                    <img className={styles.hostelCardImg} src={h.image} alt="" loading="lazy" decoding="async" />
-                    {h.verified && (
-                      <span className={styles.hostelCardVerified}>
-                        <IconCheck size={12} /> Verified
-                      </span>
-                    )}
-                    <a
-                      className={styles.hostelCardView}
-                      href={`/hostel/${h.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`View ${h.name} on site`}
-                      title="View on site"
-                    >
-                      <IconEye size={15} />
-                    </a>
-                    <span className={styles.hostelCardPrice}>
-                      {ghs.format(h.pricePerYear)} <small>/yr</small>
-                    </span>
-                  </div>
-                  <div className={styles.hostelCardBody}>
-                    <div className={styles.hostelCardHead}>
-                      <div className={styles.hostelCardName}>{h.name}</div>
-                      <div className={styles.hostelCardLoc}>
-                        <IconPin size={12} style={{ verticalAlign: "-2px" }} /> {h.location}
+                        )}
                       </div>
-                    </div>
-                    <div className={styles.hostelCardStats}>
-                      <span className={styles.hostelCardRoom}>
+                      <div className={styles.cardName}>{h.name}</div>
+                      <p className={styles.cardDesc}>
+                        <IconPin size={12} style={{ verticalAlign: "-2px" }} /> {h.location} ·{" "}
                         {h.roomType}
                         {h.totalRooms != null ? ` · ${h.totalRooms} rooms` : ""}
-                      </span>
-                      <Badge variant={h.availability}>{h.availability}</Badge>
-                    </div>
-                    <div className={styles.hostelCardFoot}>
-                      {owner ? (
-                        <span className={styles.ownerCell}>
-                          <span className={styles.ownerDot}>
-                            {ownerInitials(owner.name)}
-                          </span>
-                          {owner.name}
+                      </p>
+                      <div className={styles.cardFoot}>
+                        <span className={`${styles.badge} ${availabilityBadge(h.availability)}`}>
+                          {h.availability}
                         </span>
-                      ) : (
-                        <span className={styles.cellSub}>Unassigned</span>
-                      )}
-                      <span className={styles.cellSub}>
-                        {dateFmt.format(new Date(h.createdAt))}
-                      </span>
+                        {h.verified && (
+                          <span className={`${styles.badge} ${styles.badgeVerified}`}>
+                            <IconCheck size={10} /> Verified
+                          </span>
+                        )}
+                        <span className={styles.price}>
+                          <b>{ghs.format(h.pricePerYear)}</b> /yr
+                        </span>
+                        <span className={styles.builtBy}>
+                          {owner ? `by ${owner.name}` : "Unassigned"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className={styles.hostelCardActions}>
-                    <button
-                      className={styles.btnIcon}
-                      onClick={() => navigate(`/admin/hostels/${h.id}/edit`)}
-                      aria-label={`Edit ${h.name}`}
-                      title="Edit details"
-                    >
-                      <IconEdit size={16} />
-                    </button>
-                    <button
-                      className={styles.btnIcon}
-                      onClick={() => toggleVerify(h)}
-                      aria-label={`${h.verified ? "Remove verification" : "Mark verified"} for ${h.name}`}
-                      title={h.verified ? "Remove verification" : "Mark verified"}
-                    >
-                      <IconShield size={16} />
-                    </button>
-                    <button
-                      className={`${styles.btnIcon} ${styles.btnIconDanger}`}
-                      onClick={() => setConfirmId(h.id)}
-                      aria-label={`Delete ${h.name}`}
-                      title="Delete"
-                    >
-                      <IconTrash size={16} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            ) : (
+              <div className={styles.gridList}>
+                {filtered.map((h) => {
+                  const owner = h.ownerId ? ownerName.get(h.ownerId) : undefined;
+                  return (
+                    <div key={h.id} className={styles.listRow}>
+                      {h.image ? (
+                        <img className={styles.listThumb} src={h.image} alt="" loading="lazy" />
+                      ) : (
+                        <span className={styles.listThumbFallback}>
+                          <IconBed size={20} />
+                        </span>
+                      )}
+                      <div className={styles.listMain}>
+                        <div className={styles.listName}>{h.name}</div>
+                        <p className={styles.listDesc}>
+                          <IconPin size={12} style={{ verticalAlign: "-2px" }} /> {h.location} ·{" "}
+                          {h.roomType}
+                          {h.totalRooms != null ? ` · ${h.totalRooms} rooms` : ""} ·{" "}
+                          {owner ? owner.name : "Unassigned"}
+                        </p>
+                      </div>
+                      <div className={styles.listMeta}>
+                        <span className={`${styles.badge} ${availabilityBadge(h.availability)}`}>
+                          {h.availability}
+                        </span>
+                        {h.verified && (
+                          <span className={`${styles.badge} ${styles.badgeVerified}`}>
+                            <IconCheck size={10} /> Verified
+                          </span>
+                        )}
+                        <span className={styles.listPrice}>
+                          <b>{ghs.format(h.pricePerYear)}</b> /yr
+                        </span>
+                      </div>
+                      <button
+                        className={styles.cardKebab}
+                        type="button"
+                        aria-label={`Actions for ${h.name}`}
+                        onClick={() => setMenuId(menuId === h.id ? null : h.id)}
+                      >
+                        <IconMore size={16} />
+                      </button>
+                      {menuId === h.id && (
+                        <div className={styles.kebabMenu}>
+                          <button
+                            className={styles.kebabItem}
+                            type="button"
+                            onClick={() => {
+                              setMenuId(null);
+                              window.open(`/hostel/${h.id}`, "_blank", "noreferrer");
+                            }}
+                          >
+                            <IconEye size={16} /> View on site
+                          </button>
+                          <button
+                            className={styles.kebabItem}
+                            type="button"
+                            onClick={() => {
+                              setMenuId(null);
+                              navigate(`/admin/hostels/${h.id}/edit`);
+                            }}
+                          >
+                            <IconEdit size={16} /> Edit details
+                          </button>
+                          <button
+                            className={styles.kebabItem}
+                            type="button"
+                            onClick={() => toggleVerify(h)}
+                          >
+                            <IconShield size={16} />
+                            {h.verified ? "Remove verification" : "Mark verified"}
+                          </button>
+                          <button
+                            className={`${styles.kebabItem} ${styles.kebabItemDanger}`}
+                            type="button"
+                            onClick={() => {
+                              setMenuId(null);
+                              setConfirmId(h.id);
+                            }}
+                          >
+                            <IconTrash size={16} /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-      )}
 
       {confirmId && (
         <Modal title="Delete hostel?" onClose={() => setConfirmId(null)}>
-          <p className={styles.muted} style={{ marginBottom: 18 }}>
-            This will permanently remove the listing and unassign it from its
-            owner. This action can&rsquo;t be undone.
+          <p style={{ marginBottom: 18, color: "var(--adm-muted)", fontSize: "0.875rem" }}>
+            This will permanently remove the listing and unassign it from its owner. This
+            action can&rsquo;t be undone.
           </p>
-          <div className={styles.formActions}>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <button
               className="dabi-btn dabi-btn-ghost"
               onClick={() => setConfirmId(null)}
@@ -623,6 +791,6 @@ export default function Hostels() {
           </div>
         </Modal>
       )}
-    </div>
+      </div>
   );
 }

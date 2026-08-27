@@ -313,6 +313,16 @@ export function IconList(p: IconProps) {
   );
 }
 
+export function IconHelp(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
 export function IconGrid(p: IconProps) {
   return (
     <svg {...base(p)}>
@@ -465,6 +475,77 @@ export function IconRefresh(p: IconProps) {
     <svg {...base(p)}>
       <path d="M21 12a9 9 0 1 1-2.64-6.36" />
       <path d="M21 3v5h-5" />
+    </svg>
+  );
+}
+
+/* Filled speech bubble — used (recolored) for the status tabs,
+   mirroring the Supabase "message-square-more" severity icons. */
+export function IconMessageSquareMore(p: IconProps) {
+  const { size = 24, ...rest } = p;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth={0}
+      aria-hidden="true"
+      {...rest}
+    >
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+/* Small filled info dot — matches the reference's tooltip icon. */
+export function IconInfo(p: IconProps) {
+  const { size = 16, ...rest } = p;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+      {...rest}
+    >
+      <path
+        fillRule="evenodd"
+        d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+export function IconTextSearch(p: IconProps) {
+  return (
+    <svg {...base(p)} strokeWidth={1}>
+      <path d="M21 6H3" />
+      <path d="M10 12H3" />
+      <path d="M10 18H3" />
+      <circle cx="17" cy="15" r="3" />
+      <path d="m21 19-1.9-1.9" />
+    </svg>
+  );
+}
+
+export function IconBookOpen(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+  );
+}
+
+export function IconArrowUpRight(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <path d="M7 7h10v10" />
+      <path d="M7 17 17 7" />
     </svg>
   );
 }

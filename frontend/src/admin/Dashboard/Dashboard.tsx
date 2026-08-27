@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   fetchDashboardStats,
   fetchEnquiries,
@@ -10,6 +10,7 @@ import type { DashboardStats, Enquiry, AdminHostel } from "../types";
 import { usePolling } from "../usePolling";
 import Badge from "../components/Badge";
 import LiveControls from "../components/LiveControls";
+import RealtimeCta from "../components/RealtimeCta";
 import {
   IconBed,
   IconShield,
@@ -19,8 +20,9 @@ import {
   IconBolt,
   IconCheck,
   IconCalendar,
+  IconPlus,
 } from "../../components/Icons/Icons";
-import styles from "../admin.module.css";
+import styles from "./Dashboard.module.css";
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
@@ -44,6 +46,7 @@ export default function Dashboard() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [hostels, setHostels] = useState<AdminHostel[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const navigate = useNavigate();
   const mountedRef = useRef(false);
   useEffect(() => {
     mountedRef.current = true;
@@ -207,36 +210,51 @@ export default function Dashboard() {
   });
 
   return (
-    <div>
+    <div className={styles.dashShell}>
+      <div className={styles.dashInner}>
+        <div className={styles.toolbar}>
+        <div className={styles.toolGroup}>
+          <button
+            type="button"
+            className={styles.toolBtnPrimary}
+            onClick={() => navigate("/admin/hostels/new")}
+          >
+            <IconPlus size={14} /> Add hostel
+          </button>
+        </div>
+        <div className={styles.toolSpacer} />
+        <div className={styles.toolGroup}>
+          <LiveControls
+            lastUpdated={lastUpdated}
+            loading={isLoading}
+            onRefresh={() => load()}
+          />
+        </div>
+      </div>
+
       <div className={styles.dashHero}>
         <div className={styles.dashHeroMain}>
-          <span className={styles.dashEyebrow}>
-            <IconCalendar size={14} /> {dateLabel}
-          </span>
+          <div className={styles.dashHeroTopRow}>
+            <span className={styles.dashEyebrow}>
+              <IconCalendar size={14} /> {dateLabel}
+            </span>
+            <span className={styles.heroLive} title="Your dashboard updates in real time">
+              <span className={styles.heroLiveDot} /> Live
+            </span>
+          </div>
           <div className={styles.dashGreeting}>
             {greetingWord()}, {name}
           </div>
           <div className={styles.dashGreetingSub}>
             Here&rsquo;s how your hostels are doing today.
           </div>
-          <div className={styles.dashHeroLive}>
-            <LiveControls
-              lastUpdated={lastUpdated}
-              loading={isLoading}
-              onRefresh={() => load()}
-            />
-          </div>
         </div>
-        <div className={styles.dashHeroArt} aria-hidden="true">
-          <img
-            src="/illustrations/Welcome-5--Streamline-Brooklyn.webp"
-            alt=""
-            width={138}
-            height={138}
-           loading="lazy" decoding="async" />
+        <div className={styles.dashHeroAside}>
+          <RealtimeCta onAction={() => navigate("/admin/enquiries")} />
         </div>
       </div>
 
+      <div className={styles.dashBody}>
       {attention.length > 0 && (
         <section className={styles.attention}>
           <div className={styles.attentionHead}>
@@ -309,18 +327,7 @@ export default function Dashboard() {
           <div className={styles.panelBody}>
             {enquiries.length === 0 ? (
               <div className={styles.emptyPanel}>
-                <div className={styles.emptyPanelArt}>
-                  <img
-                    src="/illustrations/I-Have-Question-1--Streamline-Brooklyn.webp"
-                    alt="A student with a question"
-                    width={88}
-                    height={88}
-                   loading="lazy" decoding="async" />
-                </div>
-                <h4 className={styles.emptyPanelTitle}>No enquiries yet.</h4>
-                <p className={styles.emptyPanelText}>
-                  New questions from students will appear here as they come in.
-                </p>
+                <RealtimeCta onAction={() => navigate("/admin/enquiries")} />
               </div>
             ) : (
               <div className={styles.activity}>
@@ -377,6 +384,8 @@ export default function Dashboard() {
             </p>
           </div>
         </section>
+      </div>
+      </div>
       </div>
     </div>
   );

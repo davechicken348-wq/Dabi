@@ -8,9 +8,10 @@ interface ModalProps {
   children: ReactNode;
   wide?: boolean;
   xwide?: boolean;
+  narrow?: boolean;
 }
 
-export default function Modal({ title, onClose, children, wide, xwide }: ModalProps) {
+export default function Modal({ title, onClose, children, wide, xwide, narrow }: ModalProps) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -28,7 +29,7 @@ export default function Modal({ title, onClose, children, wide, xwide }: ModalPr
       <div
         className={`${styles.modal} ${wide ? styles.modalWide : ""} ${
           xwide ? styles.modalXWide : ""
-        }`}
+        } ${narrow ? styles.modalNarrow : ""}`}
       >
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>{title}</h2>

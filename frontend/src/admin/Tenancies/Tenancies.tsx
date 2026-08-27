@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   fetchTenancies,
   confirmTenancy as apiConfirm,
@@ -9,7 +10,6 @@ import {
 import Badge from "../components/Badge";
 import Modal from "../components/Modal";
 import RecordModal from "../components/RecordModal";
-import LiveControls from "../components/LiveControls";
 import AdminEmptyState from "../components/AdminEmptyState";
 import { usePolling } from "../usePolling";
 import {
@@ -17,11 +17,18 @@ import {
   IconEye,
   IconTrash,
   IconCheck,
-  IconCalendar,
-  IconUsers,
-  IconBed,
+  IconRefresh,
+  IconChevronDown,
 } from "../../components/Icons/Icons";
-import styles from "../admin.module.css";
+import {
+  IconMessageSquareMore,
+  IconTextSearch,
+  IconInfo,
+  IconBookOpen,
+  IconArrowUpRight,
+} from "../../components/Icons/Icons";
+import adv from "../Enquiries/Enquiries.module.css";
+import admin from "../admin.module.css";
 
 type TenancyStatus = "pending" | "active" | "ended";
 
@@ -55,7 +62,7 @@ interface Tenancy {
   createdAt: string;
 }
 
-const STATUS_FILTERS: ("All" | TenancyStatus)[] = ["All", "pending", "active", "ended"];
+const STATUS_TABS: TenancyStatus[] = ["pending", "active", "ended"];
 
 const statusVariant: Record<TenancyStatus, "New" | "Active" | "Resolved"> = {
   pending: "New",
@@ -67,6 +74,30 @@ const statusLabel: Record<TenancyStatus, string> = {
   pending: "Pending",
   active: "Active",
   ended: "Ended",
+};
+
+/* Maps tenancy status onto the reference's error / warning / info
+   iconography and colour tokens (pending = attention, active = in
+   progress, ended = done). */
+const STATUS_TAB: Record<
+  TenancyStatus,
+  { iconClass: string; label: string; countLabel: (n: number) => string }
+> = {
+  pending: {
+    iconClass: adv.tabIconError,
+    label: "Pending",
+    countLabel: (n) => `${n} pending`,
+  },
+  active: {
+    iconClass: adv.tabIconWarning,
+    label: "Active",
+    countLabel: (n) => `${n} active`,
+  },
+  ended: {
+    iconClass: adv.tabIconInfo,
+    label: "Ended",
+    countLabel: (n) => `${n} ended`,
+  },
 };
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", {
@@ -98,15 +129,56 @@ function normalize(dto: TenancyDTO): Tenancy {
   };
 }
 
+function exportCsv(rows: Tenancy[]) {
+  const headers = [
+    "Occupant",
+    "Phone",
+    "Hostel",
+    "Room type",
+    "Beds",
+    "Move-in",
+    "Source",
+    "Status",
+    "Created",
+  ];
+  const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const lines = rows.map((r) =>
+    [
+      r.occupantName,
+      r.phone,
+      r.hostelName,
+      r.roomTypeName,
+      r.beds,
+      r.moveIn ?? "",
+      r.source === "admin" ? "Dabi" : "Student request",
+      r.status,
+      r.createdAt,
+    ]
+      .map(escape)
+      .join(",")
+  );
+  const csv = [headers.join(","), ...lines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "tenancies.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Tenancies() {
+  const navigate = useNavigate();
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [loadState, setLoadState] = useState<"loading" | "error" | "ready">("loading");
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"All" | TenancyStatus>("All");
+  const [activeStatus, setActiveStatus] = useState<"All" | TenancyStatus>("All");
   const [view, setView] = useState<Tenancy | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [bannerHidden, setBannerHidden] = useState(false);
 
   async function refresh(showLoading = true): Promise<Tenancy[]> {
     if (showLoading) {
@@ -146,21 +218,30 @@ export default function Tenancies() {
         t.occupantName.toLowerCase().includes(q) ||
         t.hostelName.toLowerCase().includes(q) ||
         t.roomTypeName.toLowerCase().includes(q);
-      const matchesStatus = statusFilter === "All" || t.status === statusFilter;
+      const matchesStatus = activeStatus === "All" || t.status === activeStatus;
       return matchesQuery && matchesStatus;
     });
-  }, [tenancies, query, statusFilter]);
+  }, [tenancies, query, activeStatus]);
 
   const pendingCount = tenancies.filter((t) => t.status === "pending").length;
   const activeCount = tenancies.filter((t) => t.status === "active").length;
   const endedCount = tenancies.filter((t) => t.status === "ended").length;
+
+  const updatedLabel = useMemo(() => {
+    if (!lastUpdated) return "";
+    const secs = Math.round((Date.now() - lastUpdated.getTime()) / 1000);
+    if (secs < 5) return "Updated just now";
+    if (secs < 60) return `Updated ${secs}s ago`;
+    const mins = Math.round(secs / 60);
+    if (mins < 60) return `Updated ${mins}m ago`;
+    return `Updated ${Math.round(mins / 60)}h ago`;
+  }, [lastUpdated]);
 
   async function handleConfirm() {
     if (!view) return;
     await apiConfirm(view.id);
     const list = await refresh(false);
     setView(list.find((t) => t.id === view.id) ?? null);
-    setLastUpdated(new Date());
   }
 
   async function handleEnd() {
@@ -168,7 +249,6 @@ export default function Tenancies() {
     await apiEnd(view.id);
     const list = await refresh(false);
     setView(list.find((t) => t.id === view.id) ?? null);
-    setLastUpdated(new Date());
   }
 
   async function handleDelete() {
@@ -178,6 +258,25 @@ export default function Tenancies() {
     setView(null);
     refresh(false);
   }
+
+  const emptyCopy: Record<string, { title: string; text: string }> = {
+    All: {
+      title: "No tenancies detected",
+      text: "When a student requests to reserve a room, the pending tenancy will appear here for you to confirm with the owner.",
+    },
+    pending: {
+      title: "No pending tenancies",
+      text: "Every request has been confirmed or ended. Nice work keeping availability honest.",
+    },
+    active: {
+      title: "No active tenancies",
+      text: "No students are currently settled into a room.",
+    },
+    ended: {
+      title: "No ended tenancies",
+      text: "Completed stays will be archived here for reference.",
+    },
+  };
 
   if (loadState === "error") {
     const isConnectionError =
@@ -198,203 +297,312 @@ export default function Tenancies() {
     );
   }
 
+  const railItems: { key: "All" | TenancyStatus; dot: string; count: number }[] = [
+    { key: "All", dot: adv.railDotAll, count: tenancies.length },
+    { key: "pending", dot: adv.railDotNew, count: pendingCount },
+    { key: "active", dot: adv.railDotContacted, count: activeCount },
+    { key: "ended", dot: adv.railDotResolved, count: endedCount },
+  ];
+
   return (
-    <div>
-      <section className={styles.dashHero}>
-        <div className={styles.dashHeroMain}>
-          <span className={styles.dashEyebrow}>
-            <IconBed size={14} /> Tenancies
-          </span>
-          <h1 className={styles.dashGreeting}>
-            Help students settle into a place that feels like home.
-          </h1>
-          <p className={styles.dashGreetingSub}>
-            {pendingCount} {pendingCount === 1 ? "tenancy is" : "tenancies are"} waiting for
-            your confirmation. Each one you approve frees a bed and keeps a promise.
-          </p>
-          <div className={styles.dashHeroLive}>
-            <LiveControls
-              lastUpdated={lastUpdated}
-              loading={loadState === "loading"}
-              onRefresh={() => refresh()}
-            />
+    <div className={adv.shell}>
+      <div className={adv.panels}>
+        {/* ---------- Left rail ---------- */}
+        <aside className={adv.rail}>
+          <div className={adv.railHead}>
+            <span className={adv.railTitle}>Tenancies</span>
           </div>
-        </div>
-        <div className={styles.dashHeroArt} aria-hidden="true">
-          <img
-            src="/illustrations/Being-Happy-1--Streamline-Brooklyn.webp"
-            alt=""
-            width={138}
-            height={138}
-           loading="lazy" decoding="async" />
-        </div>
-      </section>
+          <div className={adv.railBody}>
+            {!bannerHidden && (
+              <div className={adv.banner}>
+                <span className={adv.bannerBadge}>New</span>
+                <span className={adv.bannerTitle}>One-tap confirm</span>
+                <span className={adv.bannerText}>
+                  Confirm a pending request straight from its row or detail view.
+                  A tap frees the bed and keeps availability honest.
+                </span>
+                <button
+                  type="button"
+                  className={adv.bannerBtn}
+                  onClick={() => setBannerHidden(true)}
+                >
+                  Got it
+                </button>
+              </div>
+            )}
 
-      <div className={styles.statGrid}>
-        <div className={`${styles.statCard} ${styles.toneGold}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Pending</span>
-            <span className={styles.statIcon}>
-              <IconCalendar size={18} />
-            </span>
+            <span className={adv.railLabel}>Views</span>
+            <nav className={adv.railNav}>
+              {railItems.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`${adv.railItem} ${
+                    activeStatus === item.key ? adv.railItemActive : ""
+                  }`}
+                  onClick={() => {
+                    setActiveStatus(item.key);
+                    setFilterOpen(false);
+                  }}
+                >
+                  <span className={`${adv.railDot} ${item.dot}`} />
+                  <span className={adv.railName}>
+                    {item.key === "All" ? "All tenancies" : statusLabel[item.key as TenancyStatus]}
+                  </span>
+                  <span className={adv.railCount}>{item.count}</span>
+                </button>
+              ))}
+            </nav>
           </div>
-          <div className={styles.statValue}>{pendingCount}</div>
-          <div className={styles.statHint}>Awaiting your confirmation</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneEmerald}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Active</span>
-            <span className={styles.statIcon}>
-              <IconCheck size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{activeCount}</div>
-          <div className={styles.statHint}>Students settled in</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneBlue}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>Ended</span>
-            <span className={styles.statIcon}>
-              <IconUsers size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{endedCount}</div>
-          <div className={styles.statHint}>Completed stays</div>
-        </div>
-        <div className={`${styles.statCard} ${styles.toneGreen}`}>
-          <div className={styles.statTop}>
-            <span className={styles.statLabel}>All tenancies</span>
-            <span className={styles.statIcon}>
-              <IconBed size={18} />
-            </span>
-          </div>
-          <div className={styles.statValue}>{tenancies.length}</div>
-          <div className={styles.statHint}>Total records</div>
-        </div>
-      </div>
+        </aside>
 
-      <div className={styles.toolbar}>
-        <label className={styles.search}>
-          <IconSearch size={17} />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tenancies…"
-          />
-        </label>
-        <div className={styles.filterGroup}>
-          {STATUS_FILTERS.map((s) => (
-            <button
-              key={s}
-              className={`${styles.chip} ${statusFilter === s ? styles.chipActive : ""}`}
-              onClick={() => setStatusFilter(s)}
-            >
-              {s === "All" ? "All" : statusLabel[s]}
+        {/* ---------- Main panel ---------- */}
+        <section className={adv.main}>
+          <div className={adv.mainHead}>
+            <div>
+              <h1 className={adv.mainTitle}>
+                {activeStatus === "All" ? "All tenancies" : `${statusLabel[activeStatus]} tenancies`}
+              </h1>
+              <p className={adv.mainSub}>
+                {activeStatus === "All"
+                  ? "Every room reservation across Dabi."
+                  : `Tenancies marked “${statusLabel[activeStatus]}”.`}
+              </p>
+            </div>
+            <button type="button" className={adv.docBtn} onClick={() => navigate("/admin/docs")}>
+              <IconBookOpen size={15} />
+              <span>Docs</span>
+              <IconArrowUpRight size={13} />
             </button>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      <p className={styles.resultsLine}>
-        Showing <b>{filtered.length}</b> of <b>{tenancies.length}</b> tenancies
-      </p>
+          {/* Status tabs — error / warning / info icons repurposed */}
+          <div className={adv.tabs} role="tablist" aria-label="Tenancy status">
+            {STATUS_TABS.map((s) => {
+              const tab = STATUS_TAB[s];
+              const active = activeStatus === s;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  className={`${adv.tab} ${active ? adv.tabActive : ""}`}
+                  onClick={() => {
+                    setActiveStatus(s);
+                    setFilterOpen(false);
+                  }}
+                >
+                  <span className={adv.tabRow}>
+                    <span className={`${adv.tabIcon} ${tab.iconClass}`}>
+                      <IconMessageSquareMore size={14} />
+                    </span>
+                    <span>{tab.label}</span>
+                    <span className={adv.tabInfo}>
+                      <IconInfo size={12} />
+                    </span>
+                  </span>
+                  <span className={adv.tabCount}>{tab.countLabel(
+                    s === "pending" ? pendingCount : s === "active" ? activeCount : endedCount
+                  )}</span>
+                </button>
+              );
+            })}
+          </div>
 
-      <div className={styles.panel}>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Occupant</th>
-                <th>Hostel</th>
-                <th>Room</th>
-                <th>Move-in</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+          {/* Toolbar */}
+          <div className={adv.toolbar}>
+            <div className={adv.filterPop}>
+              <button
+                type="button"
+                className={`${adv.toolBtn} ${adv.toolBtnDashed}`}
+                onClick={() => setFilterOpen((v) => !v)}
+                aria-expanded={filterOpen}
+              >
+                <IconSearch size={14} />
+                <span>Filter</span>
+                <IconChevronDown size={13} />
+              </button>
+              {filterOpen && (
+                <div className={adv.filterMenu}>
+                  <input
+                    className={adv.filterInput}
+                    autoFocus
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search occupant, hostel or room…"
+                  />
+                  <p className={adv.filterHint}>
+                    Matches against the occupant’s name, hostel and room type.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className={adv.toolBtn}
+              onClick={() => refresh()}
+              disabled={loadState === "loading"}
+            >
+              <IconRefresh size={14} className={loadState === "loading" ? admin.liveSpin : undefined} />
+              <span>Refresh</span>
+            </button>
+
+            <button
+              type="button"
+              className={`${adv.toolBtn} ${adv.toolBtnPrimary}`}
+              onClick={() => exportCsv(filtered)}
+              disabled={filtered.length === 0}
+            >
+              <span>Export</span>
+            </button>
+
+            <span className={adv.toolSpacer} />
+            {updatedLabel && <span className={adv.updated}>{updatedLabel}</span>}
+          </div>
+
+          {/* Loading bar */}
+          {loadState === "loading" && <div className={adv.loadBar} />}
+
+          {/* Data grid */}
+          <div className={adv.grid}>
+            <div className={adv.gridHead}>
+              <div className={adv.gridHeadCell}>Occupant</div>
+              <div className={adv.gridHeadCell}>Hostel / room</div>
+              <div className={adv.gridHeadCell}>Details</div>
+              <div className={adv.gridHeadCell} />
+            </div>
+            <div className={adv.gridBody}>
               {loadState === "loading" ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}>
-                    <td colSpan={6}>
-                      <div className={styles.skeleton} style={{ height: 18, margin: "8px 0" }} />
-                    </td>
-                  </tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className={adv.gridRow}>
+                    <div className={admin.skeleton} style={{ height: 18 }} />
+                    <div className={admin.skeleton} style={{ height: 18 }} />
+                    <div className={admin.skeleton} style={{ height: 18 }} />
+                    <div />
+                  </div>
                 ))
               ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6}>
-                    <AdminEmptyState
-                      variant="empty"
-                      illustration="/illustrations/Faq-1--Streamline-Brooklyn.webp"
-                      eyebrow="No tenancies"
-                      title="Nothing here yet."
-                      text="When a student requests to reserve a room, the pending tenancy will appear here for you to confirm with the owner."
-                      hint="Confirmations keep availability honest across the site."
-                      action={{ label: "Refresh", onClick: () => refresh() }}
-                    />
-                  </td>
-                </tr>
+                <div className={adv.emptyState}>
+                  <span className={adv.emptyStateIcon}>
+                    <IconTextSearch size={26} />
+                  </span>
+                  <span className={adv.emptyStateTitle}>
+                    {emptyCopy[activeStatus].title}
+                  </span>
+                  <span className={adv.emptyStateText}>
+                    {emptyCopy[activeStatus].text}
+                  </span>
+                </div>
               ) : (
                 filtered.map((t) => (
-                  <tr key={t.id}>
-                    <td>
-                      <div className={styles.personCell}>
-                        <span
-                          className={styles.avatar}
-                          style={{ background: personColor(t.occupantName) }}
-                        >
-                          {initials(t.occupantName)}
-                        </span>
-                        <div>
-                          <div className={styles.cellTitle}>{t.occupantName}</div>
-                          <div className={styles.cellSub}>{t.phone}</div>
-                        </div>
+                  <div key={t.id} className={adv.gridRow}>
+                    <div className={adv.cellStudent}>
+                      <span
+                        className={adv.cellAvatar}
+                        style={{ background: personColor(t.occupantName) }}
+                      >
+                        {initials(t.occupantName)}
+                      </span>
+                      <div className={adv.cellMeta}>
+                        <span className={adv.cellName}>{t.occupantName}</span>
+                        <span className={adv.cellPhone}>{t.phone}</span>
                       </div>
-                    </td>
-                    <td>{t.hostelName}</td>
-                    <td className={styles.cellSub}>{t.roomTypeName}</td>
-                    <td className={styles.cellSub}>{formatDate(t.moveIn)}</td>
-                    <td>
+                    </div>
+                    <div className={adv.cellMeta}>
+                      <span className={adv.cellMetaMain}>{t.hostelName}</span>
+                      <span className={adv.cellMetaSub}>
+                        {t.roomTypeName} · {formatDate(t.moveIn)}
+                      </span>
+                    </div>
+                    <div className={adv.cellDesc}>
+                      <span className={adv.cellMsg}>
+                        {t.beds} bed{t.beds === 1 ? "" : "s"}
+                        {t.source === "admin" ? " · Added by Dabi" : ""}
+                      </span>
                       <Badge variant={statusVariant[t.status]}>{statusLabel[t.status]}</Badge>
-                    </td>
-                    <td>
-                      <div className={styles.rowActions}>
+                    </div>
+                    <div className={adv.cellRowActions}>
+                      <button
+                        type="button"
+                        className={admin.btnIcon}
+                        onClick={() => setView(t)}
+                        aria-label={`View ${t.occupantName}`}
+                      >
+                        <IconEye size={16} />
+                      </button>
+                      {t.status === "pending" && (
                         <button
-                          className={styles.btnIcon}
-                          onClick={() => setView(t)}
-                          aria-label={`View ${t.occupantName}`}
+                          type="button"
+                          className={`${admin.btnIcon} ${admin.btnIconOk}`}
+                          onClick={async () => {
+                            await apiConfirm(t.id);
+                            await refresh(false);
+                            setLastUpdated(new Date());
+                          }}
+                          aria-label={`Confirm ${t.occupantName}`}
                         >
-                          <IconEye size={16} />
+                          <IconCheck size={16} />
                         </button>
-                        {t.status === "pending" && (
-                          <button
-                            className={`${styles.btnIcon} ${styles.btnIconOk}`}
-                            onClick={async () => {
-                              await apiConfirm(t.id);
-                              await refresh(false);
-                              setLastUpdated(new Date());
-                            }}
-                            aria-label={`Confirm ${t.occupantName}`}
-                          >
-                            <IconCheck size={16} />
-                          </button>
-                        )}
-                        <button
-                          className={`${styles.btnIcon} ${styles.btnIconDanger}`}
-                          onClick={() => setConfirmId(t.id)}
-                          aria-label={`Delete ${t.occupantName}`}
-                        >
-                          <IconTrash size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                      )}
+                      <button
+                        type="button"
+                        className={`${admin.btnIcon} ${admin.btnIconDanger}`}
+                        onClick={() => setConfirmId(t.id)}
+                        aria-label={`Delete ${t.occupantName}`}
+                      >
+                        <IconTrash size={16} />
+                      </button>
+                    </div>
+                  </div>
                 ))
               )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className={adv.footer}>
+            <div className={adv.footerCol}>
+              <span className={adv.footerTitle}>Reset view</span>
+              <span className={adv.footerText}>
+                Clear the search and status filter to see every tenancy.
+              </span>
+              <button
+                type="button"
+                className={adv.footerBtn}
+                onClick={() => {
+                  setQuery("");
+                  setActiveStatus("All");
+                }}
+              >
+                Reset filters
+              </button>
+            </div>
+            <div className={adv.footerCol}>
+              <span className={adv.footerTitle}>Re-run fetch</span>
+              <span className={adv.footerText}>
+                Tenancies are pulled live from your Dabi backend. Re-run to check
+                for new reservations.
+              </span>
+              <button
+                type="button"
+                className={adv.footerBtn}
+                onClick={() => refresh()}
+              >
+                <IconRefresh size={14} />
+                Re-run fetch
+              </button>
+            </div>
+            <div className={adv.footerCol}>
+              <span className={adv.footerTitle}>How is this generated?</span>
+              <span className={adv.footerText}>
+                Tenancies are created when a student reserves a room, or when an
+                admin adds one directly.
+              </span>
+            </div>
+          </div>
+        </section>
       </div>
 
       {view && (
@@ -410,40 +618,40 @@ export default function Tenancies() {
           avatarColor={personColor(view.occupantName)}
           onClose={() => setView(null)}
         >
-          <div className={styles.detailList}>
-            <div className={styles.detailRow}>
-              <span className={styles.detailKey}>Room type</span>
+          <div className={admin.detailList}>
+            <div className={admin.detailRow}>
+              <span className={admin.detailKey}>Room type</span>
               <span>{view.roomTypeName}</span>
             </div>
-            <div className={styles.detailRow}>
-              <span className={styles.detailKey}>Beds</span>
+            <div className={admin.detailRow}>
+              <span className={admin.detailKey}>Beds</span>
               <span>{view.beds}</span>
             </div>
-            <div className={styles.detailRow}>
-              <span className={styles.detailKey}>Move-in</span>
+            <div className={admin.detailRow}>
+              <span className={admin.detailKey}>Move-in</span>
               <span>{formatDate(view.moveIn)}</span>
             </div>
-            <div className={styles.detailRow}>
-              <span className={styles.detailKey}>Source</span>
+            <div className={admin.detailRow}>
+              <span className={admin.detailKey}>Source</span>
               <span>{view.source === "self" ? "Student request" : "Dabi"}</span>
             </div>
           </div>
 
-          <div className={styles.formActions}>
+          <div className={admin.formActions}>
             {view.status === "pending" && (
-              <button className={styles.btnPrimary} onClick={handleConfirm}>
+              <button className={admin.btnPrimary} onClick={handleConfirm}>
                 <IconCheck size={16} /> Confirm tenancy
               </button>
             )}
             {view.status === "active" && (
-              <button className={styles.btnPrimary} onClick={handleEnd}>
+              <button className={admin.btnPrimary} onClick={handleEnd}>
                 End tenancy
               </button>
             )}
-            <button className={styles.btnDanger} onClick={() => setConfirmId(view.id)}>
+            <button className={admin.btnDanger} onClick={() => setConfirmId(view.id)}>
               <IconTrash size={16} /> Delete
             </button>
-            <button className={styles.btnGhost} onClick={() => setView(null)}>
+            <button className={admin.btnGhost} onClick={() => setView(null)}>
               Done
             </button>
           </div>
@@ -452,14 +660,14 @@ export default function Tenancies() {
 
       {confirmId && (
         <Modal title="Delete tenancy?" onClose={() => setConfirmId(null)}>
-          <p className={styles.muted} style={{ marginBottom: 18 }}>
+          <p className={admin.muted} style={{ marginBottom: 18 }}>
             This tenancy record will be permanently removed.
           </p>
-          <div className={styles.formActions}>
-            <button className={styles.btnGhost} onClick={() => setConfirmId(null)}>
+          <div className={admin.formActions}>
+            <button className={admin.btnGhost} onClick={() => setConfirmId(null)}>
               Cancel
             </button>
-            <button className={styles.btnDanger} onClick={handleDelete}>
+            <button className={admin.btnDanger} onClick={handleDelete}>
               <IconTrash size={16} /> Delete
             </button>
           </div>

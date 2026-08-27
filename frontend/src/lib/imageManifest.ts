@@ -435,5 +435,22 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
       }
     ],
     "avif": []
+  },
+  "hostel_bedroom_isometric": {
+    "width": 1200,
+    "height": 960,
+    "lqip": "/images/variants/hostel_bedroom_isometric-lqip.webp",
+    "webp": [
+      { "w": 480, "src": "/images/variants/hostel_bedroom_isometric-480.webp" },
+      { "w": 768, "src": "/images/variants/hostel_bedroom_isometric-768.webp" },
+      { "w": 1080, "src": "/images/variants/hostel_bedroom_isometric-1080.webp" },
+      { "w": 1200, "src": "/images/variants/hostel_bedroom_isometric-1200.webp" }
+    ],
+    "avif": [
+      { "w": 480, "src": "/images/variants/hostel_bedroom_isometric-480.avif" },
+      { "w": 768, "src": "/images/variants/hostel_bedroom_isometric-768.avif" },
+      { "w": 1080, "src": "/images/variants/hostel_bedroom_isometric-1080.avif" },
+      { "w": 1200, "src": "/images/variants/hostel_bedroom_isometric-1200.avif" }
+    ]
   }
 };

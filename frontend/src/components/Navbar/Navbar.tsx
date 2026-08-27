@@ -66,6 +66,26 @@ const moreLinks: MenuEntry[] = [
   { label: "Admin sign in", to: "/admin", desc: "Manage hostels & listings", Icon: IconUser },
 ];
 
+type MobileLink = { label: string; to: string };
+type MobileGroup = { title: string; to: string; links: MobileLink[] };
+
+// Group every primary link with its submenu entries into a labelled section
+// for the mobile menu (e.g. "Find a Hostel" → its two sub-links). Links
+// without a submenu (About) plus the "More" links form the final group.
+const mobileGroups: MobileGroup[] = [
+  ...primaryLinks
+    .filter((l) => l.menu)
+    .map((l) => ({ title: l.label, to: l.to, links: (l.menu as MenuEntry[]).map((m) => ({ label: m.label, to: m.to })) })),
+  {
+    title: "More",
+    to: "/about",
+    links: [
+      { label: "About", to: "/about" },
+      ...moreLinks.map((m) => ({ label: m.label, to: m.to })),
+    ],
+  },
+];
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(true);
@@ -90,10 +110,6 @@ export default function Navbar() {
       window.removeEventListener("resize", onResize);
     };
   }, [open]);
-
-  const mobileEntries = primaryLinks.flatMap((l) =>
-    l.menu ? [{ label: l.label, to: l.to }, ...l.menu] : [{ label: l.label, to: l.to }]
-  );
 
   return (
     <header className={`${styles.header} ${styles.solid}`}>
@@ -210,25 +226,28 @@ export default function Navbar() {
         aria-hidden={!open}
       >
         <nav className={styles.mobileNav} aria-label="Mobile">
-          {mobileEntries.map((m, i) => (
-            <Link
-              key={`${m.label}-${i}`}
-              to={m.to}
-              className={styles.mobileLink}
-              onClick={() => setOpen(false)}
-            >
-              {m.label}
-            </Link>
-          ))}
-          {moreLinks.map((m) => (
-            <Link
-              key={m.label}
-              to={m.to}
-              className={styles.mobileLink}
-              onClick={() => setOpen(false)}
-            >
-              {m.label}
-            </Link>
+          {mobileGroups.map((g) => (
+            <div key={g.title} className={styles.mobileGroup}>
+              <Link
+                to={g.to}
+                className={styles.mobileGroupTitle}
+                onClick={() => setOpen(false)}
+              >
+                {g.title}
+              </Link>
+              <div className={styles.mobileGroupLinks}>
+                {g.links.map((m) => (
+                  <Link
+                    key={m.label}
+                    to={m.to}
+                    className={styles.mobileLink}
+                    onClick={() => setOpen(false)}
+                  >
+                    {m.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
           <Link
             to="/find-hostel"

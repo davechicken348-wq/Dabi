@@ -371,16 +371,45 @@
 .mobileNav {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 1rem var(--gutter) 1.5rem;
+  padding: 0.75rem var(--gutter) 1.5rem;
+}
+
+.mobileGroup {
+  padding: 0.35rem 0 0.55rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.mobileGroup:last-of-type {
+  border-bottom: none;
+}
+
+.mobileGroupTitle {
+  display: block;
+  padding: 0.5rem 0.5rem 0.35rem;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dabi-muted);
+}
+
+.mobileGroupLinks {
+  display: flex;
+  flex-direction: column;
 }
 
 .mobileLink {
-  padding: 0.85rem 0.5rem;
+  padding: 0.7rem 0.5rem 0.7rem 1.1rem;
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--ink);
-  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease);
+}
+
+.mobileLink:hover {
+  background: rgba(24, 32, 27, 0.04);
+  color: var(--ink);
 }
 
 .mobileNav .mobileCta {
@@ -482,6 +511,10 @@
     border-radius: 10px;
   }
   .mobileNav {
-    padding: 0.8rem var(--gutter) 1.1rem;
+    padding: 0.5rem var(--gutter) 1.1rem;
+  }
+  .mobileLink {
+    font-size: 1rem;
+    padding: 0.65rem 0.45rem 0.65rem 1rem;
   }
 }

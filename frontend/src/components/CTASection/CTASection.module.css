@@ -17,7 +17,7 @@
 }
 
 .title {
-  font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+  font-size: var(--sb-h2);
 }
 
 .lead {

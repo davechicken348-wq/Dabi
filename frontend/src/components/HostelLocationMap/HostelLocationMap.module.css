@@ -1,26 +1,45 @@
 .wrap {
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--dabi-green) 6%, transparent),
+    var(--shadow-md);
 }
 
 .canvas {
   width: 100%;
-  height: 320px;
+  height: 340px;
+  background: var(--dabi-ivory);
+}
+
+/* Soft vignette so the map edges melt into the card */
+.wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 120% at 50% 0%,
+    transparent 60%,
+    rgba(15, 35, 28, 0.12) 100%
+  );
+  z-index: 400;
 }
 
 .badge {
   position: absolute;
-  bottom: 14px;
-  left: 14px;
+  bottom: 16px;
+  left: 16px;
   z-index: 500;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.85rem;
-  background: var(--dabi-white);
+  gap: 0.55rem;
+  padding: 0.55rem 0.95rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-md);
@@ -30,7 +49,7 @@
 
 .badge strong {
   color: var(--dabi-green-700);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .badge svg {
@@ -53,6 +72,6 @@
 
 @media (max-width: 560px) {
   .canvas {
-    height: 260px;
+    height: 280px;
   }
 }

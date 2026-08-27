@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import {
   IconMenu,
@@ -7,28 +7,68 @@ import {
   IconSearch,
   IconPin,
   IconUser,
+  IconMap,
+  IconCrosshair,
+  IconCompass,
+  IconList,
+  IconSparkles,
+  IconArrowUpRight,
 } from "../Icons/Icons";
 import Wordmark from "../Wordmark/Wordmark";
 import styles from "./Navbar.module.css";
 
-const primaryLinks = [
-  { label: "Find a Hostel", to: "/find-hostel" },
-  { label: "Locations", to: "/locations" },
-  { label: "How It Works", to: "/how-it-works" },
+type MenuIcon = (p: { size?: number }) => JSX.Element;
+
+type MenuEntry = {
+  label: string;
+  to: string;
+  desc: string;
+  Icon: MenuIcon;
+};
+
+type PrimaryLink = {
+  label: string;
+  to: string;
+  menu?: MenuEntry[];
+};
+
+const primaryLinks: PrimaryLink[] = [
+  {
+    label: "Find a Hostel",
+    to: "/find-hostel",
+    menu: [
+      { label: "Search hostels", to: "/find-hostel", desc: "Filter by price, area & facilities", Icon: IconSearch },
+      { label: "Browse the map", to: "/locations", desc: "See what's near campus", Icon: IconMap },
+    ],
+  },
+  {
+    label: "Locations",
+    to: "/locations",
+    menu: [
+      { label: "All areas", to: "/locations", desc: "Every verified neighbourhood", Icon: IconPin },
+      { label: "Near campus", to: "/locations", desc: "Shortest walk to lectures", Icon: IconCrosshair },
+    ],
+  },
+  {
+    label: "How It Works",
+    to: "/how-it-works",
+    menu: [
+      { label: "For students", to: "/how-it-works", desc: "Find a room in minutes", Icon: IconCompass },
+      { label: "For owners", to: "/how-it-works", desc: "List your hostel — free", Icon: IconUser },
+      { label: "Step by step", to: "/how-it-works", desc: "How Dabi matches you", Icon: IconList },
+    ],
+  },
   { label: "About", to: "/about" },
 ];
 
-const moreLinks = [
-  { label: "Contact", to: "/contact", Icon: IconPin },
-  { label: "Admin", to: "/admin", Icon: IconUser },
+const moreLinks: MenuEntry[] = [
+  { label: "Contact", to: "/contact", desc: "Questions or feedback", Icon: IconPin },
+  { label: "Admin sign in", to: "/admin", desc: "Manage hostels & listings", Icon: IconUser },
 ];
-
-const allLinks = [...primaryLinks, ...moreLinks];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
+  const [bannerOpen, setBannerOpen] = useState(true);
 
   // Mobile menu: lock body scroll, close on Escape, and close if the viewport
   // grows past the mobile breakpoint (e.g. rotate / resize to desktop).
@@ -51,26 +91,33 @@ export default function Navbar() {
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!moreOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMoreOpen(false);
-    };
-    document.addEventListener("mousedown", onDocClick);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocClick);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [moreOpen]);
-
-  const headerClass = `${styles.header} ${styles.solid}`;
+  const mobileEntries = primaryLinks.flatMap((l) =>
+    l.menu ? [{ label: l.label, to: l.to }, ...l.menu] : [{ label: l.label, to: l.to }]
+  );
 
   return (
-    <header className={headerClass}>
+    <header className={`${styles.header} ${styles.solid}`}>
+      {bannerOpen && (
+        <div className={styles.banner}>
+          <IconSparkles size={15} className={styles.bannerIcon} />
+          <span className={styles.bannerText}>
+            School &amp; campus picker is coming soon — explore verified hostels near STU now.
+          </span>
+          <Link to="/find-hostel" className={styles.bannerLink}>
+            Search
+            <IconArrowUpRight size={13} />
+          </Link>
+          <button
+            type="button"
+            className={styles.bannerClose}
+            aria-label="Dismiss announcement"
+            onClick={() => setBannerOpen(false)}
+          >
+            <IconClose size={14} />
+          </button>
+        </div>
+      )}
+
       <div className={`dabi-container ${styles.bar}`}>
         <Link to="/home" className={styles.brand} aria-label="Dabi home">
           <Wordmark invert={false} />
@@ -78,58 +125,71 @@ export default function Navbar() {
 
         <nav className={styles.nav} aria-label="Primary">
           {primaryLinks.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) =>
-                `${styles.link} ${isActive ? styles.linkActive : ""}`
-              }
-            >
-              {l.label}
-            </NavLink>
+            <div key={l.label} className={styles.item}>
+              <NavLink
+                to={l.to}
+                className={({ isActive }) =>
+                  `${styles.link} ${l.menu ? styles.linkCaret : ""} ${isActive ? styles.linkActive : ""}`
+                }
+              >
+                {l.label}
+                {l.menu && <IconChevronDown size={14} className={styles.caret} />}
+              </NavLink>
+
+              {l.menu && (
+                <div className={styles.dropdown} role="menu">
+                  <div className={styles.dropdownInner}>
+                    {l.menu.map((m) => (
+                      <Link key={m.label} to={m.to} className={styles.entry} role="menuitem">
+                        <span className={styles.entryIcon}>
+                          <m.Icon size={18} />
+                        </span>
+                        <span className={styles.entryText}>
+                          <span className={styles.entryTitle}>{m.label}</span>
+                          <span className={styles.entryDesc}>{m.desc}</span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
 
-          <div className={styles.more} ref={moreRef}>
-            <button
-              type="button"
-              className={`${styles.moreBtn} ${moreOpen ? styles.moreBtnOpen : ""}`}
-              aria-haspopup="true"
-              aria-expanded={moreOpen}
-              onClick={() => setMoreOpen((v) => !v)}
-            >
+          <div className={styles.item}>
+            <button type="button" className={`${styles.link} ${styles.linkCaret}`} tabIndex={0}>
               More
-              <IconChevronDown size={15} className={styles.moreCaret} />
+              <IconChevronDown size={14} className={styles.caret} />
             </button>
-
-            {moreOpen && (
-              <div className={styles.menu} role="menu">
-                {moreLinks.map((l) => (
-                  <Link
-                    key={l.to}
-                    to={l.to}
-                    role="menuitem"
-                    className={styles.menuLink}
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    <l.Icon size={17} className={styles.menuIcon} />
-                    {l.label}
+            <div className={styles.dropdown} role="menu">
+              <div className={styles.dropdownInner}>
+                {moreLinks.map((m) => (
+                  <Link key={m.label} to={m.to} className={styles.entry} role="menuitem">
+                    <span className={styles.entryIcon}>
+                      <m.Icon size={18} />
+                    </span>
+                    <span className={styles.entryText}>
+                      <span className={styles.entryTitle}>{m.label}</span>
+                      <span className={styles.entryDesc}>{m.desc}</span>
+                    </span>
                   </Link>
                 ))}
               </div>
-            )}
+            </div>
           </div>
         </nav>
 
         <div className={styles.actions}>
-          <span
-            className={styles.schoolComing}
-            title="School picker is coming soon"
-          >
-            📍 Coming soon
-          </span>
+          <Link to="/find-hostel" className={styles.search} aria-label="Search hostels">
+            <IconSearch size={18} />
+          </Link>
+
+          <Link to="/admin" className={styles.signin}>
+            <IconUser size={16} />
+            Sign in
+          </Link>
 
           <Link to="/find-hostel" className={`dabi-btn dabi-btn-primary ${styles.cta}`}>
-            <IconSearch size={17} />
             Find a Hostel
           </Link>
 
@@ -150,14 +210,24 @@ export default function Navbar() {
         aria-hidden={!open}
       >
         <nav className={styles.mobileNav} aria-label="Mobile">
-          {allLinks.map((l) => (
+          {mobileEntries.map((m, i) => (
             <Link
-              key={l.to}
-              to={l.to}
+              key={`${m.label}-${i}`}
+              to={m.to}
               className={styles.mobileLink}
               onClick={() => setOpen(false)}
             >
-              {l.label}
+              {m.label}
+            </Link>
+          ))}
+          {moreLinks.map((m) => (
+            <Link
+              key={m.label}
+              to={m.to}
+              className={styles.mobileLink}
+              onClick={() => setOpen(false)}
+            >
+              {m.label}
             </Link>
           ))}
           <Link
@@ -165,10 +235,8 @@ export default function Navbar() {
             className={`dabi-btn dabi-btn-primary ${styles.mobileCta}`}
             onClick={() => setOpen(false)}
           >
-            <IconSearch size={17} />
             Find a Hostel
           </Link>
-          <span className={styles.mobileSchoolComing}>📍 School picker — coming soon</span>
         </nav>
       </div>
     </header>

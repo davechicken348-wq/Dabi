@@ -445,7 +445,7 @@ export default function Hostels() {
                             <span className={`${styles.badge} ${styles.badgeVerified}`}>Verified</span>
                           )}
                           <span className={styles.builtBy}>
-                            {ghs.format(wide.pricePerYear)} <span>/yr</span>
+                            {ghs.format(wide.pricePerYear)} <span>price per head</span>
                           </span>
                         </div>
                       </div>
@@ -482,7 +482,7 @@ export default function Hostels() {
                             {h.availability}
                           </span>
                           <span className={styles.builtBy}>
-                            {ghs.format(h.pricePerYear)} <span>/yr</span>
+                            {ghs.format(h.pricePerYear)} <span>price per head</span>
                           </span>
                         </div>
                       </div>
@@ -668,7 +668,7 @@ export default function Hostels() {
                           </span>
                         )}
                         <span className={styles.price}>
-                          <b>{ghs.format(h.pricePerYear)}</b> /yr
+                          <b>{ghs.format(h.pricePerYear)}</b> price per head
                         </span>
                         <span className={styles.builtBy}>
                           {owner ? `by ${owner.name}` : "Unassigned"}
@@ -710,7 +710,7 @@ export default function Hostels() {
                           </span>
                         )}
                         <span className={styles.listPrice}>
-                          <b>{ghs.format(h.pricePerYear)}</b> /yr
+                          <b>{ghs.format(h.pricePerYear)}</b> price per head
                         </span>
                       </div>
                       <button

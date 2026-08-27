@@ -38,6 +38,38 @@ export function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Walking route between two coordinates, computed from the road network via the
+// public OSRM walking profile. Falls back to `null` on any failure (offline,
+// rate-limited, non-routable) so callers can keep using the straight-line
+// estimate instead.
+export interface WalkRoute {
+  meters: number;
+  minutes: number;
+}
+
+export async function fetchWalkingRoute(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): Promise<WalkRoute | null> {
+  try {
+    const url =
+      "https://router.project-osrm.org/route/v1/walking/" +
+      `${lng1},${lat1};${lng2},${lat2}?overview=false`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.code !== "Ok" || !data.routes?.length) return null;
+    const meters = Number(data.routes[0].distance);
+    if (!Number.isFinite(meters) || meters <= 0) return null;
+    // ~5 km/h average walking pace.
+    return { meters, minutes: meters / 83.3 };
+  } catch {
+    return null;
+  }
+}
+
 // Straight-line ("as the crow flies") distance from a hostel to the school.
 // Uses the hostel's precise coordinates when present; otherwise falls back to
 // the stored `distanceFromSTU` (e.g. for listings without coordinates yet).

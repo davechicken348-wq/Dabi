@@ -122,7 +122,7 @@ export default function FindHostelMap({ hostels }: Props) {
            <div class="${styles.popupBody}">
              <strong class="${styles.popupName}">${h.name}</strong>
              <span class="${styles.popupMeta}">${h.location}</span>
-             <span class="${styles.popupMeta}">GH₵ ${price} / year</span>
+              <span class="${styles.popupMeta}">GH₵ ${price} / year</span>
              <span class="${styles.popupDist}">${distance.toFixed(1)} km from ${school.short} (straight line)</span>
              <a class="${styles.popupLink}" href="/hostel/${h.id}">View details</a>
            </div>

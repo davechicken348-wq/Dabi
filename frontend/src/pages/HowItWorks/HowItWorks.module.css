@@ -5,7 +5,7 @@
 
 .sectionTitle {
   margin-top: 0.7rem;
-  font-size: clamp(1.85rem, 4.2vw, 2.9rem);
+  font-size: var(--sb-h2);
   letter-spacing: -0.025em;
   max-width: 18ch;
 }
@@ -38,7 +38,7 @@
 
 .heroTitle {
   margin-top: 1rem;
-  font-size: clamp(2.4rem, 5.6vw, 4rem);
+  font-size: var(--sb-display);
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
@@ -259,7 +259,7 @@
 }
 
 .studentTitle {
-  font-size: 1.25rem;
+  font-size: var(--sb-text-2xl);
   font-weight: 800;
   margin-bottom: 0.45rem;
 }
@@ -309,7 +309,7 @@
 }
 
 .ownerColTag {
-  font-size: 0.8rem;
+  font-size: var(--sb-text-sm);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -324,7 +324,7 @@
 }
 
 .ownerColTitle {
-  font-size: 1.25rem;
+  font-size: var(--sb-text-2xl);
   font-weight: 800;
 }
 
@@ -404,7 +404,7 @@
 }
 
 .manualTitle {
-  font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+  font-size: var(--sb-h2);
   max-width: 16ch;
 }
 

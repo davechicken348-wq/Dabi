@@ -8,7 +8,7 @@
 
 .title {
   font-family: var(--font);
-  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-size: var(--sb-h2);
   margin-top: 0.6rem;
 }
 
@@ -16,7 +16,7 @@
   max-width: 640px;
   margin-top: 0.75rem;
   color: var(--ink-soft);
-  font-size: 1.05rem;
+  font-size: var(--sb-text-lg);
 }
 
 .mapSection {

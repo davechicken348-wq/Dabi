@@ -7,7 +7,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.8rem;
+  font-size: var(--sb-text-sm);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -24,7 +24,7 @@
 
 .sectionTitle {
   margin-top: 0.7rem;
-  font-size: clamp(1.85rem, 4.2vw, 2.9rem);
+  font-size: var(--sb-h2);
   letter-spacing: -0.025em;
   max-width: 18ch;
 }
@@ -57,7 +57,7 @@
 
 .heroTitle {
   margin-top: 1rem;
-  font-size: clamp(2.4rem, 5.6vw, 4rem);
+  font-size: var(--sb-display);
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
@@ -148,7 +148,7 @@
 }
 
 .problemTitle {
-  font-size: clamp(1.85rem, 4vw, 2.7rem);
+  font-size: var(--sb-h2);
   max-width: 16ch;
 }
 
@@ -388,7 +388,7 @@
 
 .ownerTitle {
   margin-top: 0.8rem;
-  font-size: clamp(1.95rem, 4.6vw, 3rem);
+  font-size: var(--sb-h2);
   letter-spacing: -0.03em;
   line-height: 1.1;
 }
@@ -506,7 +506,7 @@
 }
 
 .manualTitle {
-  font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+  font-size: var(--sb-h2);
   max-width: 16ch;
 }
 
@@ -638,7 +638,7 @@
 }
 
 .localTitle {
-  font-size: clamp(1.85rem, 4vw, 2.7rem);
+  font-size: var(--sb-h2);
   max-width: 12ch;
 }
 
@@ -742,13 +742,13 @@
 }
 
 .visionTitle {
-  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  font-size: var(--sb-h2);
   letter-spacing: -0.025em;
 }
 
 .visionAlt {
   margin-top: 1rem;
-  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  font-size: var(--sb-h2);
   letter-spacing: -0.025em;
   color: var(--dabi-green);
 }
@@ -834,7 +834,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.8rem;
+  font-size: var(--sb-text-sm);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -852,7 +852,7 @@
 
 .finalTitle {
   color: var(--dabi-white);
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: var(--sb-h1);
   letter-spacing: -0.03em;
 }
 

@@ -10,7 +10,7 @@
 
 .title {
   margin-top: 0.6rem;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: var(--sb-h2);
 }
 
 .grid {
@@ -49,20 +49,21 @@
   position: absolute;
   top: 1.5rem;
   right: 1.6rem;
-  font-size: 1.1rem;
+  font-size: var(--sb-text-lg);
   font-weight: 800;
   color: var(--dabi-gold);
   letter-spacing: 0.02em;
 }
 
 .stepTitle {
-  font-size: 1.25rem;
+  font-size: var(--sb-text-2xl);
   font-weight: 800;
   margin-bottom: 0.4rem;
 }
 
 .stepText {
   color: var(--ink-soft);
+  font-size: var(--sb-text-base);
   line-height: 1.55;
 }
 

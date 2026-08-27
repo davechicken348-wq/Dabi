@@ -20,7 +20,7 @@ import { usePolling } from "../../admin/usePolling";
 import LiveControls from "../../admin/components/LiveControls";
 import type { Hostel } from "../../data/hostels";
 import type { HostelDetail, Facility, GalleryImage, RoomType } from "../../data/hostelDetails";
-import { areaCoords, haversineKm } from "../../data/geo";
+import { areaCoords, haversineKm, fetchWalkingRoute } from "../../data/geo";
 import { useSchool } from "../../context/SchoolContext";
 import HostelLocationMap from "../../components/HostelLocationMap/HostelLocationMap";
 import Gallery from "./Gallery";
@@ -138,6 +138,7 @@ export default function HostelDetails() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [fullOpen, setFullOpen] = useState(false);
+  const [walk, setWalk] = useState<{ km: number; min: number } | null>(null);
 
   function handleInterested() {
     if (liveHostAvail === "Full") {
@@ -171,6 +172,20 @@ export default function HostelDetails() {
   useEffect(() => {
     loadHostel();
   }, [id]);
+
+  useEffect(() => {
+    if (!detail?.lat || !detail?.lng) {
+      setWalk(null);
+      return;
+    }
+    let cancelled = false;
+    fetchWalkingRoute(detail.lat, detail.lng, school.lat, school.lng).then((r) => {
+      if (!cancelled && r) setWalk({ km: r.meters / 1000, min: r.minutes });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [detail, school.lat, school.lng]);
 
   if (status === "loading") {
     return (
@@ -225,6 +240,10 @@ export default function HostelDetails() {
     : null;
   const distanceLabel =
     distanceKm != null ? `${distanceKm.toFixed(1)} km (straight line)` : detail.distanceFromSTU;
+
+  const fromSchoolLabel = walk
+    ? `${Math.round(walk.min)} min walk · ${walk.km.toFixed(1)} km`
+    : distanceLabel;
 
   const liveRooms: RoomType[] = detail.roomTypes;
   const liveHostAvail = detail.availability;
@@ -375,7 +394,7 @@ export default function HostelDetails() {
                     <span className={styles.locationLabel}>
                       <IconMap size={14} /> From {school.short}
                     </span>
-                    <span className={styles.locationValue}>{distanceLabel}</span>
+                    <span className={styles.locationValue}>{fromSchoolLabel}</span>
                   </div>
                 </div>
 
@@ -388,6 +407,8 @@ export default function HostelDetails() {
                     schoolName={school.name}
                     schoolLat={school.lat}
                     schoolLng={school.lng}
+                    walkKm={walk?.km}
+                    walkMin={walk?.min}
                   />
                 ) : (
                   <div className={styles.map}>
@@ -405,8 +426,9 @@ export default function HostelDetails() {
                 )}
 
                 <p className={styles.locationNote}>
-                  Approximately {distanceLabel} from {school.name}
-                  {school.id === "stu" ? " (STU)" : ""}.
+                  {walk
+                    ? `About a ${Math.round(walk.min)}-minute walk (${walk.km.toFixed(1)} km on foot) from ${school.name}${school.id === "stu" ? " (STU)" : ""}.`
+                    : `Approximately ${distanceLabel} from ${school.name}${school.id === "stu" ? " (STU)" : ""}.`}
                 </p>
               </section>
 

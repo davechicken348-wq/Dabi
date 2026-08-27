@@ -12,6 +12,8 @@ interface Props {
   schoolName: string;
   schoolLat: number;
   schoolLng: number;
+  walkKm?: number;
+  walkMin?: number;
 }
 
 function pinIcon(color: string): L.DivIcon {
@@ -38,6 +40,8 @@ export default function HostelLocationMap({
   schoolName,
   schoolLat,
   schoolLng,
+  walkKm,
+  walkMin,
 }: Props) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -50,6 +54,11 @@ export default function HostelLocationMap({
 
     const map = L.map(elRef.current, {
       scrollWheelZoom: false,
+      doubleClickZoom: false,
+      touchZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      zoomControl: false,
       attributionControl: true,
     });
 
@@ -82,6 +91,8 @@ export default function HostelLocationMap({
       padding: [60, 60],
     });
 
+    map.setZoom(Math.max(map.getZoom() - 2, 10));
+
     mapRef.current = map;
     setState("ready");
     setTimeout(() => map.invalidateSize(), 200);
@@ -110,7 +121,15 @@ export default function HostelLocationMap({
         <div className={styles.badge}>
           <IconDirections size={18} />
           <span>
-            <strong>{distance.toFixed(1)} km</strong> from {schoolName}
+            {typeof walkMin === "number" && typeof walkKm === "number" ? (
+              <>
+                <strong>{Math.round(walkMin)} min</strong> walk · {walkKm.toFixed(1)} km
+              </>
+            ) : (
+              <>
+                <strong>{distance.toFixed(1)} km</strong> from {schoolName}
+              </>
+            )}
           </span>
         </div>
       )}

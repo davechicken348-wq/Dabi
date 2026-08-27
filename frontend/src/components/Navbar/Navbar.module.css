@@ -9,19 +9,86 @@
   border-bottom: 1px solid transparent;
 }
 
-/* Solid bar (always frosted). */
+/* Frosted light bar (always translucent, like Supabase's navbar). */
 .solid {
-  background: rgba(252, 250, 244, 0.86);
-  backdrop-filter: saturate(150%) blur(12px);
+  background: rgba(252, 250, 244, 0.82);
+  backdrop-filter: saturate(160%) blur(14px);
   border-bottom-color: var(--line);
-  box-shadow: 0 10px 30px rgba(15, 40, 30, 0.06);
+  box-shadow: 0 1px 0 rgba(24, 32, 27, 0.04), 0 8px 24px rgba(15, 40, 30, 0.05);
 }
 
+/* ---------- Slim announcement banner (Supabase-style top strip) ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem var(--gutter);
+  background: linear-gradient(
+    90deg,
+    var(--dabi-green-50),
+    #f3ecd8
+  );
+  border-bottom: 1px solid rgba(23, 107, 77, 0.12);
+  color: var(--dabi-green-700);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.bannerIcon {
+  flex: none;
+  color: var(--dabi-green);
+}
+
+.bannerText {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bannerLink {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-weight: 800;
+  color: var(--dabi-green-700);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  transition: background 0.15s var(--ease), gap 0.15s var(--ease);
+}
+
+.bannerLink:hover {
+  background: rgba(23, 107, 77, 0.1);
+  gap: 0.4rem;
+}
+
+.bannerClose {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--dabi-green-700);
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+
+.bannerClose:hover {
+  background: rgba(23, 107, 77, 0.12);
+}
+
+/* ---------- Bar ---------- */
 .bar {
   display: flex;
   align-items: center;
   gap: 1rem;
-  height: 78px;
+  height: 66px;
 }
 
 /* --- Brand --- */
@@ -38,44 +105,54 @@
   transform: translateY(-1px);
 }
 
-/* --- Primary nav (centered between brand and actions) --- */
+/* --- Primary nav (left-aligned, like Supabase) --- */
 .nav {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
+  gap: 0.1rem;
+  margin-left: 0.4rem;
+}
+
+.item {
+  position: relative;
 }
 
 .link {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 0.85rem;
+  gap: 0.3rem;
+  padding: 0.5rem 0.8rem;
   border-radius: var(--radius-pill);
   font-weight: 600;
-  font-size: 0.97rem;
+  font-size: 0.95rem;
   color: var(--ink-soft);
   white-space: nowrap;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
   transition: color 0.15s var(--ease), background 0.15s var(--ease);
 }
 
+/* Muted-by-default → foreground on hover (Supabase emotion). */
 .link:hover {
-  color: var(--dabi-green);
-  background: rgba(23, 107, 77, 0.07);
+  color: var(--ink);
+  background: rgba(24, 32, 27, 0.05);
 }
 
 .linkActive,
 .linkActive:hover {
   color: var(--dabi-green-700);
-  background: rgba(23, 107, 77, 0.1);
+  background: rgba(23, 107, 77, 0.09);
 }
 
 .linkActive::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 4px;
+  bottom: 3px;
   transform: translateX(-50%);
   width: 18px;
   height: 3px;
@@ -83,137 +160,175 @@
   background: var(--dabi-gold);
 }
 
-/* --- "More" dropdown --- */
-.more {
-  position: relative;
-}
-
-.moreBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 0.97rem;
-  color: var(--ink-soft);
-  background: none;
-  border: none;
-  padding: 0.5rem 0.7rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: color 0.15s var(--ease), background 0.15s var(--ease);
-}
-
-.moreBtn:hover,
-.moreBtnOpen {
-  color: var(--dabi-green);
-  background: rgba(23, 107, 77, 0.07);
-}
-
-.moreCaret {
+.caret {
   transition: transform 0.2s var(--ease);
 }
 
-.moreBtnOpen .moreCaret {
+.item:hover .caret,
+.link:focus-visible .caret {
   transform: rotate(180deg);
 }
 
-.menu {
+/* --- Icon mega-menu dropdown (Supabase signature) --- */
+.dropdown {
   position: absolute;
-  top: calc(100% + 0.7rem);
-  right: 0;
-  min-width: 210px;
-  background: var(--dabi-white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  z-index: 60;
+  top: calc(100% + 0.55rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 268px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease),
+    visibility 0s linear 0.18s;
+  z-index: 80;
 }
 
-.menuLink {
+/* Show on hover / keyboard focus, like Supabase's hover menus. */
+.item:hover .dropdown,
+.item:focus-within .dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease), visibility 0s;
+}
+
+.dropdown::before {
+  content: "";
+  position: absolute;
+  top: -0.55rem;
+  left: 0;
+  right: 0;
+  height: 0.6rem;
+}
+
+.dropdownInner {
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  transition: background 0.15s var(--ease);
+}
+
+.entry:hover {
+  background: var(--dabi-green-50);
+}
+
+.entryIcon {
+  flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.6rem 0.7rem;
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 0.95rem;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--dabi-green-50);
+  color: var(--dabi-green);
   transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
 
-.menuIcon {
+.entry:hover .entryIcon {
+  background: var(--dabi-green);
+  color: var(--dabi-white);
+}
+
+.entryText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.entryTitle {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.entryDesc {
+  font-size: 0.8rem;
   color: var(--dabi-muted);
-  flex: none;
-  transition: color 0.15s var(--ease);
-}
-
-.menuLink:hover {
-  background: var(--dabi-green-50);
-  color: var(--dabi-green-700);
-}
-
-.menuLink:hover .menuIcon {
-  color: var(--dabi-green);
+  line-height: 1.3;
 }
 
 /* --- Right-side actions --- */
 .actions {
   flex: 0 0 auto;
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
-.schoolComing {
+.search {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  background: var(--dabi-green-50);
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--radius-md);
-  padding: 0.32rem 0.7rem 0.32rem 0.6rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--dabi-muted);
-  cursor: default;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink-soft);
+  border: none;
+  background: transparent;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
 
-.schoolIcon {
-  color: var(--dabi-green);
-  flex: none;
+.search:hover {
+  background: rgba(24, 32, 27, 0.06);
+  color: var(--ink);
+}
+
+.signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-pill);
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.signin:hover {
+  color: var(--ink);
+  background: rgba(24, 32, 27, 0.05);
 }
 
 .bar .cta {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 1.1rem;
+  padding: 0.55rem 1.15rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--dabi-green-700);
-  background: transparent;
+  color: var(--dabi-white);
+  background: var(--dabi-green);
   border: 1.5px solid var(--dabi-green);
-  border-radius: var(--radius-md);
-  box-shadow: inset 0 0 0 0 var(--dabi-green);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 18px rgba(23, 107, 77, 0.18);
   transition: background 0.18s var(--ease), color 0.18s var(--ease),
     border-color 0.18s var(--ease), box-shadow 0.18s var(--ease),
     transform 0.18s var(--ease);
 }
 
-.bar .cta svg {
-  flex: none;
-}
-
 .bar .cta:hover {
-  color: var(--dabi-white);
-  background: var(--dabi-green);
-  border-color: var(--dabi-green);
-  box-shadow: 0 8px 20px rgba(23, 107, 77, 0.22);
+  background: var(--dabi-green-700);
+  border-color: var(--dabi-green-700);
+  box-shadow: 0 10px 24px rgba(23, 107, 77, 0.26);
   transform: translateY(-1px);
 }
 
@@ -239,17 +354,14 @@
   overflow: hidden;
   max-height: 0;
   visibility: hidden;
-  border-top: 1px solid transparent;
   background: var(--dabi-cream);
   transition: max-height 0.28s var(--ease), visibility 0s linear 0.28s;
 }
 
 .mobileOpen {
   visibility: visible;
-  /* Cover the viewport below the 78px bar; scroll instead of clipping so the
-     school picker is never cut off on short phones. */
-  max-height: calc(100vh - 78px);
-  max-height: calc(100dvh - 78px);
+  max-height: calc(100vh - 70px);
+  max-height: calc(100dvh - 70px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   border-top: 1px solid var(--line);
@@ -259,7 +371,7 @@
 .mobileNav {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
   padding: 1rem var(--gutter) 1.5rem;
 }
 
@@ -274,40 +386,20 @@
 .mobileNav .mobileCta {
   margin-top: 1rem;
   width: 100%;
-  color: var(--dabi-green-700);
-  background: transparent;
+  color: var(--dabi-white);
+  background: var(--dabi-green);
   border: 1.5px solid var(--dabi-green);
-  border-radius: var(--radius-md);
-  transition: background 0.18s var(--ease), color 0.18s var(--ease),
-    border-color 0.18s var(--ease);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 18px rgba(23, 107, 77, 0.18);
+  justify-content: center;
 }
 
 .mobileNav .mobileCta:hover {
-  color: var(--dabi-white);
-  background: var(--dabi-green);
-  border-color: var(--dabi-green);
-}
-
-.mobileSchoolComing {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 1rem;
-  padding: 0.6rem 0.9rem;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--dabi-muted);
-  background: var(--dabi-green-50);
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--radius-sm);
+  background: var(--dabi-green-700);
+  border-color: var(--dabi-green-700);
 }
 
 /* --- Responsive --- */
-@media (max-width: 1080px) {
-  .schoolComing {
-    display: none;
-  }
-}
-
 @media (max-width: 860px) {
   .bar {
     justify-content: space-between;
@@ -315,6 +407,8 @@
   .nav {
     display: none;
   }
+  .search,
+  .signin,
   .cta {
     display: none;
   }
@@ -326,11 +420,10 @@
   }
 }
 
-/* Progressive shrink — keep the bar compact as the viewport narrows, stepping
-   down height, gaps, and the wordmark so nothing ever feels cramped. */
+/* Progressive shrink — keep the bar compact as the viewport narrows. */
 @media (max-width: 720px) {
   .bar {
-    height: 72px;
+    height: 60px;
     gap: 0.65rem;
   }
   .brand {
@@ -347,19 +440,12 @@
     width: 42px;
     height: 42px;
   }
-  .mobileLink {
-    font-size: 1.05rem;
-    padding: 0.8rem 0.45rem;
-  }
 }
 
 @media (max-width: 480px) {
   .bar {
-    height: 64px;
+    height: 56px;
     gap: 0.5rem;
-  }
-  .brand {
-    gap: 0.4rem;
   }
   .brand svg {
     width: 22px;
@@ -380,11 +466,8 @@
 
 @media (max-width: 360px) {
   .bar {
-    height: 56px;
+    height: 52px;
     gap: 0.35rem;
-  }
-  .brand {
-    gap: 0.3rem;
   }
   .brand svg {
     width: 20px;
@@ -397,10 +480,6 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-  }
-  .mobileLink {
-    font-size: 0.95rem;
-    padding: 0.7rem 0.35rem;
   }
   .mobileNav {
     padding: 0.8rem var(--gutter) 1.1rem;

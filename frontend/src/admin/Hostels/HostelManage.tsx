@@ -540,7 +540,7 @@ export default function HostelManage() {
               <div className={styles.formRow}>
                 <div className={styles.field}>
                   <label className={styles.fieldLabel} htmlFor="h-price">
-                    Yearly rent (GHS)
+                    Price per head (GHS)
                   </label>
                   <input
                     id="h-price"
@@ -586,7 +586,7 @@ export default function HostelManage() {
                     <IconSparkles size={16} />
                   </span>
                   <span className={styles.suggestText}>
-                    Suggested yearly rent for this setup:{" "}
+                    Suggested price per head for this setup:{" "}
                     <strong>{ghs.format(suggestedPrice)}</strong>
                   </span>
                   <button
@@ -1137,7 +1137,7 @@ export default function HostelManage() {
               </span>
               <span className={styles.previewPrice}>
                 GH₵{previewHostel.pricePerYear.toLocaleString("en-GH")}{" "}
-                <small>/yr</small>
+                <small>price per head</small>
               </span>
             </div>
             {facilities.length > 0 && (

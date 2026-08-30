@@ -3,7 +3,7 @@
   flex-direction: column;
   background: var(--dabi-white);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease),
@@ -20,9 +20,12 @@
   position: relative;
   aspect-ratio: 4 / 3;
   background: var(--dabi-green-50);
+  overflow: hidden;
 }
 
 .image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -132,16 +135,17 @@
 }
 
 .cta {
-  margin-top: 0.75rem;
+  margin-top: 0.7rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   font-weight: 700;
+  font-size: 0.9rem;
   color: var(--dabi-white);
   background: var(--dabi-green);
   border-radius: var(--radius-sm);
-  padding: 0.6rem 0.8rem;
+  padding: 0.48rem 0.7rem;
   transition: background 0.15s var(--ease);
 }
 
@@ -204,18 +208,27 @@
     gap: 0.38rem;
   }
   .name {
-    font-size: 0.98rem;
+    font-size: 1rem;
+  }
+  .loc,
+  .room {
+    font-size: 0.8rem;
+  }
+  .dist {
+    display: none;
   }
   .price {
-    font-size: 0.96rem;
+    font-size: 0.98rem;
   }
   .status {
     font-size: 0.7rem;
     padding: 0.24rem 0.52rem;
   }
   .cta {
-    margin-top: 0.65rem;
-    font-size: 0.95rem;
+    margin-top: 0.6rem;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.86rem;
+    font-weight: 700;
   }
 }
 
@@ -225,21 +238,26 @@
     gap: 0.36rem;
   }
   .name {
-    font-size: 0.96rem;
+    font-size: 1rem;
   }
   .loc,
   .room {
     font-size: 0.82rem;
   }
   .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
     padding-top: 0.58rem;
   }
   .price {
-    font-size: 0.94rem;
+    font-size: 0.96rem;
   }
   .cta {
-    margin-top: 0.62rem;
-    padding: 0.52rem 0.72rem;
+    margin-top: 0.58rem;
+    padding: 0.4rem 0.58rem;
+    font-size: 0.85rem;
+    font-weight: 700;
   }
 }
 
@@ -249,23 +267,24 @@
     gap: 0.34rem;
   }
   .name {
-    font-size: 0.94rem;
+    font-size: 0.97rem;
   }
   .loc,
   .room {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
   .price {
-    font-size: 0.92rem;
+    font-size: 0.95rem;
   }
   .status {
     font-size: 0.66rem;
     padding: 0.2rem 0.48rem;
   }
   .cta {
-    margin-top: 0.6rem;
-    padding: 0.5rem 0.7rem;
-    font-size: 0.92rem;
+    margin-top: 0.55rem;
+    padding: 0.36rem 0.54rem;
+    font-size: 0.8rem;
+    font-weight: 700;
   }
 }
 
@@ -288,9 +307,10 @@
     font-size: 0.9rem;
   }
   .cta {
-    margin-top: 0.56rem;
-    padding: 0.48rem 0.68rem;
-    font-size: 0.9rem;
+    margin-top: 0.48rem;
+    padding: 0.32rem 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
   }
 }
 
@@ -320,9 +340,10 @@
     left: 0.45rem;
   }
   .cta {
-    margin-top: 0.52rem;
-    padding: 0.46rem 0.64rem;
-    font-size: 0.88rem;
+    margin-top: 0.44rem;
+    padding: 0.3rem 0.46rem;
+    font-size: 0.76rem;
+    font-weight: 700;
   }
 }
 
@@ -346,8 +367,9 @@
     padding: 0.18rem 0.42rem;
   }
   .cta {
-    margin-top: 0.48rem;
-    padding: 0.44rem 0.6rem;
-    font-size: 0.85rem;
+    margin-top: 0.42rem;
+    padding: 0.28rem 0.44rem;
+    font-size: 0.74rem;
+    font-weight: 700;
   }
 }

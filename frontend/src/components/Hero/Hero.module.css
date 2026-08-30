@@ -1,14 +1,17 @@
 .hero {
+  position: relative;
   background-image: linear-gradient(
       0deg,
-      rgba(15, 40, 30, 0.55) 0%,
-      rgba(15, 40, 30, 0.35) 100%
+      rgba(15, 40, 30, 0.62) 0%,
+      rgba(15, 40, 30, 0.42) 55%,
+      rgba(15, 40, 30, 0.55) 100%
     ),
     url("/images/home_hero.webp");
   background-image: linear-gradient(
       0deg,
-      rgba(15, 40, 30, 0.55) 0%,
-      rgba(15, 40, 30, 0.35) 100%
+      rgba(15, 40, 30, 0.62) 0%,
+      rgba(15, 40, 30, 0.42) 55%,
+      rgba(15, 40, 30, 0.55) 100%
     ),
     image-set(
       url("/images/variants/home_hero-480.webp") type("image/webp") 480w,
@@ -23,48 +26,74 @@
   align-items: center;
   justify-content: center;
   min-height: 88vh;
+  overflow: hidden;
+}
+
+/* Supabase-style radial glow — a soft green/gold bloom that lifts the hero
+   copy off the photo without washing it out. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 50% 38%, rgba(233, 185, 73, 0.16), transparent 70%),
+    radial-gradient(70% 60% at 50% 110%, rgba(23, 107, 77, 0.45), transparent 72%);
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .grid {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
 .copy {
-  max-width: 720px;
+  max-width: 760px;
   width: 100%;
   text-align: center;
   color: var(--dabi-white);
 }
 
-.copy :global(.dabi-eyebrow) {
-  color: var(--dabi-gold);
+.copy :global(.dabi-eyebrow-pill) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--dabi-white);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .title {
-  margin-top: 1rem;
-  font-size: clamp(2.6rem, 6vw, 4.25rem);
+  margin-top: 1.25rem;
+  font-size: var(--sb-display);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
   color: var(--dabi-white);
+  text-shadow: 0 2px 30px rgba(10, 25, 18, 0.35);
 }
 
 .accent {
-  color: var(--dabi-gold);
+  background: linear-gradient(120deg, var(--dabi-gold) 0%, #f7e7c2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .lead {
-  margin-top: 1.25rem;
+  margin-top: 1.4rem;
   font-size: clamp(1.05rem, 2vw, 1.25rem);
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
   max-width: 56ch;
   margin-left: auto;
   margin-right: auto;
+  line-height: 1.6;
 }
 
 .actions {
-  margin-top: 2rem;
+  margin-top: 2.25rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -79,18 +108,12 @@
     padding-top: clamp(6rem, 14vw, 10rem);
     padding-bottom: clamp(4rem, 9vw, 7rem);
   }
-  .title {
-    font-size: clamp(2.3rem, 8vw, 3.5rem);
-  }
 }
 
 @media (max-width: 720px) {
   .hero {
     min-height: 72vh;
     padding: clamp(5rem, 12vw, 8rem) 0 clamp(3.5rem, 8vw, 6rem);
-  }
-  .title {
-    font-size: clamp(2.1rem, 9vw, 3rem);
   }
   .lead {
     font-size: 1.05rem;
@@ -106,9 +129,6 @@
     min-height: 66vh;
     padding: clamp(4rem, 11vw, 6rem) 0 clamp(3rem, 7vw, 4.5rem);
   }
-  .title {
-    font-size: clamp(1.9rem, 10vw, 2.6rem);
-  }
   .lead {
     font-size: 1rem;
     margin-top: 1rem;
@@ -122,9 +142,6 @@
   .hero {
     min-height: 60vh;
     padding: clamp(3.5rem, 10vw, 5rem) 0 clamp(2.75rem, 7vw, 4rem);
-  }
-  .title {
-    font-size: clamp(1.7rem, 11vw, 2.3rem);
   }
   .lead {
     font-size: 0.95rem;

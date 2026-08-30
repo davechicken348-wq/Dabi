@@ -85,19 +85,27 @@ export default function Locations() {
       list.push(h);
       groups.set(h.location, list);
     }
+    const usedSlugs = new Set<string>();
     return Array.from(groups.entries()).map(([name, list]) => {
       const distances = list.map((h) => hostelDistanceKm(h, school));
       const nearest = distances.some((d) => Number.isFinite(d))
         ? Math.min(...distances.filter((d) => Number.isFinite(d)))
         : null;
+      let slug = slugify(name);
+      let unique = slug;
+      let n = 2;
+      while (usedSlugs.has(unique)) {
+        unique = `${slug}-${n++}`;
+      }
+      usedSlugs.add(unique);
       return {
-        slug: slugify(name),
+        slug: unique,
         name,
         hostels: list,
         nearestKm: nearest,
       };
     });
-  }, [hostels]);
+  }, [hostels, school]);
 
   return (
     <>
@@ -175,15 +183,16 @@ export default function Locations() {
                   ))}
                 </div>
 
-                <h2 id="loc-areas-title" className="dabi-eyebrow" style={{ marginBottom: "1.5rem" }}>
-                  Areas we cover
-                </h2>
+                <div className={styles.areasHead}>
+                  <h2 id="loc-areas-title" className="dabi-eyebrow">
+                    Areas we cover
+                  </h2>
 
-                <div className={styles.liveRow}>
                   <LiveControls
                     lastUpdated={lastUpdated}
                     loading={isLoading}
                     onRefresh={() => loadHostels()}
+                    showIndicator={false}
                   />
                 </div>
 

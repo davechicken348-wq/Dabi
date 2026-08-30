@@ -79,6 +79,7 @@ export default function Home() {
                   lastUpdated={lastUpdated}
                   loading={status === "loading"}
                   onRefresh={() => loadHostels()}
+                  showIndicator={false}
                 />
                 <Link to="/find-hostel" className={styles.viewAll}>
                   View all hostels <IconArrow size={18} />

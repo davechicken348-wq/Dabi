@@ -174,6 +174,12 @@
   color: var(--dabi-gold);
 }
 
+/* Duplicate of the area, shown only on mobile where it shares a row with the
+   live control and the verified badge. Hidden on desktop. */
+.identityArea {
+  display: none;
+}
+
 /* Price strip */
 .priceStrip {
   display: flex;
@@ -1186,6 +1192,28 @@
   .facilities,
   .verifyList {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .blockTitle {
+    font-size: 1.1rem;
+    margin-bottom: 0.7rem;
+  }
+  .facilityGroup + .facilityGroup {
+    margin-top: 0.9rem;
+  }
+  .facilityGroupTitle {
+    font-size: 0.72rem;
+    margin-bottom: 0.55rem;
+  }
+  .facility {
+    padding: 0.6rem 0.8rem;
+    gap: 0.55rem;
+    font-size: 0.88rem;
+  }
+  .facilityIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
   }
   .identity {
     align-items: flex-start;
@@ -1195,5 +1223,58 @@
   }
   .roomOptions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .blockTitle {
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+  .facility {
+    padding: 0.5rem 0.7rem;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+  }
+  .facilityIcon {
+    width: 28px;
+    height: 28px;
+  }
+  .facilityGroupTitle {
+    font-size: 0.68rem;
+    margin-bottom: 0.5rem;
+  }
+  .facilityGroup + .facilityGroup {
+    margin-top: 0.8rem;
+  }
+}
+
+/* Mobile: stack the identity block so the hostel name sits on top, then a
+   single row with the area, live control and verified badge together. The
+   area under the title is hidden to avoid duplication with this row. */
+@media (max-width: 640px) {
+  .identity {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .identityMeta > .metaItem:first-child {
+    display: none;
+  }
+  .identityArea {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .identityActions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
   }
 }

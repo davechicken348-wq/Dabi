@@ -31,16 +31,23 @@
 .step:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
+  border-color: rgba(23, 107, 77, 0.22);
+}
+
+.step:hover .icon {
+  box-shadow: inset 0 0 0 1px rgba(23, 107, 77, 0.3);
+  color: var(--dabi-green-700);
 }
 
 .icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--dabi-green-50);
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--grad-brand-soft);
+  box-shadow: inset 0 0 0 1px rgba(23, 107, 77, 0.16);
   color: var(--dabi-green);
   margin-bottom: 1.1rem;
 }

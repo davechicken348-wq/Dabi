@@ -19,11 +19,13 @@ export default function LiveControls({
   loading = false,
   onRefresh,
   dark = false,
+  showIndicator = true,
 }: {
   lastUpdated: Date | null;
   loading?: boolean;
   onRefresh: () => void;
   dark?: boolean;
+  showIndicator?: boolean;
 }) {
   const [now, setNow] = useState(() => Date.now());
 
@@ -34,16 +36,20 @@ export default function LiveControls({
 
   return (
     <div className={`${styles.liveControls} ${dark ? styles.onDark : ""}`}>
-      <span
-        className={`${styles.livePill} ${loading ? styles.livePillBusy : ""}`}
-        title={loading ? "Refreshing…" : "Updates automatically"}
-      >
-        <span className={styles.liveDot} />
-        Live
-      </span>
-      <span className={styles.liveUpdated}>
-        {lastUpdated ? `Updated ${relativeTime(lastUpdated, now)}` : "Not yet loaded"}
-      </span>
+      {showIndicator && (
+        <span
+          className={`${styles.livePill} ${loading ? styles.livePillBusy : ""}`}
+          title={loading ? "Refreshing…" : "Updates automatically"}
+        >
+          <span className={styles.liveDot} />
+          Live
+        </span>
+      )}
+      {showIndicator && (
+        <span className={styles.liveUpdated}>
+          {lastUpdated ? `Updated ${relativeTime(lastUpdated, now)}` : "Not yet loaded"}
+        </span>
+      )}
       <button
         type="button"
         className={styles.liveBtn}
@@ -52,7 +58,7 @@ export default function LiveControls({
         aria-label="Refresh now"
         title="Refresh now"
       >
-        <IconRefresh size={16} className={loading ? styles.liveSpin : undefined} />
+        <IconRefresh size={14} className={loading ? styles.liveSpin : undefined} />
       </button>
     </div>
   );

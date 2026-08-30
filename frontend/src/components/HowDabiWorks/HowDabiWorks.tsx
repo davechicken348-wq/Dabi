@@ -35,7 +35,7 @@ export default function HowDabiWorks() {
           {steps.map(({ n, title, text, Icon }) => (
             <div key={n} className={styles.step}>
               <span className={styles.icon}>
-                <Icon size={26} />
+                <Icon size={28} />
               </span>
               <span className={styles.num}>{n}</span>
               <h3 className={styles.stepTitle}>{title}</h3>

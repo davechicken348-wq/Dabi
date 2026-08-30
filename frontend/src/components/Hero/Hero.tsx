@@ -6,7 +6,7 @@ export default function Hero() {
     <section className={styles.hero}>
       <div className={`dabi-container ${styles.grid}`}>
         <div className={styles.copy}>
-          <span className="dabi-eyebrow">Hostel hunting, made easier</span>
+          <span className="dabi-eyebrow-pill">Hostel hunting, made easier</span>
           <h1 className={styles.title}>
             Find a place.
             <br />

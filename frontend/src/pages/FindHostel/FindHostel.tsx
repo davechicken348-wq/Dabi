@@ -261,6 +261,7 @@ export default function FindHostel() {
     setAreaHostels({ area, hostels: hs });
   }, []);
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { school } = useSchool();
   const { label: facilityLabel } = useFacilities();
 
@@ -363,7 +364,22 @@ export default function FindHostel() {
 
   const searchBarEl = (
     <section className={styles.searchBar} aria-label="Search hostels">
-      <div className={styles.searchFields}>
+      <button
+        type="button"
+        className={styles.searchToggle}
+        aria-expanded={searchOpen}
+        onClick={() => setSearchOpen((v) => !v)}
+      >
+        <IconSearch size={16} />
+        <span>Search hostels</span>
+        <IconChevronDown
+          size={16}
+          className={`${styles.searchToggleChevron} ${searchOpen ? styles.searchToggleOpen : ""}`}
+        />
+      </button>
+
+      <div className={`${styles.searchCollapse} ${searchOpen ? styles.searchCollapseOpen : ""}`}>
+        <div className={styles.searchFields}>
         {view === "map" && (
           <div className={styles.field}>
             <label htmlFor="f-dist" className={styles.label}>
@@ -429,6 +445,7 @@ export default function FindHostel() {
               </option>
             ))}
           </select>
+        </div>
         </div>
       </div>
     </section>
@@ -642,6 +659,7 @@ export default function FindHostel() {
                   loading={status === "loading"}
                   onRefresh={() => loadHostels()}
                   dark
+                  showIndicator={false}
                 />
 
                 <div className={styles.sortWrap}>

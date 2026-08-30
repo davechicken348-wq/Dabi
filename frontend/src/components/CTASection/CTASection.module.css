@@ -4,6 +4,7 @@
 }
 
 .panel {
+  position: relative;
   background: var(--dabi-white);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -14,6 +15,15 @@
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--grad-brand);
 }
 
 .title {

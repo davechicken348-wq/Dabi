@@ -277,10 +277,14 @@ export default function HostelDetails() {
               </div>
             </div>
             <div className={styles.identityActions}>
+              <span className={styles.identityArea}>
+                <IconPin size={18} className={styles.metaIcon} /> {detail.location}
+              </span>
               <LiveControls
                 lastUpdated={lastUpdated}
                 loading={isLoading}
                 onRefresh={() => loadHostel()}
+                showIndicator={false}
               />
               {detail.verified && <VerificationBadge />}
             </div>

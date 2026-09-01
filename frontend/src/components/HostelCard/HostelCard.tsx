@@ -55,7 +55,7 @@ export default function HostelCard({ hostel }: { hostel: Hostel }) {
         </div>
 
         <Link to={`/hostel/${hostel.id}`} className={styles.cta}>
-          View Hostel <IconArrow size={18} />
+          View Room <IconArrow size={18} />
         </Link>
       </div>
     </article>

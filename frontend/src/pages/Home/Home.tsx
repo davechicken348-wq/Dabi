@@ -127,26 +127,15 @@ export default function Home() {
 
         <section className={styles.problem} aria-labelledby="problem-title">
           <div className={`dabi-container ${styles.problemInner}`}>
-            <div className={styles.problemCopy}>
-              <h2 id="problem-title" className={styles.problemTitle}>
-                Hostel hunting shouldn&rsquo;t feel like a treasure hunt.
-              </h2>
-              <ul className={styles.problemList}>
-                <li>You&rsquo;ve walked around.</li>
-                <li>You&rsquo;ve asked friends.</li>
-                <li>You&rsquo;ve visited places that were already full.</li>
-              </ul>
-              <p className={styles.problemOutro}>Dabi makes the search easier.</p>
-            </div>
-
-            <div className={styles.problemVisual}>
-              <ResponsiveImage
-                name="hostel_illustration2"
-                alt="Students searching for a hostel the hard way"
-                className={styles.problemImg}
-                transparent
-              />
-            </div>
+            <h2 id="problem-title" className={styles.problemTitle}>
+              Hostel hunting shouldn&rsquo;t feel like a treasure hunt.
+            </h2>
+            <ul className={styles.problemList}>
+              <li>You&rsquo;ve walked around.</li>
+              <li>You&rsquo;ve asked friends.</li>
+              <li>You&rsquo;ve visited places that were already full.</li>
+            </ul>
+            <p className={styles.problemOutro}>Dabi makes the search easier.</p>
           </div>
         </section>
 

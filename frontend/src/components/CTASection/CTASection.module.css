@@ -1,52 +1,84 @@
 .section {
-  padding: clamp(3rem, 7vw, 5rem) 0;
-  background: var(--dabi-cream);
-}
-
-.panel {
   position: relative;
-  background: var(--dabi-white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: clamp(2rem, 5vw, 3.2rem);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  overflow: hidden;
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.35) 50%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+    url("/images/walkway.webp");
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.35) 50%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+    image-set(
+      url("/images/variants/walkway-480.avif") type("image/avif") 1x,
+      url("/images/variants/walkway-480.webp") type("image/webp") 1x,
+      url("/images/variants/walkway-768.avif") type("image/avif") 2x,
+      url("/images/variants/walkway-768.webp") type("image/webp") 2x
+    );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: clamp(5rem, 12vw, 9rem) 0;
 }
 
-.panel::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: var(--grad-brand);
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dabi-gold);
+  margin-bottom: 1rem;
 }
 
 .title {
-  font-size: var(--sb-h2);
+  font-family: "Fredoka", var(--font);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #f5ede0;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.3);
+  max-width: 18ch;
 }
 
-.lead {
-  margin-top: 0.6rem;
-  color: var(--ink-soft);
-  max-width: 46ch;
+.btn {
+  margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+  background: var(--dabi-gold);
+  color: var(--dabi-green-700);
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 0.95rem 2.2rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  transition: background 0.18s var(--ease), transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
 
-.actions {
-  display: flex;
-  gap: 0.85rem;
-  flex-wrap: wrap;
+.btn:hover {
+  background: var(--dabi-gold-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(233, 185, 73, 0.35);
 }
 
-@media (max-width: 640px) {
-  .actions {
-    width: 100%;
+@media (max-width: 480px) {
+  .title {
+    font-size: clamp(1.9rem, 9vw, 2.4rem);
   }
-  .actions .dabi-btn {
-    flex: 1;
+  .btn {
+    width: 100%;
+    justify-content: center;
   }
 }

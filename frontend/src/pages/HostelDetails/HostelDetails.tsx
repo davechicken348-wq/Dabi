@@ -11,6 +11,8 @@ import {
   IconClose,
   IconShield,
   IconMap,
+  IconDirections,
+  IconCompass,
 } from "../../components/Icons/Icons";
 import { FacilityGlyph } from "../../services/facilityIcons";
 import { useFacilities } from "../../context/FacilitiesContext";
@@ -262,7 +264,7 @@ export default function HostelDetails() {
             <span className={styles.breadcrumbCurrent}>{detail.name}</span>
           </nav>
 
-          <Gallery images={detail.images} onOpen={openLightbox} />
+          <Gallery images={detail.images} onOpen={openLightbox} title={detail.name} />
 
           <header className={styles.identity}>
             <div>
@@ -371,61 +373,73 @@ export default function HostelDetails() {
 
               <section className={styles.block}>
                 <div className={styles.locationHeader}>
-                  <img
-                    className={styles.locationIllustration}
-                    src="/illustrations/Travel--Streamline-Manchester.webp"
-                    alt="Illustration of travel and directions"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <h2 className={styles.blockTitle}>Where is it?</h2>
+                  <span className="dabi-eyebrow">
+                    <IconCompass size={14} /> Getting there
+                  </span>
+                  <h2 className={styles.blockTitle}>Where you'll be living</h2>
+                  <p className={styles.locationSubtitle}>
+                    Close enough to roll out of bed for that 8 a.m. lecture — and far
+                    enough to feel like home.
+                  </p>
                 </div>
 
                 <div className={styles.locationGrid}>
+                  <div className={`${styles.locationCard} ${styles.locationHero}`}>
+                    <span className={styles.locationLabel}>
+                      <IconDirections size={16} /> Walk from {school.short}
+                    </span>
+                    <span className={styles.locationHeroValue}>{fromSchoolLabel}</span>
+                    <span className={styles.locationHeroMeta}>{distanceLabel}</span>
+                  </div>
                   <div className={styles.locationCard}>
                     <span className={styles.locationLabel}>
-                      <IconPin size={14} /> Area
+                      <IconPin size={14} /> Neighbourhood
                     </span>
                     <span className={styles.locationValue}>{detail.area}</span>
                   </div>
                   <div className={styles.locationCard}>
                     <span className={styles.locationLabel}>
-                      <IconMap size={14} /> From {school.short}
+                      <IconMap size={14} /> Closest campus
                     </span>
-                    <span className={styles.locationValue}>{fromSchoolLabel}</span>
+                    <span className={styles.locationValue}>{school.name}</span>
                   </div>
                 </div>
 
-                {hasCoords ? (
-                  <HostelLocationMap
-                    key={`${school.id}-${detail.id}`}
-                    hostelName={detail.name}
-                    hostelLat={detail.lat as number}
-                    hostelLng={detail.lng as number}
-                    schoolName={school.name}
-                    schoolLat={school.lat}
-                    schoolLng={school.lng}
-                    walkKm={walk?.km}
-                    walkMin={walk?.min}
-                  />
-                ) : (
-                  <div className={styles.map}>
-                    <div className={styles.mapPin} aria-hidden="true">
-                      <IconMap size={26} />
-                      <span className={styles.mapLabel}>{detail.area}</span>
+                <div className={styles.mapFrame}>
+                  <span className={styles.mapFrameTag}>
+                    <IconMap size={14} /> Map view
+                  </span>
+                  {hasCoords ? (
+                    <HostelLocationMap
+                      key={`${school.id}-${detail.id}`}
+                      hostelName={detail.name}
+                      hostelLat={detail.lat as number}
+                      hostelLng={detail.lng as number}
+                      schoolName={school.name}
+                      schoolLat={school.lat}
+                      schoolLng={school.lng}
+                      walkKm={walk?.km}
+                      walkMin={walk?.min}
+                    />
+                  ) : (
+                    <div className={styles.map}>
+                      <div className={styles.mapPin} aria-hidden="true">
+                        <IconMap size={26} />
+                        <span className={styles.mapLabel}>{detail.area}</span>
+                      </div>
+                      <div className={styles.mapStu} aria-hidden="true">
+                        <IconMap size={22} />
+                        <span className={styles.mapLabel}>{school.short}</span>
+                      </div>
+                      <span className={styles.mapRoute} aria-hidden="true" />
+                      <span className={styles.mapDistance}>{distanceLabel}</span>
                     </div>
-                    <div className={styles.mapStu} aria-hidden="true">
-                      <IconMap size={22} />
-                      <span className={styles.mapLabel}>{school.short}</span>
-                    </div>
-                    <span className={styles.mapRoute} aria-hidden="true" />
-                    <span className={styles.mapDistance}>{distanceLabel}</span>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 <p className={styles.locationNote}>
                   {walk
-                    ? `About a ${Math.round(walk.min)}-minute walk (${walk.km.toFixed(1)} km on foot) from ${school.name}${school.id === "stu" ? " (STU)" : ""}.`
+                    ? `You're about a ${Math.round(walk.min)}-minute stroll (${walk.km.toFixed(1)} km on foot) from ${school.name}${school.id === "stu" ? " (STU)" : ""} — easy to skip the tro-tro and walk it instead.`
                     : `Approximately ${distanceLabel} from ${school.name}${school.id === "stu" ? " (STU)" : ""}.`}
                 </p>
               </section>

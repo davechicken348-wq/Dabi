@@ -57,7 +57,7 @@ export default function HostelGridCard({ hostel }: { hostel: Hostel }) {
         </div>
 
         <Link to={`/hostel/${hostel.id}`} className={styles.cta}>
-          View Hostel <IconArrow size={16} />
+          View Room <IconArrow size={16} />
         </Link>
       </div>
     </article>

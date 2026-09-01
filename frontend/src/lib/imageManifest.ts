@@ -22,7 +22,16 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/about_hostel-751.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/about_hostel-480.avif"
+      },
+      {
+        "w": 751,
+        "src": "/images/variants/about_hostel-751.avif"
+      }
+    ]
   },
   "about_hostel2": {
     "width": 889,
@@ -42,7 +51,20 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/about_hostel2-889.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/about_hostel2-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/about_hostel2-768.avif"
+      },
+      {
+        "w": 889,
+        "src": "/images/variants/about_hostel2-889.avif"
+      }
+    ]
   },
   "about_hostel3": {
     "width": 750,
@@ -58,7 +80,16 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/about_hostel3-750.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/about_hostel3-480.avif"
+      },
+      {
+        "w": 750,
+        "src": "/images/variants/about_hostel3-750.avif"
+      }
+    ]
   },
   "dorm2": {
     "width": 2080,
@@ -86,7 +117,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/dorm2-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/dorm2-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/dorm2-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/dorm2-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/dorm2-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/dorm2-2000.avif"
+      }
+    ]
   },
   "dorm3": {
     "width": 1728,
@@ -114,7 +166,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/dorm3-1728.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/dorm3-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/dorm3-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/dorm3-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/dorm3-1600.avif"
+      },
+      {
+        "w": 1728,
+        "src": "/images/variants/dorm3-1728.avif"
+      }
+    ]
   },
   "dorm4": {
     "width": 3064,
@@ -142,7 +215,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/dorm4-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/dorm4-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/dorm4-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/dorm4-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/dorm4-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/dorm4-2000.avif"
+      }
+    ]
   },
   "dorm_room": {
     "width": 1557,
@@ -166,7 +260,24 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/dorm_room-1557.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/dorm_room-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/dorm_room-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/dorm_room-1080.avif"
+      },
+      {
+        "w": 1557,
+        "src": "/images/variants/dorm_room-1557.avif"
+      }
+    ]
   },
   "graffiti1": {
     "width": 3000,
@@ -194,7 +305,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/graffiti1-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/graffiti1-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/graffiti1-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/graffiti1-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/graffiti1-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/graffiti1-2000.avif"
+      }
+    ]
   },
   "graffiti2": {
     "width": 2000,
@@ -222,7 +354,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/graffiti2-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/graffiti2-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/graffiti2-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/graffiti2-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/graffiti2-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/graffiti2-2000.avif"
+      }
+    ]
   },
   "graffiti3": {
     "width": 1333,
@@ -246,7 +399,24 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/graffiti3-1333.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/graffiti3-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/graffiti3-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/graffiti3-1080.avif"
+      },
+      {
+        "w": 1333,
+        "src": "/images/variants/graffiti3-1333.avif"
+      }
+    ]
   },
   "graffiti4": {
     "width": 1976,
@@ -274,7 +444,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/graffiti4-1976.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/graffiti4-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/graffiti4-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/graffiti4-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/graffiti4-1600.avif"
+      },
+      {
+        "w": 1976,
+        "src": "/images/variants/graffiti4-1976.avif"
+      }
+    ]
   },
   "home_hero": {
     "width": 1008,
@@ -294,7 +485,20 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/home_hero-1008.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/home_hero-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/home_hero-768.avif"
+      },
+      {
+        "w": 1008,
+        "src": "/images/variants/home_hero-1008.avif"
+      }
+    ]
   },
   "home_sweet_home": {
     "width": 806,
@@ -314,7 +518,61 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/home_sweet_home-806.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/home_sweet_home-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/home_sweet_home-768.avif"
+      },
+      {
+        "w": 806,
+        "src": "/images/variants/home_sweet_home-806.avif"
+      }
+    ]
+  },
+  "hostel_bedroom_isometric": {
+    "width": 1200,
+    "height": 960,
+    "lqip": "/images/variants/hostel_bedroom_isometric-lqip.webp",
+    "webp": [
+      {
+        "w": 480,
+        "src": "/images/variants/hostel_bedroom_isometric-480.webp"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/hostel_bedroom_isometric-768.webp"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/hostel_bedroom_isometric-1080.webp"
+      },
+      {
+        "w": 1200,
+        "src": "/images/variants/hostel_bedroom_isometric-1200.webp"
+      }
+    ],
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/hostel_bedroom_isometric-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/hostel_bedroom_isometric-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/hostel_bedroom_isometric-1080.avif"
+      },
+      {
+        "w": 1200,
+        "src": "/images/variants/hostel_bedroom_isometric-1200.avif"
+      }
+    ]
   },
   "hostel_illustration1": {
     "width": 1424,
@@ -338,7 +596,24 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/hostel_illustration1-1424.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/hostel_illustration1-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/hostel_illustration1-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/hostel_illustration1-1080.avif"
+      },
+      {
+        "w": 1424,
+        "src": "/images/variants/hostel_illustration1-1424.avif"
+      }
+    ]
   },
   "hostel_illustration2": {
     "width": 2000,
@@ -366,7 +641,28 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/hostel_illustration2-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/hostel_illustration2-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/hostel_illustration2-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/hostel_illustration2-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/hostel_illustration2-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/hostel_illustration2-2000.avif"
+      }
+    ]
   },
   "how_it_works1": {
     "width": 1040,
@@ -386,7 +682,20 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/how_it_works1-1040.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/how_it_works1-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/how_it_works1-768.avif"
+      },
+      {
+        "w": 1040,
+        "src": "/images/variants/how_it_works1-1040.avif"
+      }
+    ]
   },
   "how_it_works2": {
     "width": 2000,
@@ -414,7 +723,126 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/how_it_works2-2000.webp"
       }
     ],
-    "avif": []
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/how_it_works2-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/how_it_works2-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/how_it_works2-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/how_it_works2-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/how_it_works2-2000.avif"
+      }
+    ]
+  },
+  "sofa": {
+    "width": 5152,
+    "height": 6864,
+    "lqip": "/images/variants/sofa-lqip.webp",
+    "webp": [
+      {
+        "w": 480,
+        "src": "/images/variants/sofa-480.webp"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/sofa-768.webp"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/sofa-1080.webp"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/sofa-1600.webp"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/sofa-2000.webp"
+      }
+    ],
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/sofa-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/sofa-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/sofa-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/sofa-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/sofa-2000.avif"
+      }
+    ]
+  },
+  "walkway": {
+    "width": 4000,
+    "height": 2250,
+    "lqip": "/images/variants/walkway-lqip.webp",
+    "webp": [
+      {
+        "w": 480,
+        "src": "/images/variants/walkway-480.webp"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/walkway-768.webp"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/walkway-1080.webp"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/walkway-1600.webp"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/walkway-2000.webp"
+      }
+    ],
+    "avif": [
+      {
+        "w": 480,
+        "src": "/images/variants/walkway-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/walkway-768.avif"
+      },
+      {
+        "w": 1080,
+        "src": "/images/variants/walkway-1080.avif"
+      },
+      {
+        "w": 1600,
+        "src": "/images/variants/walkway-1600.avif"
+      },
+      {
+        "w": 2000,
+        "src": "/images/variants/walkway-2000.avif"
+      }
+    ]
   },
   "welcome_hostel": {
     "width": 898,
@@ -434,23 +862,19 @@ export const imageManifest: Record<string, ImageManifestEntry> = {
         "src": "/images/variants/welcome_hostel-898.webp"
       }
     ],
-    "avif": []
-  },
-  "hostel_bedroom_isometric": {
-    "width": 1200,
-    "height": 960,
-    "lqip": "/images/variants/hostel_bedroom_isometric-lqip.webp",
-    "webp": [
-      { "w": 480, "src": "/images/variants/hostel_bedroom_isometric-480.webp" },
-      { "w": 768, "src": "/images/variants/hostel_bedroom_isometric-768.webp" },
-      { "w": 1080, "src": "/images/variants/hostel_bedroom_isometric-1080.webp" },
-      { "w": 1200, "src": "/images/variants/hostel_bedroom_isometric-1200.webp" }
-    ],
     "avif": [
-      { "w": 480, "src": "/images/variants/hostel_bedroom_isometric-480.avif" },
-      { "w": 768, "src": "/images/variants/hostel_bedroom_isometric-768.avif" },
-      { "w": 1080, "src": "/images/variants/hostel_bedroom_isometric-1080.avif" },
-      { "w": 1200, "src": "/images/variants/hostel_bedroom_isometric-1200.avif" }
+      {
+        "w": 480,
+        "src": "/images/variants/welcome_hostel-480.avif"
+      },
+      {
+        "w": 768,
+        "src": "/images/variants/welcome_hostel-768.avif"
+      },
+      {
+        "w": 898,
+        "src": "/images/variants/welcome_hostel-898.avif"
+      }
     ]
   }
 };

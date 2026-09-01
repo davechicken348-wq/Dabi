@@ -88,10 +88,10 @@ export default function HostelLocationMap({
       );
 
     map.fitBounds(L.latLngBounds([school.getLatLng(), hostel.getLatLng()]), {
-      padding: [60, 60],
+      padding: [50, 50],
     });
 
-    map.setZoom(Math.max(map.getZoom() - 2, 10));
+    map.setZoom(Math.max(map.getZoom() - 1, 13));
 
     mapRef.current = map;
     setState("ready");

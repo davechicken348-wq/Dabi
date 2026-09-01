@@ -63,72 +63,204 @@
   font-weight: 700;
 }
 
-/* Gallery */
+/* Gallery — immersive, editorial feel */
 .gallery {
   position: relative;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2.1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 12px;
-  border-radius: var(--radius-lg);
+  gap: 14px;
+  height: clamp(480px, 58vh, 700px);
+  border-radius: calc(var(--radius-lg) + 8px);
   overflow: hidden;
+  transform: translateZ(0);
+  background: var(--dabi-ivory);
+  animation: galleryRise 0.85s var(--ease) both;
+}
+
+@keyframes galleryRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .galleryBtn {
   padding: 0;
   border: none;
-  background: var(--dabi-green-50);
+  background: var(--dabi-charcoal);
   cursor: pointer;
   overflow: hidden;
+  display: block;
+  position: relative;
+  border-radius: var(--radius-md);
+}
+
+/* Warm, atmospheric wash over the whole gallery to tie the palette together */
+.gallery::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 12% 8%, rgba(233, 185, 73, 0.16), transparent 42%),
+    radial-gradient(120% 100% at 92% 100%, rgba(23, 107, 77, 0.2), transparent 46%);
+  mix-blend-mode: soft-light;
 }
 
 .galleryMain {
-  grid-row: span 2;
-  border-radius: var(--radius-lg);
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  border-radius: calc(var(--radius-lg) + 8px);
+  background: var(--dabi-charcoal);
 }
 
 .gallerySide {
+  grid-column: 2 / span 2;
+  grid-row: 1 / span 2;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .galleryThumb {
   border-radius: var(--radius-md);
   position: relative;
+  min-height: 0;
 }
 
 .galleryImg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s var(--ease);
+  object-position: center 42%;
+  transform: scale(1.01);
+  transition: transform 0.7s var(--ease), filter 0.7s var(--ease);
+  will-change: transform;
 }
 
 .galleryBtn:hover .galleryImg {
-  transform: scale(1.04);
+  transform: scale(1.07);
+  filter: saturate(1.08) contrast(1.03);
+}
+
+/* Cinematic scrims for legibility + mood */
+.galleryScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(24, 32, 27, 0.12) 0%,
+    rgba(24, 32, 27, 0) 34%,
+    rgba(24, 32, 27, 0.58) 100%
+  );
+}
+
+.galleryThumbScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(24, 32, 27, 0) 55%, rgba(24, 32, 27, 0.32) 100%);
+}
+
+.galleryThumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 0 var(--dabi-gold);
+  transition: box-shadow 0.3s var(--ease);
+  pointer-events: none;
+}
+
+.galleryThumb:hover::after {
+  box-shadow: inset 0 0 0 3px var(--dabi-gold);
+}
+
+/* Emotional caption over the hero image */
+.galleryCaption {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--dabi-white);
+  text-align: left;
+  max-width: 80%;
+}
+
+.galleryEyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dabi-gold);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.galleryCaptionTitle {
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+}
+
+.galleryMore {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 32, 27, 0.46);
+  backdrop-filter: blur(2px);
+  color: var(--dabi-white);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
 }
 
 .galleryAll {
   position: absolute;
-  right: 14px;
-  bottom: 14px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 8;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--dabi-charcoal);
-  border: 1px solid var(--line-strong);
+  background: rgba(24, 32, 27, 0.55);
+  backdrop-filter: blur(10px);
+  color: var(--dabi-white);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: var(--radius-pill);
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1.1rem;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.15s var(--ease);
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease),
+    border-color 0.2s var(--ease);
 }
 
 .galleryAll:hover {
-  background: var(--dabi-white);
+  background: rgba(24, 32, 27, 0.72);
+  border-color: var(--dabi-gold);
+  transform: translateY(-2px);
 }
 
 /* Identity */
@@ -393,16 +525,24 @@
 /* Location cards */
 .locationHeader {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.locationIllustration {
-  width: 88px;
-  height: 88px;
-  object-fit: contain;
-  flex: none;
+.locationHeader .blockTitle {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  margin-bottom: 0;
+}
+
+.locationSubtitle {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-style: italic;
 }
 
 .locationGrid {
@@ -417,7 +557,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  padding: 1rem 1.1rem;
+  padding: 1.1rem 1.2rem;
   background: linear-gradient(180deg, var(--dabi-white), var(--dabi-ivory));
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -428,6 +568,50 @@
 .locationCard:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.locationHero {
+  background: linear-gradient(150deg, var(--dabi-green) 0%, #1f7a57 100%);
+  border-color: transparent;
+  color: var(--dabi-white);
+  overflow: hidden;
+}
+
+.locationHero::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -15%;
+  width: 60%;
+  height: 180%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.locationHero:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.locationHero .locationLabel {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.locationHero .locationLabel svg {
+  color: var(--dabi-gold);
+}
+
+.locationHeroValue {
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.locationHeroMeta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .locationLabel {
@@ -449,6 +633,36 @@
   font-weight: 800;
   color: var(--ink);
   line-height: 1.25;
+}
+
+/* Map frame */
+.mapFrame {
+  position: relative;
+  padding: 0.6rem;
+  background: var(--dabi-white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin: 0 0 1.1rem;
+}
+
+.mapFrameTag {
+  position: absolute;
+  top: -0.75rem;
+  left: 1rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dabi-green);
+  background: var(--dabi-ivory);
+  border: 1px solid var(--line);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
 }
 
 /* Map placeholder */
@@ -1169,12 +1383,16 @@
   .gallery {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
+    height: auto;
   }
   .galleryMain {
+    grid-column: auto;
     grid-row: auto;
     aspect-ratio: 4 / 3;
   }
   .gallerySide {
+    grid-column: auto;
+    grid-row: auto;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
   }

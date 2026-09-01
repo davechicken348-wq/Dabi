@@ -3,24 +3,11 @@
   background-image:
     linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.35) 50%,
-      rgba(0, 0, 0, 0.55) 100%
+      rgba(0, 0, 0, 0.18) 0%,
+      rgba(0, 0, 0, 0.12) 50%,
+      rgba(0, 0, 0, 0.35) 100%
     ),
     url("/images/walkway.webp");
-  background-image:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.35) 50%,
-      rgba(0, 0, 0, 0.55) 100%
-    ),
-    image-set(
-      url("/images/variants/walkway-480.avif") type("image/avif") 1x,
-      url("/images/variants/walkway-480.webp") type("image/webp") 1x,
-      url("/images/variants/walkway-768.avif") type("image/avif") 2x,
-      url("/images/variants/walkway-768.webp") type("image/webp") 2x
-    );
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;

@@ -13,7 +13,6 @@ import type { AdminHostel } from "../../admin/types";
 import { usePolling } from "../../admin/usePolling";
 import LiveControls from "../../admin/components/LiveControls";
 import styles from "./Home.module.css";
-import ResponsiveImage from "../../components/ResponsiveImage/ResponsiveImage";
 
 export default function Home() {
   const [hostels, setHostels] = useState<AdminHostel[]>([]);

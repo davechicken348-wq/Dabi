@@ -20,21 +20,33 @@ const router = Router();
 
 router.post(
   "/",
-  upload.single("image"),
+  upload.any(),
   asyncHandler(async (req, res) => {
-    if (!req.file) {
+    const uploadedFiles = Array.isArray(req.files) ? req.files : [];
+    const uploadedFile = uploadedFiles.find(
+      (file) => file && typeof file === "object" && "fieldname" in file,
+    ) ?? undefined;
+
+    if (!uploadedFile || !("buffer" in uploadedFile) || !("originalname" in uploadedFile)) {
       throw new ApiError(400, "No image was uploaded");
     }
+
     const origin = `${req.protocol}://${req.get("host")}`;
-    const hostelId =
-      typeof req.body?.hostelId === "string" ? req.body.hostelId : undefined;
+    const folder =
+      typeof req.body?.folder === "string"
+        ? req.body.folder
+        : typeof req.body?.hostelId === "string"
+          ? req.body.hostelId
+          : undefined;
+
     const url = await saveImage(
-      req.file.buffer,
-      req.file.originalname,
-      req.file.mimetype,
+      uploadedFile.buffer,
+      uploadedFile.originalname,
+      uploadedFile.mimetype,
       origin,
-      hostelId,
+      folder,
     );
+
     res.status(201).json({ url });
   }),
 );

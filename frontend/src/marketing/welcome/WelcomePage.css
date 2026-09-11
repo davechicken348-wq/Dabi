@@ -1,0 +1,100 @@
+.welcome-page-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  background-image:
+    linear-gradient(135deg, rgba(25, 35, 29, 0.48), rgba(25, 35, 29, 0.72)),
+    url('../../assets/images/graffiti.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.welcome-page-card {
+  width: min(34rem, 100%);
+  padding: clamp(2rem, 4vw, 3.5rem);
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(104, 144, 109, 0.2);
+  box-shadow: 0 24px 72px rgba(18, 29, 23, 0.24);
+  text-align: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.welcome-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #52845a, #8bb38a);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+}
+
+.welcome-brand-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1d2d23;
+}
+
+.welcome-kicker {
+  margin: 0;
+  color: #52845a;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.welcome-page-card h1 {
+  margin: 0.85rem 0 0.9rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: #1d2d23;
+}
+
+.welcome-copy {
+  margin: 0;
+  color: rgba(29, 45, 35, 0.72);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.welcome-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #52845a, #6d9f72);
+  color: white;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 16px 32px rgba(82, 132, 90, 0.22);
+}
+
+.welcome-cta:hover {
+  background: linear-gradient(135deg, #496f4f, #5d8b61);
+}

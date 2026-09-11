@@ -153,7 +153,7 @@ async function populate() {
         id: o.id,
         name: o.name,
         phone: o.phone,
-        email: o.email,
+        ...(o.email ? { email: o.email } : {}),
         active: o.active,
         joinedAt: new Date(o.joinedAt),
       },

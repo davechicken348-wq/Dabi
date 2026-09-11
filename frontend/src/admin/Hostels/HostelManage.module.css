@@ -875,7 +875,7 @@
 .verifPanel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .verifSummary {
@@ -883,21 +883,23 @@
   align-items: center;
   gap: 16px;
   border: 1px solid var(--adm-line);
-  border-radius: 12px;
-  padding: 16px;
-  background: var(--adm-surface);
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  border-radius: 16px;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--adm-surface), rgba(31, 138, 85, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .verifSummaryDone {
-  background: var(--adm-green-tint);
+  background: linear-gradient(135deg, var(--adm-green-tint), rgba(31, 138, 85, 0.08));
   border-color: var(--adm-green);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px rgba(31, 138, 85, 0.06);
 }
 
 .verifRing {
   --verif-color: var(--adm-green);
-  width: 56px;
-  height: 56px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -907,14 +909,16 @@
     var(--adm-line) 0
   );
   position: relative;
+  box-shadow: inset 0 0 0 1px rgba(26, 30, 35, 0.06);
 }
 
 .verifRing::before {
   content: "";
   position: absolute;
-  inset: 5px;
+  inset: 6px;
   border-radius: 50%;
   background: var(--adm-surface);
+  box-shadow: inset 0 0 0 1px rgba(26, 30, 35, 0.05);
 }
 
 .verifRingNum {
@@ -960,21 +964,25 @@
   gap: 12px;
   text-align: left;
   border: 1px solid var(--adm-line);
-  border-radius: 10px;
-  padding: 12px;
+  border-left: 3px solid transparent;
+  border-radius: 12px;
+  padding: 12px 14px 12px 12px;
   background: var(--adm-surface);
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .verifItem:hover {
   border-color: var(--adm-line-strong);
+  transform: translateY(-1px);
 }
 
 .verifItemOn {
   border-color: var(--adm-green);
-  background: var(--adm-green-tint);
+  border-left-color: var(--adm-green);
+  background: linear-gradient(135deg, var(--adm-green-tint), rgba(31, 138, 85, 0.02));
+  box-shadow: inset 0 0 0 1px rgba(31, 138, 85, 0.06);
 }
 
 .verifIconWrap {
@@ -1024,6 +1032,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  padding-top: 2px;
 }
 
 .verifActionHint {
@@ -1035,9 +1044,15 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  width: fit-content;
+  padding: 10px 12px;
+  border: 1px solid var(--adm-line);
+  border-radius: 10px;
+  background: var(--adm-surface);
   font-size: 0.8125rem;
   color: var(--adm-charcoal);
   cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .verifToggle input {
@@ -1049,6 +1064,7 @@
 .verifToggleLocked {
   color: var(--adm-muted);
   cursor: not-allowed;
+  background: var(--adm-surface-2);
 }
 
 /* ---------- Preview ---------- */

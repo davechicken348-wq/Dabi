@@ -19,7 +19,7 @@ import { clearCache } from "./utils/cache";
 
 // GET endpoints consumed by the public site stay open; everything else under
 // /api requires a valid admin token.
-const PUBLIC_GET = [/^\/hostels(\/[^/]+)?$/, /^\/facilities(\/[^/]+)?$/];
+const PUBLIC_GET = [/^\/hostels(\/[^/]+)?$/, /^\/facilities(\/[^/]+)?$/, /^\/enquiries(\/[^/]+)?$/];
 
 // Public mutations that don't need an admin token — the enquiry form on the
 // public site is a lead-capture flow, so anonymous visitors must be able to POST.

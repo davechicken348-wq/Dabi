@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -32,7 +32,7 @@ import CommandMenu from "./CommandMenu";
 import HelpCenter from "./HelpCenter";
 import styles from "./admin.module.css";
 
-type NavIcon = (p: { size?: number }) => JSX.Element;
+type NavIcon = (p: { size?: number }) => ReactElement;
 
 const groups: { items: { to: string; label: string; icon: NavIcon; end: boolean }[] }[] = [
   {

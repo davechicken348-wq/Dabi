@@ -31,7 +31,7 @@ function toDTO(owner: {
   id: string;
   name: string;
   phone: string;
-  email: string;
+  email: string | null;
   joinedAt: Date;
   active: boolean;
 }, hostelIds: string[]): OwnerDTO {
@@ -39,7 +39,7 @@ function toDTO(owner: {
     id: owner.id,
     name: owner.name,
     phone: owner.phone,
-    email: owner.email,
+    email: owner.email ?? undefined,
     joinedAt: owner.joinedAt.toISOString().slice(0, 10),
     active: owner.active,
     hostelIds,
@@ -67,7 +67,7 @@ export async function createOwner(input: OwnerCreate): Promise<OwnerDTO> {
     data: {
       name: input.name,
       phone: input.phone,
-      email: input.email,
+      ...(input.email ? { email: input.email } : {}),
       active: input.active,
     },
   });
@@ -91,10 +91,10 @@ export async function updateOwner(id: string, patch: OwnerUpdate): Promise<Owner
     prisma.owner.update({
       where: { id },
       data: {
-        name: patch.name,
-        phone: patch.phone,
-        email: patch.email,
-        active: patch.active,
+        ...(patch.name !== undefined ? { name: patch.name } : {}),
+        ...(patch.phone !== undefined ? { phone: patch.phone } : {}),
+        ...(patch.email !== undefined ? { email: patch.email || null } : {}),
+        ...(patch.active !== undefined ? { active: patch.active } : {}),
       },
     }),
     // Detach hostels no longer owned.

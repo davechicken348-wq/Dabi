@@ -1,0 +1,14 @@
+.freshness-badge {
+  font-size: var(--text-xs);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  color: var(--color-muted);
+  background-color: var(--color-ivory);
+  white-space: nowrap;
+}
+
+.freshness-stale {
+  background-color: #fef2f2;
+  color: var(--color-error);
+}

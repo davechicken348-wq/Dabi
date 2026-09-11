@@ -1,0 +1,32 @@
+.findroom-shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f6f3;
+}
+
+.findroom-main {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.findroom-content {
+  flex: 1;
+  padding: 1.75rem 2rem 3rem;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.findroom-content:has(.map-page) {
+  max-width: none;
+  padding: 0;
+}
+
+@media (max-width: 1024px) {
+  .findroom-main {
+    margin-left: 0;
+  }
+}

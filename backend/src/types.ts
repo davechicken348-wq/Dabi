@@ -1,13 +1,34 @@
 export type Availability = "Available" | "Limited" | "Full";
+export type PricingPeriod = "AcademicYear" | "Semester" | "Month";
 export type EnquiryStatus = "New" | "Contacted" | "Resolved";
+
+export interface RoomOfferingDTO {
+  id: string;
+  hostelId: string;
+  roomType: string;
+  price: number;
+  pricingPeriod: PricingPeriod;
+  bedsPerRoom?: number;
+  totalRooms?: number;
+  availableRooms?: number;
+  availability: Availability;
+  description?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
 
 export interface HostelDTO {
   id: string;
   name: string;
   location: string;
+  address?: string;
+  landmark?: string;
   pricePerYear: number;
   roomType: string;
   totalRooms?: number;
+  updatedAt?: string;
+  publishedAt?: string;
+  roomOfferings?: RoomOfferingDTO[];
   /** Total bed capacity across every room of this hostel's room type. */
   totalBeds?: number;
   /** Beds still free after accounting for approved (Active) tenancies. */
@@ -22,10 +43,17 @@ export interface HostelDTO {
   longitude?: number;
   facilities: string[];
   ownerId?: string;
+  verifiedAt?: string;
+  lastCheckedAt?: string;
   createdAt: string;
 }
 
 export type HostelCreate = Omit<HostelDTO, "id" | "createdAt"> & {
+  roomOfferings?: Array<
+    Omit<RoomOfferingDTO, "id" | "hostelId" | "createdAt" | "updatedAt"> & {
+      id?: string;
+    }
+  >;
   /**
    * When a hostel is created from the admin UI, images are uploaded to a
    * temporary folder before the hostel id exists. Passing that folder here lets
@@ -40,7 +68,7 @@ export interface OwnerDTO {
   id: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string | null;
   hostelIds: string[];
   joinedAt: string;
   active: boolean;
@@ -74,6 +102,7 @@ export interface EnquiryDTO {
   school?: string;
   hostelId?: string;
   hostelName?: string;
+  roomOfferingId?: string;
   roomType?: string;
   moveInDate?: string;
   message?: string;
@@ -91,8 +120,9 @@ export type TenancyStatus = "Pending" | "Active" | "Ended";
 
 export interface TenancyDTO {
   id: string;
-  hostelId: string;
+  hostelId?: string;
   hostelName: string;
+  roomOfferingId?: string;
   roomType: string;
   beds: number;
   occupantName: string;

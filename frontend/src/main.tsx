@@ -1,22 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import App from "./App";
-import { AuthProvider } from "./context/AuthContext";
-import { SchoolProvider } from "./context/SchoolContext";
-import { FacilitiesProvider } from "./context/FacilitiesContext";
-import "./styles/global.css";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import './styles/global.css';
+import './styles/animations.css';
+import { router } from './routes';
+import { AuthProvider } from './context/AuthContext';
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <SchoolProvider>
-          <FacilitiesProvider>
-            <App />
-          </FacilitiesProvider>
-        </SchoolProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  </StrictMode>
 );

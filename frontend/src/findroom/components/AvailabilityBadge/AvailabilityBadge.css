@@ -1,0 +1,23 @@
+.availability-badge {
+  font-size: var(--text-xs);
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.availability-available {
+  background-color: var(--color-green-50);
+  color: var(--color-green);
+}
+
+.availability-limited {
+  background-color: var(--color-gold-soft);
+  color: #92610a;
+}
+
+.availability-full {
+  background-color: var(--color-border);
+  color: var(--color-muted);
+}

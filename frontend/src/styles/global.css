@@ -1,213 +1,62 @@
-:root {
-  /* Brand palette — green is an accent, not the dominant color */
-  --dabi-ivory: #f8f6ef; /* dominant warm background */
-  --dabi-white: #ffffff; /* content surfaces */
-  --dabi-charcoal: #18201b; /* primary text */
-  --dabi-green: #176b4d; /* brand accent */
-  --dabi-green-700: #12573d; /* deep green — reserved sections only */
-  --dabi-green-600: #1c7a58; /* hover/active */
-  --dabi-green-50: #e8f1ec; /* light green tint, used sparingly */
-  --dabi-gold: #e9b949; /* personality accent */
-  --dabi-gold-soft: #f7e7c2;
-  --dabi-muted: #68716b; /* secondary text */
-
-  /* Aliases so existing references keep working */
-  --dabi-cream: var(--dabi-ivory);
-  --ink: var(--dabi-charcoal);
-  --ink-soft: #44504a;
-  --ink-muted: var(--dabi-muted);
-
-   /* Lines — neutral, low-noise (shared by admin + public) */
-   --line: #e4e5de;
-   --line-strong: #d6d9d2;
-
-  /* Status */
-  --status-available: #1f8a55;
-  --status-limited: #c98a0a;
-  --status-full: #b23b3b;
-
-  /* Shadows — soft and warm */
-  --shadow-sm: 0 1px 2px rgba(24, 32, 27, 0.05);
-  --shadow-md: 0 10px 30px rgba(24, 32, 27, 0.07);
-  --shadow-lg: 0 18px 48px rgba(24, 32, 27, 0.1);
-  --shadow-float: 0 22px 60px rgba(23, 107, 77, 0.16);
-
-  /* Radius */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-pill: 999px;
-
-  /* Layout */
-  --maxw: 1600px;
-  --gutter: 24px;
-
-  /* Type — playful, rounded, friendly */
-  --font: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-graffiti: "Permanent Marker", "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-brand: "ziclets", "Permanent Marker", "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-admin: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-
-  /* =========================================================
-     Type scale — copied from the Supabase homepage (supabase.com)
-     Tailwind token values, exact rem + line-heights. Used to
-     align Dabi's front-facing pages with Supabase's typographic
-     rhythm (body sits at 15px, display scales up to 94px).
-     ========================================================= */
-  --sb-text-xs: 0.75rem;
-  --sb-text-xs--lh: 1.3333;
-  --sb-text-sm: 0.875rem;
-  --sb-text-sm--lh: 1.4286;
-  --sb-text-base: 0.9375rem;
-  --sb-text-base--lh: 1.6;
-  --sb-text-lg: 1rem;
-  --sb-text-lg--lh: 1.5556;
-  --sb-text-xl: 1.125rem;
-  --sb-text-xl--lh: 1.5556;
-  --sb-text-2xl: 1.375rem;
-  --sb-text-2xl--lh: 1.3333;
-  --sb-text-3xl: 1.75rem;
-  --sb-text-3xl--lh: 1.2857;
-  --sb-text-4xl: 2.125rem;
-  --sb-text-4xl--lh: 1.1765;
-  --sb-text-5xl: 2.875rem;
-  --sb-text-5xl--lh: 1;
-  --sb-text-6xl: 3.625rem;
-  --sb-text-6xl--lh: 1;
-  --sb-text-7xl: 4.375rem;
-  --sb-text-7xl--lh: 1;
-  --sb-text-8xl: 5.875rem;
-  --sb-text-8xl--lh: 1;
-
-  /* Fluid display — maps Supabase's mobile→desktop hero range
-     (text-5xl up to text-8xl) into a single clamp. */
-  --sb-display: clamp(2.875rem, 1.5rem + 6.08vw, 5.875rem);
-  --sb-h1: clamp(2.125rem, 1.2rem + 4vw, 3.625rem);
-  --sb-h2: clamp(1.75rem, 1.1rem + 2.6vw, 2.875rem);
-  --sb-h3: clamp(1.375rem, 1.05rem + 1.4vw, 1.75rem);
-
-  /* Brand gradient — green → gold, the Supabase-style accent pair */
-  --grad-brand: linear-gradient(120deg, var(--dabi-green) 0%, #1f8a55 45%, var(--dabi-gold) 120%);
-  --grad-brand-soft: linear-gradient(120deg, rgba(23, 107, 77, 0.1), rgba(233, 185, 73, 0.12));
-
-  /* Motion */
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  /* Scrollbar — shared by admin (dark) + public (light) surfaces.
-     Neutral thumb stays visible on both themes; brand green on interaction. */
-  --scrollbar-size: 12px;
-  --scrollbar-thumb: rgba(120, 130, 125, 0.5);
-  --scrollbar-thumb-hover: var(--dabi-green-600, #1c7a58);
-  --scrollbar-thumb-active: var(--dabi-green, #176b4d);
-  --scrollbar-track: transparent;
-}
+@import './tokens.css';
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-/* =========================================================
-   Unified scrollbar — applied globally to every scroll
-   container, inspired by the admin list-grid design. Works
-   on light (public) and dark (admin) surfaces alike.
-   ========================================================= */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-::-webkit-scrollbar {
-  width: var(--scrollbar-size);
-  height: var(--scrollbar-size);
-}
-
-::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: padding-box;
-  transition: background-color 0.15s var(--ease);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar-thumb-hover);
-  background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:active {
-  background-color: var(--scrollbar-thumb-active);
-  background-clip: padding-box;
-}
-
-/* When the admin area is mounted, the page scrollbar adapts to the
-   dark admin theme: a lighter neutral thumb on the near-black surface,
-   with the brighter Dabi green on interaction. */
-html.adm-theme {
-  --scrollbar-thumb: rgba(150, 160, 155, 0.4);
-  --scrollbar-thumb-hover: var(--adm-green-600, #34c893);
-  --scrollbar-thumb-active: var(--adm-green, #2bbd86);
-  --scrollbar-track: transparent;
+  margin: 0;
+  padding: 0;
 }
 
 html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
 }
 
 body {
-  margin: 0;
-  font-family: var(--font);
-  font-size: var(--sb-text-base);
-  color: var(--ink);
-  background: var(--dabi-cream);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  line-height: var(--sb-text-base--lh);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-charcoal);
+  background-color: var(--color-white);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 h1,
 h2,
 h3,
-h4 {
-  margin: 0;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  color: var(--ink);
-}
-
-/* Default heading sizes follow the copied Supabase scale; pages may
-   override per-component where a fluid clamp is preferred. */
-h1 {
-  font-size: var(--sb-h1);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-
-h2 {
-  font-size: var(--sb-h2);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-}
-
-h3 {
-  font-size: var(--sb-h3);
+h4,
+h5,
+h6 {
+  font-family: var(--font-body);
   line-height: 1.15;
+  letter-spacing: 0;
+  color: var(--color-charcoal);
 }
 
-h4 {
-  font-size: var(--sb-text-2xl);
-  line-height: 1.2;
-}
+h1 { font-size: var(--text-4xl); }
+h2 { font-size: var(--text-3xl); }
+h3 { font-size: var(--text-2xl); }
+h4 { font-size: var(--text-xl); }
+h5 { font-size: var(--text-lg); }
+h6 { font-size: var(--text-md); }
 
-p {
-  margin: 0;
+.marketing-page h1,
+.marketing-page h2,
+.marketing-page h3,
+.marketing-page h4,
+.marketing-page h5,
+.marketing-page h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
 }
 
 a {
@@ -215,181 +64,46 @@ a {
   text-decoration: none;
 }
 
-img {
-  display: block;
-  max-width: 100%;
-}
-
 button {
   font-family: inherit;
   cursor: pointer;
+  border: none;
+  background: none;
 }
 
-ul {
-  margin: 0;
-  padding: 0;
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+ul,
+ol {
   list-style: none;
 }
 
+::selection {
+  background-color: var(--color-green-50);
+  color: var(--color-charcoal);
+}
+
 :focus-visible {
-  outline: 3px solid var(--dabi-gold);
+  outline: 2px solid var(--color-green);
   outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Shared helpers */
-.dabi-container {
-  width: 100%;
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding-inline: var(--gutter);
-}
-
-.dabi-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--dabi-green);
-}
-
-.dabi-eyebrow::before {
-  content: "";
-  width: 24px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--dabi-gold);
-}
-
-/* Supabase-style pill eyebrow — bordered chip with a leading dot. Reads as a
-   crisp "section tag" and pairs with the brand gradient on hover/active. */
-.dabi-eyebrow-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--dabi-green);
-  background: var(--dabi-white);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  padding: 0.4rem 0.9rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.dabi-eyebrow-pill::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--grad-brand);
-}
-
-/* Gradient text — used for accent words inside big display headings. */
-.dabi-text-gradient {
-  background: var(--grad-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.dabi-wordmark {
-  display: inline-flex;
-  align-items: baseline;
-  font-family: var(--font-brand);
-  font-weight: 500;
-  font-size: 1.6rem;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
-.dabi-wordmark__a {
-  color: var(--dabi-charcoal);
-}
-
-.dabi-wordmark__b {
-  color: var(--dabi-green);
-}
-
-/* On the deep-green footer the wordmark flips to white + gold */
-.dabi-wordmark--invert .dabi-wordmark__a {
-  color: var(--dabi-white);
-}
-
-.dabi-wordmark--invert .dabi-wordmark__b {
-  color: var(--dabi-gold);
-}
-
-.dabi-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  font-size: 1rem;
-  padding: 0.85rem 1.5rem;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  transition:
-    transform 0.18s var(--ease),
-    background-color 0.18s var(--ease),
-    box-shadow 0.18s var(--ease),
-    color 0.18s var(--ease);
-}
-
-.dabi-btn-primary {
-  background: var(--dabi-green);
-  color: var(--dabi-white);
-}
-
-.dabi-btn-primary:hover {
-  background: var(--dabi-green-700);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.dabi-btn-secondary {
-  background: var(--dabi-white);
-  color: var(--dabi-green);
-  border-color: var(--line-strong);
-}
-
-.dabi-btn-secondary:hover {
-  border-color: var(--dabi-green);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-.dabi-btn-gold {
-  background: var(--dabi-gold);
-  color: var(--dabi-green-700);
-}
-
-.dabi-btn-gold:hover {
-  background: var(--dabi-gold-soft);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.dabi-btn-ghost-light {
-  background: transparent;
-  color: var(--dabi-white);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.dabi-btn-ghost-light:hover {
-  background: rgba(255, 255, 255, 0.12);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

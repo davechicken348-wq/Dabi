@@ -1,0 +1,44 @@
+.marketing-cta {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: clamp(6rem, 12vw, 11rem) var(--space-6);
+  background-color: #19342d;
+  color: var(--color-white);
+  text-align: center;
+  background-image:
+    linear-gradient(rgba(17, 37, 31, 0.55), rgba(17, 37, 31, 0.55)),
+    url('../../../assets/images/bed.jpg');
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.marketing-cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.marketing-cta-title {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  margin-bottom: var(--space-4);
+  color: var(--color-white);
+}
+
+.marketing-cta-subtitle {
+  font-size: var(--text-lg);
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: var(--space-8);
+}
+
+.marketing-cta .btn-primary {
+  background-color: var(--color-white);
+  color: var(--color-green);
+}
+
+.marketing-cta .btn-primary:hover {
+  background-color: var(--color-ivory);
+}

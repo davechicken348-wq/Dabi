@@ -1,0 +1,137 @@
+.about-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #19342d;
+  background-image:
+    linear-gradient(180deg, rgba(17, 37, 31, 0.65) 0%, rgba(17, 37, 31, 0.65) 60%, rgba(17, 37, 31, 0) 100%),
+    url('../../assets/images/motel.jpg');
+  background-position: center;
+  background-size: cover;
+  padding: clamp(5rem, 9vw, 9rem) var(--space-6) clamp(4rem, 7vw, 7rem);
+  text-align: left;
+  color: var(--color-white);
+  box-sizing: border-box;
+}
+
+.about-hero-inner {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.about-eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-6);
+}
+
+.about-title {
+  max-width: 850px;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-6);
+  color: var(--color-white);
+}
+
+.about-subtitle {
+  max-width: 600px;
+  font-size: var(--text-lg);
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.6;
+}
+
+.about-section {
+  padding: clamp(6rem, 10vw, 10rem) var(--space-6);
+  background-color: var(--color-white);
+}
+
+.about-section-alt {
+  background-color: var(--color-ivory);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 2vw, 2rem);
+  margin-top: clamp(2.5rem, 4vw, 4rem);
+}
+
+.about-card {
+  padding: 1.5rem 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.about-card h4 {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-3);
+}
+
+.about-card p {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.process-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 2vw, 2rem);
+  margin-top: clamp(2.5rem, 4vw, 4rem);
+}
+
+.process-step {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--color-border-strong);
+  text-align: left;
+}
+
+.process-number {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-green);
+  margin-bottom: 0;
+}
+
+.process-content h4 {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-2);
+}
+
+.process-content p {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .process-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .process-steps {
+    grid-template-columns: 1fr;
+  }
+  .about-title {
+    font-size: var(--text-3xl);
+  }
+}

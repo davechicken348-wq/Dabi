@@ -1,0 +1,167 @@
+.findroom-help {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem 0 2rem;
+}
+
+.findroom-help-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, #edf7f0 0%, #f8faf7 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+}
+
+.findroom-help-eyebrow {
+  margin: 0;
+  color: var(--color-green);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.findroom-help-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  line-height: 1.05;
+  color: var(--color-charcoal);
+}
+
+.findroom-help-header p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.findroom-help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.findroom-help-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: #ffffff;
+}
+
+.findroom-help-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--color-charcoal);
+}
+
+.findroom-help-card p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.findroom-help-card a,
+.findroom-help-link {
+  margin-top: auto;
+  align-self: flex-start;
+  color: var(--color-green);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.findroom-help-card a:hover,
+.findroom-help-link:hover {
+  text-decoration: underline;
+}
+
+.findroom-help-steps {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.findroom-help-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.findroom-help-step-number {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #e5efe9;
+  color: var(--color-green);
+  font-weight: 800;
+}
+
+.findroom-help-step h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  color: var(--color-charcoal);
+}
+
+.findroom-help-step p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.findroom-help-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.findroom-help-faq h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-charcoal);
+}
+
+.findroom-help-faq-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.findroom-help-faq-item {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.findroom-help-faq-item strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--color-charcoal);
+}
+
+.findroom-help-faq-item p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .findroom-help {
+    padding-top: 0.75rem;
+  }
+
+  .findroom-help-header {
+    padding: 1.25rem;
+  }
+}

@@ -9,8 +9,9 @@ import type {
 
 type TenancyRow = {
   id: string;
-  hostelId: string;
+  hostelId: string | null;
   hostelName: string;
+  roomOfferingId: string | null;
   roomType: string;
   beds: number;
   occupantName: string;
@@ -25,8 +26,9 @@ type TenancyRow = {
 function toDTO(t: TenancyRow): TenancyDTO {
   return {
     id: t.id,
-    hostelId: t.hostelId,
+    hostelId: t.hostelId ?? undefined,
     hostelName: t.hostelName,
+    roomOfferingId: t.roomOfferingId ?? undefined,
     roomType: t.roomType,
     beds: t.beds,
     occupantName: t.occupantName,
@@ -57,12 +59,13 @@ export async function getTenancy(id: string): Promise<TenancyDTO> {
 }
 
 export async function createTenancy(input: TenancyCreate): Promise<TenancyDTO> {
-  const hostel = await prisma.hostel.findUnique({ where: { id: input.hostelId } });
-  if (!hostel) throw new ApiError(404, "Hostel not found");
+  const hostel = input.hostelId ? await prisma.hostel.findUnique({ where: { id: input.hostelId } }) : null;
+  if (input.hostelId && !hostel) throw new ApiError(404, "Hostel not found");
   const t = await prisma.tenancy.create({
     data: {
-      hostelId: input.hostelId,
-      hostelName: input.hostelName ?? hostel.name,
+      hostelId: input.hostelId ?? null,
+      roomOfferingId: input.roomOfferingId ?? null,
+      hostelName: input.hostelName ?? hostel?.name ?? "",
       roomType: input.roomType,
       beds: input.beds ?? 1,
       occupantName: input.occupantName,

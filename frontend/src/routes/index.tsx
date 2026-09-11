@@ -1,57 +1,72 @@
-import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import Welcome from "../pages/Welcome/Welcome";
-import Home from "../pages/Home/Home";
-import FindHostel from "../pages/FindHostel/FindHostel";
-import HostelDetails from "../pages/HostelDetails/HostelDetails";
-import Locations from "../pages/Locations/Locations";
-import HowItWorks from "../pages/HowItWorks/HowItWorks";
-import About from "../pages/About/About";
-import Contact from "../pages/Contact/Contact";
-import AdminLayout from "../admin/AdminLayout";
-import RequireAuth from "../admin/RequireAuth";
-import Login from "../admin/Login/Login";
-import Dashboard from "../admin/Dashboard/Dashboard";
-import Hostels from "../admin/Hostels/Hostels";
-import HostelManage from "../admin/Hostels/HostelManage";
-import Enquiries from "../admin/Enquiries/Enquiries";
-import Owners from "../admin/Owners/Owners";
-import ManagedHostels from "../admin/Owners/ManagedHostels";
-import Deals from "../admin/Deals/Deals";
-import Tenancies from "../admin/Tenancies/Tenancies";
-import Facilities from "../admin/Facilities/Facilities";
-import Docs from "../admin/Docs/Docs";
+import { createBrowserRouter } from 'react-router-dom';
+import App from '../App';
+import WelcomePage from '../marketing/welcome/WelcomePage';
+import MarketingHome from '../marketing/home/Home';
+import About from '../marketing/about/About';
+import Contact from '../marketing/contact/Contact';
+import FindRoomHome from '../findroom/home/FindRoomHome';
+import Explore from '../findroom/explore/Explore';
+import Rooms from '../findroom/rooms/Rooms';
+import Map from '../findroom/map/Map';
+import Locations from '../findroom/locations/Locations';
+import RoomDetails from '../findroom/rooms/RoomDetails';
+import MyEnquiries from '../findroom/enquiries/MyEnquiries';
+import HelpPage from '../findroom/help/HelpPage';
+import { RouteError } from '../shared/RouteError/RouteError';
+import AdminLogin from '../admin/Login/Login';
+import AdminLayout from '../admin/AdminLayout';
+import RequireAuth from '../admin/RequireAuth';
+import Dashboard from '../admin/Dashboard/Dashboard';
+import Hostels from '../admin/Hostels/Hostels';
+import HostelManage from '../admin/Hostels/HostelManage';
+import Owners from '../admin/Owners/Owners';
+import ManagedHostels from '../admin/Owners/ManagedHostels';
+import Enquiries from '../admin/Enquiries/Enquiries';
+import Tenancies from '../admin/Tenancies/Tenancies';
+import Deals from '../admin/Deals/Deals';
+import Facilities from '../admin/Facilities/Facilities';
+import Docs from '../admin/Docs/Docs';
+import { FacilitiesProvider } from '../context/FacilitiesContext';
 
-export const routes: RouteObject[] = [
-  { path: "/", element: <Welcome /> },
-  { path: "/home", element: <Home /> },
-  { path: "/find-hostel", element: <FindHostel /> },
-  { path: "/hostel/:id", element: <HostelDetails /> },
-  { path: "/locations", element: <Locations /> },
-  { path: "/how-it-works", element: <HowItWorks /> },
-  { path: "/about", element: <About /> },
-  { path: "/contact", element: <Contact /> },
-  { path: "/admin/login", element: <Login /> },
+export const router = createBrowserRouter([
   {
-    path: "/admin",
-    element: (
-      <RequireAuth>
-        <AdminLayout />
-      </RequireAuth>
-    ),
+    path: '/',
+    element: <App />,
+    errorElement: <RouteError />,
     children: [
-      { index: true, element: <Dashboard /> },
-      { path: "hostels", element: <Hostels /> },
-      { path: "hostels/new", element: <HostelManage /> },
-      { path: "hostels/:id/edit", element: <HostelManage /> },
-      { path: "enquiries", element: <Enquiries /> },
-      { path: "tenancies", element: <Tenancies /> },
-      { path: "owners", element: <Owners /> },
-      { path: "managed-hostels", element: <ManagedHostels /> },
-      { path: "deals", element: <Deals /> },
-       { path: "facilities", element: <Facilities /> },
-       { path: "docs", element: <Docs /> },
+      { index: true, element: <WelcomePage /> },
+      { path: 'marketing', element: <MarketingHome /> },
+      { path: 'about', element: <About /> },
+      { path: 'contact', element: <Contact /> },
+      {
+        path: 'findroom',
+        element: <FindRoomHome />,
+      },
+      { path: 'findroom/explore', element: <Explore /> },
+      { path: 'findroom/rooms', element: <Rooms /> },
+      { path: 'findroom/map', element: <Map /> },
+      { path: 'findroom/locations', element: <Locations /> },
+      { path: 'findroom/rooms/:id', element: <RoomDetails /> },
+      { path: 'findroom/enquiries', element: <MyEnquiries /> },
+      { path: 'findroom/help', element: <HelpPage /> },
+      { path: 'admin/login', element: <AdminLogin /> },
+      {
+        path: 'admin',
+        element: <RequireAuth><FacilitiesProvider><AdminLayout /></FacilitiesProvider></RequireAuth>,
+        children: [
+          { index: true, element: <Dashboard /> },
+          { path: 'hostels', element: <Hostels /> },
+          { path: 'hostels/new', element: <HostelManage /> },
+          { path: 'hostels/:id/edit', element: <HostelManage /> },
+          { path: 'owners', element: <Owners /> },
+          { path: 'managed-hostels', element: <ManagedHostels /> },
+          { path: 'enquiries', element: <Enquiries /> },
+          { path: 'tenancies', element: <Tenancies /> },
+          { path: 'deals', element: <Deals /> },
+          { path: 'facilities', element: <Facilities /> },
+          { path: 'docs', element: <Docs /> },
+        ],
+      },
     ],
   },
-  { path: "*", element: <Navigate to="/" replace /> },
-];
+]);

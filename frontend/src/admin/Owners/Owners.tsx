@@ -53,7 +53,7 @@ function describeError(err: unknown): string {
     return "An owner with this email already exists. Please use a different email address.";
   }
   if (lower.includes("required")) {
-    return "Please fill in the owner's name, email and phone number.";
+    return "Please fill in the owner's name and phone number.";
   }
   if (lower.includes("could not reach")) {
     return "We couldn't reach the server. Check your connection or make sure the backend is running, then try again.";
@@ -162,7 +162,7 @@ export default function Owners() {
     sorted.sort((a, b) => {
       switch (sort) {
         case "email":
-          return a.email.localeCompare(b.email);
+          return (a.email ?? "").localeCompare(b.email ?? "");
         case "hostels":
           return b.hostelIds.length - a.hostelIds.length;
         case "newest":
@@ -634,7 +634,6 @@ function OwnerForm({ initial, onClose, onSubmit, onDelete }: FormProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="owner@example.com"
-                required
               />
             </div>
             {emailError && (

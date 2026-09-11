@@ -37,7 +37,7 @@ import {
 
 import styles from "./HostelManage.module.css";
 
-const FALLBACK_IMAGE = "/illustrations/Photography-Fashion--Streamline-Bangalore.webp";
+const FALLBACK_IMAGE = "/src/assets/images/camera.jpg";
 
 const AVAILABILITY: { id: Availability; label: string; color: string; desc: string }[] = [
   {
@@ -80,15 +80,30 @@ const ghs = new Intl.NumberFormat("en-GH", {
   maximumFractionDigits: 0,
 });
 
-type Tab = "overview" | "photos" | "availability" | "location" | "owner" | "verification";
+type Tab = "place" | "rooms" | "facilities" | "photos" | "owner" | "verification" | "review";
+
+type RoomOfferingDraft = {
+  id: string;
+  roomType: string;
+  price: string;
+  pricingPeriod: "AcademicYear" | "Semester" | "Month";
+  bedsPerRoom: string;
+  totalRooms: string;
+  availableRooms: string;
+  availability: Availability;
+  description: string;
+};
+
+const ROOM_TYPE_OPTIONS = ["1-in-1", "2-in-1", "3-in-1", "4-in-1", "5-in-1", "Other"];
 
 const TABS: { id: Tab; label: string; icon: typeof IconBed }[] = [
-  { id: "overview", label: "Overview", icon: IconBed },
+  { id: "place", label: "Place", icon: IconMap },
+  { id: "rooms", label: "Rooms", icon: IconBed },
+  { id: "facilities", label: "Facilities", icon: IconTag },
   { id: "photos", label: "Photos", icon: IconImages },
-  { id: "availability", label: "Availability", icon: IconCheck },
-  { id: "location", label: "Location", icon: IconMap },
   { id: "owner", label: "Owner", icon: IconUser },
   { id: "verification", label: "Verification", icon: IconShield },
+  { id: "review", label: "Review", icon: IconEye },
 ];
 
 function ownerInitials(name: string): string {
@@ -100,7 +115,19 @@ function ownerInitials(name: string): string {
     .toUpperCase();
 }
 
-const today = () => new Date().toISOString().slice(0, 10);
+function createEmptyRoomOffering(): RoomOfferingDraft {
+  return {
+    id: crypto.randomUUID(),
+    roomType: "2-in-1",
+    price: "",
+    pricingPeriod: "AcademicYear",
+    bedsPerRoom: "",
+    totalRooms: "",
+    availableRooms: "",
+    availability: "Available",
+    description: "",
+  };
+}
 
 const STU = getSchool("stu");
 
@@ -133,13 +160,13 @@ export default function HostelManage() {
 
   const [loading, setLoading] = useState(Boolean(id));
   const [owners, setOwners] = useState<Owner[]>([]);
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTab] = useState<Tab>("place");
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [price, setPrice] = useState("");
-  const [roomType, setRoomType] = useState("2-in-1");
-  const [totalRooms, setTotalRooms] = useState("");
+  const [landmark, setLandmark] = useState("");
+  const [address, setAddress] = useState("");
+  const [roomOfferings, setRoomOfferings] = useState<RoomOfferingDraft[]>([createEmptyRoomOffering()]);
   const [availability, setAvailability] = useState<Availability>("Available");
   const [verified, setVerified] = useState(true);
   const [image, setImage] = useState("");
@@ -163,8 +190,10 @@ export default function HostelManage() {
   const [dragActive, setDragActive] = useState(false);
 
   const suggestedPrice = useMemo(() => {
-    if (!allHostels.length || !roomType.trim()) return null;
-    const sameRoom = allHostels.filter((h) => h.roomType === roomType.trim());
+    if (!allHostels.length || roomOfferings.length === 0) return null;
+    const firstRoom = roomOfferings[0];
+    if (!firstRoom.roomType.trim()) return null;
+    const sameRoom = allHostels.filter((h) => h.roomType === firstRoom.roomType.trim());
     const pool = sameRoom.length >= 3 ? sameRoom : allHostels;
     const loc = location.trim().toLowerCase();
     const scored = pool.map((h) => {
@@ -177,16 +206,17 @@ export default function HostelManage() {
     const total = scored.reduce((s, x) => s + x.weight, 0);
     const avg = scored.reduce((s, x) => s + x.price * x.weight, 0) / total;
     return Math.round(avg / 50) * 50;
-  }, [allHostels, roomType, location, facilities]);
+  }, [allHostels, roomOfferings, location, facilities]);
 
   // Smart suggestion: facilities common among similar hostels (same room type
   // or location) that this hostel doesn't yet list.
   const suggestedFacilities = useMemo(() => {
     if (!allHostels.length) return [];
+    const firstRoomType = roomOfferings[0]?.roomType?.trim();
     const loc = location.trim().toLowerCase();
     const peers = allHostels.filter(
       (h) =>
-        h.roomType === roomType.trim() ||
+        (firstRoomType ? h.roomType === firstRoomType : false) ||
         (loc !== "" && h.location.toLowerCase() === loc),
     );
     const pool = peers.length >= 2 ? peers : allHostels;
@@ -200,14 +230,14 @@ export default function HostelManage() {
       .filter(([key, n]) => n / pool.length >= 0.5 && !facilities.includes(key))
       .sort((a, b) => b[1] - a[1])
       .map(([key]) => key);
-  }, [allHostels, roomType, location, facilities]);
+  }, [allHostels, roomOfferings, location, facilities]);
 
   const previewHostel: Hostel = {
     id: "preview",
     name: name.trim() || "Hostel name",
     location: location.trim() || "Location",
-    pricePerYear: Number(price) || 0,
-    roomType: roomType.trim() || "—",
+    pricePerYear: roomOfferings[0] ? Number(roomOfferings[0].price) || 0 : 0,
+    roomType: roomOfferings[0]?.roomType.trim() || "—",
     availability,
     verified,
     image: image || FALLBACK_IMAGE,
@@ -225,9 +255,36 @@ export default function HostelManage() {
           if (!active) return;
           setName(h.name);
           setLocation(h.location);
-          setPrice(h.pricePerYear.toString());
-          setRoomType(h.roomType);
-          setTotalRooms(h.totalRooms != null ? h.totalRooms.toString() : "");
+          setLandmark(h.landmark ?? "");
+          setAddress(h.address ?? "");
+          setRoomOfferings(
+            (h.roomOfferings && h.roomOfferings.length > 0
+              ? h.roomOfferings
+              : [
+                  {
+                    id: crypto.randomUUID(),
+                    roomType: h.roomType || "2-in-1",
+                    price: h.pricePerYear?.toString() ?? "",
+                    pricingPeriod: "AcademicYear",
+                    bedsPerRoom: "",
+                    totalRooms: h.totalRooms != null ? h.totalRooms.toString() : "",
+                    availableRooms: h.totalRooms != null ? h.totalRooms.toString() : "",
+                    availability: h.availability ?? "Available",
+                    description: h.note ?? "",
+                  },
+                ]
+            ).map((room: Partial<RoomOfferingDraft> & { id?: string }) => ({
+              id: room.id ?? crypto.randomUUID(),
+              roomType: room.roomType,
+              price: room.price?.toString?.() ?? "",
+              pricingPeriod: room.pricingPeriod ?? "AcademicYear",
+              bedsPerRoom: room.bedsPerRoom?.toString?.() ?? "",
+              totalRooms: room.totalRooms?.toString?.() ?? "",
+              availableRooms: room.availableRooms?.toString?.() ?? "",
+              availability: room.availability ?? "Available",
+              description: room.description ?? "",
+            })),
+          );
           setAvailability(h.availability);
           setVerified(h.verified);
           setImage(h.image);
@@ -237,8 +294,7 @@ export default function HostelManage() {
           setNote(h.note ?? "");
           setLat(h.latitude ?? null);
           setLng(h.longitude ?? null);
-          setCheckLoc
-
+          setCheckLoc(h.verified);
           setCheckPhotos(h.verified);
           setCheckPrice(h.verified);
           setCheckAvail(h.verified);
@@ -257,6 +313,23 @@ export default function HostelManage() {
     setFacilities((prev) =>
       prev.includes(fid) ? prev.filter((f) => f !== fid) : [...prev, fid],
     );
+  }
+
+  function updateRoomOffering(id: string, field: keyof RoomOfferingDraft, value: string) {
+    setRoomOfferings((prev) =>
+      prev.map((room) => (room.id === id ? { ...room, [field]: value } : room)),
+    );
+  }
+
+  function addRoomOffering() {
+    setRoomOfferings((prev) => [...prev, createEmptyRoomOffering()]);
+  }
+
+  function removeRoomOffering(id: string) {
+    setRoomOfferings((prev) => {
+      if (prev.length === 1) return prev;
+      return prev.filter((room) => room.id !== id);
+    });
   }
 
   const checkSetters: Record<VerifKey, (v: boolean) => void> = {
@@ -371,16 +444,33 @@ export default function HostelManage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    const normalizedRoomOfferings = roomOfferings
+      .filter((room) => room.roomType.trim())
+      .map((room) => ({
+        roomType: room.roomType.trim(),
+        price: Number(room.price) || 0,
+        pricingPeriod: room.pricingPeriod,
+        bedsPerRoom: room.bedsPerRoom ? Number(room.bedsPerRoom) : undefined,
+        totalRooms: room.totalRooms ? Number(room.totalRooms) : undefined,
+        availableRooms: room.availableRooms ? Number(room.availableRooms) : undefined,
+        availability: room.availability,
+        description: room.description.trim() || undefined,
+      }));
+
     const input: HostelInput = {
       name: name.trim(),
       location: location.trim(),
-      pricePerYear: Number(price) || 0,
-      roomType: roomType.trim(),
-      totalRooms: totalRooms ? Number(totalRooms) : undefined,
-      availability,
+      landmark: landmark.trim() || undefined,
+      address: address.trim() || undefined,
+      pricePerYear: normalizedRoomOfferings[0]?.price ?? 0,
+      roomType: normalizedRoomOfferings[0]?.roomType ?? "1-in-1",
+      totalRooms: normalizedRoomOfferings[0]?.totalRooms,
+      availability: normalizedRoomOfferings[0]?.availability ?? "Available",
       verified,
       image: photos[0] ?? image ?? "",
       photos,
+      roomOfferings: normalizedRoomOfferings,
       facilities,
       ownerId: ownerId || undefined,
       note: note.trim() || undefined,
@@ -492,10 +582,18 @@ export default function HostelManage() {
       </div>
 
       <form id="hostel-form" className={styles.form} onSubmit={handleSubmit}>
-        {tab === "overview" && (
+        {tab === "place" && (
           <div className={styles.tabPanel}>
             <div className={styles.formSection}>
-              <div className={styles.formSectionTitle}>Basic information</div>
+              <div className={styles.formSectionHead}>
+                <div>
+                  <div className={styles.formSectionTitle}>Where is this place?</div>
+                  <div className={styles.formSectionHint}>
+                    Start with the basics. Tell Dabi where this hostel is and help students understand where they'll find it.
+                  </div>
+                </div>
+              </div>
+
               <div className={styles.formRow}>
                 <div className={styles.field}>
                   <label className={styles.fieldLabel} htmlFor="h-name">
@@ -510,6 +608,48 @@ export default function HostelManage() {
                   />
                 </div>
               </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.field}>
+                  <label className={styles.fieldLabel} htmlFor="h-loc">
+                    Location / Area
+                  </label>
+                  <input
+                    id="h-loc"
+                    className={styles.input}
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. Fiapre"
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.fieldLabel} htmlFor="h-landmark">
+                    Landmark
+                  </label>
+                  <input
+                    id="h-landmark"
+                    className={styles.input}
+                    value={landmark}
+                    onChange={(e) => setLandmark(e.target.value)}
+                    placeholder="Near Fiapre Junction"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.fieldLabel} htmlFor="h-address">
+                  Address
+                </label>
+                <input
+                  id="h-address"
+                  className={styles.input}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Optional street or building address"
+                />
+              </div>
+
               <div className={styles.field}>
                 <label className={styles.fieldLabel} htmlFor="h-note">
                   Description
@@ -519,89 +659,224 @@ export default function HostelManage() {
                   className={styles.textarea}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Short description shown on the listing"
+                  placeholder="Tell students a little about this place."
                 />
               </div>
             </div>
 
             <div className={styles.formSection}>
-              <div className={styles.formSectionTitle}>Rooms &amp; pricing</div>
-              <div className={styles.formRow}>
-                <div className={styles.field}>
-                  <label className={styles.fieldLabel} htmlFor="h-price">
-                    Price per head (GHS)
-                  </label>
-                  <input
-                    id="h-price"
-                    className={styles.input}
-                    type="number"
-                    min={0}
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.fieldLabel} htmlFor="h-room">
-                    Room type
-                  </label>
-                  <input
-                    id="h-room"
-                    className={styles.input}
-                    value={roomType}
-                    onChange={(e) => setRoomType(e.target.value)}
-                    placeholder="e.g. 2-in-1"
-                    required
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.fieldLabel} htmlFor="h-rooms">
-                    Number of rooms
-                  </label>
-                  <input
-                    id="h-rooms"
-                    className={styles.input}
-                    type="number"
-                    min={0}
-                    value={totalRooms}
-                    onChange={(e) => setTotalRooms(e.target.value)}
-                    placeholder="e.g. 12"
-                  />
-                </div>
+              <div className={styles.formSectionTitle}>Map &amp; location pin</div>
+              <div className={styles.formSectionHint}>
+                Search for a place or move the marker to the exact location.
               </div>
+
+              <LocationPicker
+                latitude={lat ?? undefined}
+                longitude={lng ?? undefined}
+                onChange={(la, ln) => {
+                  setLat(la);
+                  setLng(ln);
+                }}
+                onArea={(area) => setLocation(area)}
+              />
+
+              {lat != null && lng != null && (
+                <p className={styles.coords}>
+                  <IconMap size={14} style={{ verticalAlign: "-2px" }} /> Pinned at{" "}
+                  {lat.toFixed(5)}, {lng.toFixed(5)} ·{" "}
+                  {Math.round(haversineKm(STU.lat, STU.lng, lat, lng))} km from STU
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {tab === "rooms" && (
+          <div className={styles.tabPanel}>
+            <div className={styles.formSection}>
+              <div className={styles.formSectionHead}>
+                <div>
+                  <div className={styles.formSectionTitle}>What rooms are available?</div>
+                  <div className={styles.formSectionHint}>
+                    Tell us what students can actually get at this hostel.
+                  </div>
+                </div>
+                <button type="button" className={styles.btnSecondary} onClick={addRoomOffering}>
+                  + Add room type
+                </button>
+              </div>
+
+              {roomOfferings.map((room, index) => (
+                <div key={room.id} className={styles.formSection} style={{ padding: 16, gap: 12 }}>
+                  <div className={styles.formSectionHead}>
+                    <div className={styles.formSectionTitle}>Room type {index + 1}</div>
+                    {roomOfferings.length > 1 && (
+                      <button
+                        type="button"
+                        className={styles.btnGhost}
+                        onClick={() => removeRoomOffering(room.id)}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>Room type</label>
+                      <select
+                        className={styles.select}
+                        value={room.roomType}
+                        onChange={(e) => updateRoomOffering(room.id, "roomType", e.target.value)}
+                      >
+                        {ROOM_TYPE_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>Price</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min={0}
+                        value={room.price}
+                        onChange={(e) => updateRoomOffering(room.id, "price", e.target.value)}
+                        placeholder="2500"
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>Pricing period</label>
+                      <select
+                        className={styles.select}
+                        value={room.pricingPeriod}
+                        onChange={(e) =>
+                          updateRoomOffering(
+                            room.id,
+                            "pricingPeriod",
+                            e.target.value as RoomOfferingDraft["pricingPeriod"],
+                          )
+                        }
+                      >
+                        <option value="AcademicYear">Academic Year</option>
+                        <option value="Semester">Semester</option>
+                        <option value="Month">Month</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>How many students share the room?</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min={1}
+                        value={room.bedsPerRoom}
+                        onChange={(e) => updateRoomOffering(room.id, "bedsPerRoom", e.target.value)}
+                        placeholder="2"
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>How many rooms of this type exist?</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min={0}
+                        value={room.totalRooms}
+                        onChange={(e) => updateRoomOffering(room.id, "totalRooms", e.target.value)}
+                        placeholder="4"
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>How many are available right now?</label>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min={0}
+                        value={room.availableRooms}
+                        onChange={(e) => updateRoomOffering(room.id, "availableRooms", e.target.value)}
+                        placeholder="2"
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.field}>
+                      <label className={styles.fieldLabel}>Availability</label>
+                      <select
+                        className={styles.select}
+                        value={room.availability}
+                        onChange={(e) =>
+                          updateRoomOffering(
+                            room.id,
+                            "availability",
+                            e.target.value as Availability,
+                          )
+                        }
+                      >
+                        {AVAILABILITY.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Anything students should know?</label>
+                    <textarea
+                      className={styles.textarea}
+                      value={room.description}
+                      onChange={(e) => updateRoomOffering(room.id, "description", e.target.value)}
+                      placeholder="Washroom inside, furnished, self-contained..."
+                    />
+                  </div>
+                </div>
+              ))}
+
               {suggestedPrice != null && (
                 <div className={styles.suggestBox}>
                   <span className={styles.suggestIcon}>
                     <IconSparkles size={16} />
                   </span>
                   <span className={styles.suggestText}>
-                    Suggested price per head for this setup:{" "}
-                    <strong>{ghs.format(suggestedPrice)}</strong>
+                    Suggested price for this setup: <strong>{ghs.format(suggestedPrice)}</strong>
                   </span>
                   <button
                     type="button"
                     className={styles.suggestApply}
-                    onClick={() => setPrice(suggestedPrice.toString())}
-                    disabled={Number(price) === suggestedPrice}
+                    onClick={() => {
+                      const firstRoom = roomOfferings[0];
+                      if (!firstRoom) return;
+                      updateRoomOffering(firstRoom.id, "price", suggestedPrice.toString());
+                    }}
+                    disabled={Number(roomOfferings[0]?.price ?? 0) === suggestedPrice}
                   >
                     Apply
                   </button>
                 </div>
               )}
             </div>
+          </div>
+        )}
 
+        {tab === "facilities" && (
+          <div className={styles.tabPanel}>
             <div className={styles.formSection}>
               <div className={styles.formSectionHead}>
                 <div>
-                  <div className={styles.formSectionTitle}>Facilities</div>
+                  <div className={styles.formSectionTitle}>What&rsquo;s included?</div>
                   <div className={styles.formSectionHint}>
-                    What does this hostel offer?
+                    Help students understand what they can expect at this hostel.
                   </div>
                 </div>
-                <span className={styles.facilityCount}>
-                  {facilities.length} selected
-                </span>
+                <span className={styles.facilityCount}>{facilities.length} selected</span>
               </div>
+
               <div className={styles.facilityGrid}>
                 {facilityCatalog.map((f) => {
                   const on = facilities.includes(f.key);
@@ -627,6 +902,7 @@ export default function HostelManage() {
                   );
                 })}
               </div>
+
               {suggestedFacilities.length > 0 && (
                 <div className={styles.facilitySuggest}>
                   <span className={styles.facilitySuggestLabel}>
@@ -672,7 +948,7 @@ export default function HostelManage() {
                   />
                 ) : (
                   <div className={styles.coverFallback}>
-                    <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt}  loading="lazy" decoding="async" />
+                    <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt} loading="lazy" decoding="async" />
                     <span>No cover photo yet</span>
                   </div>
                 )}
@@ -691,8 +967,7 @@ export default function HostelManage() {
                 <div>
                   <div className={styles.formSectionTitle}>Gallery</div>
                   <div className={styles.formSectionHint}>
-                    Upload your own photos. The first photo is the cover — reorder
-                    or pick a cover, and remove any you don&rsquo;t want.
+                    Upload your own photos. The first photo is the cover — reorder or pick a cover, and remove any you don&apos;t want.
                   </div>
                 </div>
                 <span className={styles.facilityCount}>{photos.length} added</span>
@@ -732,6 +1007,7 @@ export default function HostelManage() {
                   disabled={uploading}
                 />
               </label>
+
               {uploading && (
                 <p className={`${styles.uploadHint} ${styles.uploadProgress}`}>
                   <IconRefresh size={15} className={styles.liveSpin} />
@@ -742,7 +1018,7 @@ export default function HostelManage() {
 
               {photos.length === 0 ? (
                 <div className={styles.galleryEmpty}>
-                  <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt}  loading="lazy" decoding="async" />
+                  <img src={FALLBACK_IMAGE} alt="" className={styles.fallbackArt} loading="lazy" decoding="async" />
                   <span>No photos yet — upload one above to get started.</span>
                 </div>
               ) : (
@@ -822,109 +1098,12 @@ export default function HostelManage() {
           </div>
         )}
 
-        {tab === "availability" && (
-          <div className={styles.tabPanel}>
-            <div className={styles.formSection}>
-              <div className={styles.formSectionTitle}>Current status</div>
-              <div className={styles.formSectionHint}>
-                Let students know how many spaces are left.
-              </div>
-              <div className={styles.availGrid}>
-                {AVAILABILITY.map((a) => {
-                  const on = availability === a.id;
-                  return (
-                    <button
-                      type="button"
-                      key={a.id}
-                      className={`${styles.availCard} ${on ? styles.availCardOn : ""}`}
-                      style={
-                        {
-                          "--avail-color": a.color,
-                        } as CSSProperties
-                      }
-                      onClick={() => setAvailability(a.id)}
-                      aria-pressed={on}
-                    >
-                      <span className={styles.availCardHead}>
-                        <span className={styles.availDot} style={{ background: a.color }} />
-                        <span className={styles.availCardLabel}>{a.label}</span>
-                        <span className={styles.availCheck}>
-                          {on && <IconCheck size={13} />}
-                        </span>
-                      </span>
-                      <span className={styles.availCardDesc}>{a.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className={styles.availMeta}>
-                Last checked: {today()}
-              </p>
-              {isEdit && (
-                <button
-                  type="button"
-                  className={`${styles.btnSecondary} ${styles.btnSm}`}
-                  style={{ marginTop: 12 }}
-                  onClick={() => updateHostel(id!, { availability }).then(() => navigate("/admin/hostels"))}
-                >
-                  Update availability
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {tab === "location" && (
-          <div className={styles.tabPanel}>
-            <div className={styles.formSection}>
-              <div className={styles.formSectionTitle}>Hostel location</div>
-              <div className={styles.formSectionHint}>
-                Drop a pin on the map to mark exactly where the hostel is. The
-                area name fills in automatically, or type it below.
-              </div>
-
-              <LocationPicker
-                latitude={lat ?? undefined}
-                longitude={lng ?? undefined}
-                onChange={(la, ln) => {
-                  setLat(la);
-                  setLng(ln);
-                }}
-                onArea={(area) => setLocation(area)}
-              />
-
-              <div className={styles.field} style={{ marginTop: 16 }}>
-                <label className={styles.fieldLabel} htmlFor="h-loc">
-                  Location
-                </label>
-                <input
-                  id="h-loc"
-                  className={styles.input}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. Ayeduase"
-                  required
-                />
-              </div>
-
-              {lat != null && lng != null && (
-                <p className={styles.coords}>
-                  <IconMap size={14} style={{ verticalAlign: "-2px" }} /> Pinned at{" "}
-                  {lat.toFixed(5)}, {lng.toFixed(5)} ·{" "}
-                  {Math.round(haversineKm(STU.lat, STU.lng, lat, lng))} km
-                  from STU
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
         {tab === "owner" && (
           <div className={styles.tabPanel}>
             <div className={styles.formSection}>
-              <div className={styles.formSectionTitle}>Owner</div>
+              <div className={styles.formSectionTitle}>Who owns this place?</div>
               <div className={styles.formSectionHint}>
-                The person responsible for this hostel.
+                Select an existing owner or add one now. Phone is the important contact detail.
               </div>
               <div className={styles.field}>
                 <label className={styles.fieldLabel} htmlFor="h-owner">
@@ -965,7 +1144,7 @@ export default function HostelManage() {
                       <span className={styles.ownerContactIcon}>
                         <IconMail size={15} />
                       </span>
-                      <span className={styles.ownerContactText}>{owner.email}</span>
+                      <span className={styles.ownerContactText}>{owner.email ?? "No email on file"}</span>
                     </a>
                   </div>
                 </div>
@@ -1077,6 +1256,81 @@ export default function HostelManage() {
                   />
                   Listed as a verified hostel on Dabi
                 </label>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "review" && (
+          <div className={styles.tabPanel}>
+            <div className={styles.formSection}>
+              <div className={styles.formSectionTitle}>Looks good?</div>
+              <div className={styles.formSectionHint}>
+                Here&rsquo;s a quick review of what students will see.
+              </div>
+
+              <div className={styles.previewCard} style={{ maxWidth: "none", marginBottom: 0 }}>
+                <div className={styles.previewMedia}>
+                  <img
+                    className={styles.previewImg}
+                    src={previewHostel.image}
+                    alt={previewHostel.name}
+                    onError={onImgError}
+                  />
+                  <div className={styles.previewBadges}>
+                    <span className={styles.previewStatus}>
+                      <span
+                        className={styles.previewStatusDot}
+                        style={{
+                          background:
+                            AVAILABILITY.find((a) => a.id === previewHostel.availability)?.color ??
+                            "#1f8a55",
+                        }}
+                      />
+                      {previewHostel.availability}
+                    </span>
+                    {previewHostel.verified && (
+                      <span className={styles.previewVerified}>
+                        <IconCheck size={12} /> Verified
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.previewBody}>
+                  <h3 className={styles.previewName}>{previewHostel.name}</h3>
+                  <p className={styles.previewLoc}>
+                    <IconMap size={14} /> {previewHostel.location}
+                  </p>
+                  {previewHostel.note && (
+                    <p className={styles.previewNote}>{previewHostel.note}</p>
+                  )}
+                  <div className={styles.previewMeta}>
+                    <span className={styles.previewRoom}>
+                      <IconBed size={14} /> {previewHostel.roomType}
+                    </span>
+                    <span className={styles.previewPrice}>
+                      GH₵{previewHostel.pricePerYear.toLocaleString("en-GH")} <small>price per head</small>
+                    </span>
+                  </div>
+                  {facilities.length > 0 && (
+                    <div className={styles.previewFacilities}>
+                      {facilities.slice(0, 4).map((f) => {
+                        const fac = facilityCatalog.find((x) => x.key === f);
+                        return (
+                          <span key={f} className={styles.previewChip}>
+                            {fac ? fac.label : f}
+                          </span>
+                        );
+                      })}
+                      {facilities.length > 4 && (
+                        <span className={styles.previewChip}>
+                          +{facilities.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

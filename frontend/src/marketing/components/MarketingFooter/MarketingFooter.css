@@ -1,0 +1,82 @@
+.marketing-footer {
+  background:
+    radial-gradient(circle at top left, rgba(23, 107, 77, 0.35), transparent 32%),
+    linear-gradient(180deg, #14241c 0%, #0f1d17 100%);
+  color: var(--color-white);
+  padding: var(--space-16) var(--space-6) var(--space-8);
+}
+
+.marketing-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+
+.marketing-footer-brand {
+  max-width: 280px;
+}
+
+.marketing-footer-brand .logo-text {
+  color: var(--color-white);
+}
+
+.marketing-footer-tagline {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.6;
+}
+
+.marketing-footer-links {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.marketing-footer-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  color: var(--color-white);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.marketing-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.marketing-footer-link {
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.72);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.marketing-footer-link:hover {
+  color: var(--color-white);
+  transform: translateX(2px);
+}
+
+.marketing-footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+  .marketing-footer-inner {
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .marketing-footer-links {
+    gap: var(--space-8);
+  }
+}

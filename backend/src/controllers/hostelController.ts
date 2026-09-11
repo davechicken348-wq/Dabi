@@ -13,8 +13,8 @@ export const getOne = asyncHandler(async (req, res) => {
 
 export const create = asyncHandler(async (req, res) => {
   const body = req.body as HostelCreate;
-  if (!body.name || !body.location || body.pricePerYear == null) {
-    throw new ApiError(400, "name, location and pricePerYear are required");
+  if (!body.name || !body.location) {
+    throw new ApiError(400, "name and location are required");
   }
   res.status(201).json(await service.createHostel(body));
 });

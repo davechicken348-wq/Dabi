@@ -14,14 +14,16 @@ export const getOne = asyncHandler(async (req, res) => {
 
 export const create = asyncHandler(async (req, res) => {
   const body = req.body as OwnerCreate;
-  if (!body.name || !body.email || !body.phone) {
-    throw new ApiError(400, "name, email and phone are required");
+  if (!body.name || !body.phone) {
+    throw new ApiError(400, "name and phone are required");
   }
-  const existing = await prisma.owner.findUnique({
-    where: { email: body.email },
-  });
-  if (existing) {
-    throw new ApiError(409, "An owner with this email already exists.");
+  if (body.email) {
+    const existing = await prisma.owner.findUnique({
+      where: { email: body.email },
+    });
+    if (existing) {
+      throw new ApiError(409, "An owner with this email already exists.");
+    }
   }
   res.status(201).json(await service.createOwner(body));
 });

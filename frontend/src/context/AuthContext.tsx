@@ -1,65 +1,40 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  getSession,
-  login as authLogin,
-  logout as authLogout,
-  onUnauthorized,
-} from "../services/auth";
-import type { AdminUser } from "../admin/types";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { loginAdmin, getSession, clearSession, type AuthUser } from '../services/auth';
 
-interface AuthState {
-  user: AdminUser | null;
+interface AuthContextValue {
+  user: AuthUser | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthState | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AdminUser | null>(() => getSession());
+  const [user, setUser] = useState<AuthUser | null>(() => getSession());
 
   useEffect(() => {
     setUser(getSession());
   }, []);
 
-  // React to global 401s (e.g. expired token) by clearing the session; the
-  // RequireAuth guard then bounces the user back to the login page.
-  useEffect(() => {
-    return onUnauthorized(() => {
-      authLogout();
-      setUser(null);
-    });
-  }, []);
-
-  async function login(email: string, password: string): Promise<boolean> {
-    const result = await authLogin(email, password);
-    if (result) {
-      setUser(result);
+  const value = useMemo<AuthContextValue>(() => ({
+    user,
+    login: async (email, password) => {
+      const nextUser = await loginAdmin(email, password);
+      if (!nextUser) return false;
+      setUser(nextUser);
       return true;
-    }
-    return false;
-  }
+    },
+    logout: () => {
+      clearSession();
+      setUser(null);
+    },
+  }), [user]);
 
-  function logout(): void {
-    authLogout();
-    setUser(null);
-  }
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth(): AuthState {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
+export function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
 }

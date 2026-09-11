@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactElement,
 } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -28,7 +29,7 @@ import {
 } from "./adminIcons";
 import styles from "./CommandMenu.module.css";
 
-type CmdIcon = (p: { size?: number }) => JSX.Element;
+type CmdIcon = (p: { size?: number }) => ReactElement;
 
 interface Command {
   label: string;

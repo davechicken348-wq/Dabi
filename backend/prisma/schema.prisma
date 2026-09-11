@@ -18,6 +18,12 @@ enum Availability {
   Full
 }
 
+enum PricingPeriod {
+  AcademicYear
+  Semester
+  Month
+}
+
 enum EnquiryStatus {
   New
   Contacted
@@ -34,11 +40,12 @@ model Hostel {
   id              String       @id @default(cuid())
   name            String
   location        String
-  pricePerYear    Int // Ghana Cedis, per academic year
-  roomType        String
-  totalRooms      Int? // Total number of rooms in the hostel
-  availability    Availability @default(Available)
+  description     String?
+  address         String?
+  landmark        String?
   verified        Boolean      @default(false)
+  verifiedAt      DateTime?
+  lastCheckedAt   DateTime?
   image           String       @default("/images/hostel-placeholder.svg")
   photos          String[]     @default([])
   note            String?
@@ -46,15 +53,24 @@ model Hostel {
   latitude        Float?
   longitude       Float?
   createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  publishedAt     DateTime?
+
+  // Legacy compatibility fields retained during the RoomOffering migration.
+  pricePerYear    Int?
+  roomType        String?
+  totalRooms      Int?
+  availability    Availability? @default(Available)
 
   ownerId String?
   owner   Owner?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
 
   facilities Facility[] @relation("HostelFacilities")
 
-  enquiries Enquiry[]
-  tenancies Tenancy[]
-  deals     Deal[]
+  roomOfferings RoomOffering[]
+  enquiries     Enquiry[]
+  tenancies     Tenancy[]
+  deals         Deal[]
 
   @@index([ownerId])
   @@index([availability])
@@ -65,7 +81,7 @@ model Owner {
   id       String   @id @default(cuid())
   name     String
   phone    String
-  email    String   @unique
+  email    String?  @unique
   joinedAt DateTime @default(now())
   active   Boolean  @default(true)
 
@@ -74,21 +90,48 @@ model Owner {
   @@index([active])
 }
 
-model Enquiry {
-  id         String        @id @default(cuid())
-  name       String
-  phone      String
-  school     String?
-  hostelId   String?
-  hostel     Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
-  hostelName String?
-  roomType   String?
-  moveInDate DateTime?
-  message    String?
-  status     EnquiryStatus @default(New)
-  createdAt  DateTime      @default(now())
+model RoomOffering {
+  id            String        @id @default(cuid())
+  hostelId      String
+  hostel        Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  roomType      String
+  price         Int
+  pricingPeriod PricingPeriod @default(AcademicYear)
+  bedsPerRoom   Int?
+  totalRooms    Int?
+  availableRooms Int?
+  availability  Availability  @default(Available)
+  description   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  enquiries Enquiry[]
+  tenancies Tenancy[]
 
   @@index([hostelId])
+  @@index([roomType])
+  @@index([price])
+  @@index([availability])
+}
+
+model Enquiry {
+  id             String        @id @default(cuid())
+  name           String
+  phone          String
+  school         String?
+  hostelId       String?
+  hostel         Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  roomOfferingId String?
+  roomOffering   RoomOffering? @relation(fields: [roomOfferingId], references: [id], onDelete: SetNull)
+  hostelName     String?
+  roomType       String?
+  moveInDate     DateTime?
+  message        String?
+  status         EnquiryStatus @default(New)
+  createdAt      DateTime      @default(now())
+
+  @@index([hostelId])
+  @@index([roomOfferingId])
   @@index([status])
   @@index([createdAt])
 }
@@ -98,8 +141,10 @@ model Enquiry {
 // bed count, ended tenancies free it back up. Dabi confirms a pending request.
 model Tenancy {
   id            String        @id @default(cuid())
-  hostelId      String
-  hostel        Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelId      String?
+  hostel        Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  roomOfferingId String?
+  roomOffering  RoomOffering? @relation(fields: [roomOfferingId], references: [id], onDelete: SetNull)
   hostelName    String
   roomType      String
   beds          Int           @default(1)
@@ -112,6 +157,7 @@ model Tenancy {
   createdAt     DateTime      @default(now())
 
   @@index([hostelId])
+  @@index([roomOfferingId])
   @@index([status])
   @@index([createdAt])
 }

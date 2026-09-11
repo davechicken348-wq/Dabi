@@ -36,7 +36,7 @@ export interface Owner {
   id: string;
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   /** Hostel ids managed by this owner */
   hostelIds: string[];
   joinedAt: string;

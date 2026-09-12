@@ -132,7 +132,7 @@ export default function RoomDetails() {
   const relatedRooms = hostel.roomOptions
     .filter((candidate) => candidate.id !== room.id)
     .slice(0, 3);
-  const roomOfferingId = room?.roomOfferingId ?? room?.id ?? null;
+  const roomOfferingId = room?.roomOfferingId;
   const roomShareUrl = buildRoomShareUrl(room.id);
   const roomShareText = generateRoomShareMessage(
     {

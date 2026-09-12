@@ -28,7 +28,7 @@ export async function fetchEnquiries(): Promise<Enquiry[]> {
 }
 
 export async function submitEnquiry(data: {
-  roomId: string;
+  roomId?: string;
   hostelId: string;
   roomName: string;
   hostelName: string;
@@ -43,7 +43,7 @@ export async function submitEnquiry(data: {
     phone: data.phone ?? '',
     school: data.school,
     hostelId: data.hostelId,
-    roomOfferingId: data.roomId,
+    ...(data.roomId ? { roomOfferingId: data.roomId } : {}),
     hostelName: data.hostelName,
     roomType: data.roomName,
     moveInDate: data.moveInDate,

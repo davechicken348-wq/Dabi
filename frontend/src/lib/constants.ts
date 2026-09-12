@@ -20,6 +20,17 @@ export const FACILITIES = [
   'Study Room',
 ] as const;
 
+export const FACILITY_EMOJIS: Record<string, string> = {
+  Water: '💧',
+  ECG: '⚡',
+  Kitchen: '🍳',
+  'Self-contained': '🏠',
+  'Wi-Fi': '📶',
+  Parking: '🚗',
+  Security: '🔒',
+  'Study Room': '📚',
+};
+
 export const ROOM_TYPES = [
   '1 in 1',
   '2 in 1',

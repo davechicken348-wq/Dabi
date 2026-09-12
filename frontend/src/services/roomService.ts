@@ -30,6 +30,8 @@ interface BackendHostel {
   photos?: string[];
   note?: string;
   createdAt?: string;
+  lastCheckedAt?: string;
+  checkedAt?: string;
   roomOfferings?: BackendRoomOffering[];
 }
 
@@ -71,6 +73,7 @@ function toRoomOption(hostel: BackendHostel, roomOffering?: BackendRoomOffering)
     hostelName: hostel.name,
     hostelLocation: hostel.location,
     pricingPeriod: roomOffering?.pricingPeriod,
+    lastCheckedAt: hostel.lastCheckedAt ?? hostel.checkedAt,
   };
 }
 

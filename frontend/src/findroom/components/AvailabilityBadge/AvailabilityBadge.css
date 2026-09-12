@@ -1,20 +1,23 @@
 .availability-badge {
-  font-size: var(--text-xs);
-  padding: 0.25rem 0.625rem;
+  font-size: var(--text-2xs);
+  padding: 0.3rem 0.7rem;
   border-radius: var(--radius-full);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .availability-available {
   background-color: var(--color-green-50);
   color: var(--color-green);
+  box-shadow: 0 0 0 2px rgba(21, 105, 75, 0.06);
 }
 
 .availability-limited {
   background-color: var(--color-gold-soft);
-  color: #92610a;
+  color: #8c5f0a;
+  box-shadow: 0 0 0 2px rgba(201, 139, 20, 0.08);
 }
 
 .availability-full {

@@ -6,7 +6,7 @@ import { LoadingState } from '../components/LoadingState/LoadingState';
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { fetchRooms, fetchFilterFacilities } from '../../services/roomService';
 import type { RoomOption, SearchFilters } from '../../types';
-import { LOCATIONS, FACILITIES, OCCUPANCY_OPTIONS, PRICE_RANGES } from '../../lib/constants';
+import { LOCATIONS, FACILITIES, OCCUPANCY_OPTIONS, PRICE_RANGES, FACILITY_EMOJIS } from '../../lib/constants';
 import './Explore.css';
 
 type FilterIconName = 'location' | 'rooms' | 'availability' | 'price' | 'facility';
@@ -187,8 +187,7 @@ export default function Explore() {
               className={`facility-chip ${filters.facilities.includes(facility) ? 'facility-chip-active' : ''}`}
               onClick={() => toggleFacility(facility)}
             >
-              <span className="facility-chip-icon" aria-hidden="true"><FilterIcon name="facility" /></span>
-              {facility}
+              {FACILITY_EMOJIS[facility] ? `${FACILITY_EMOJIS[facility]} ${facility}` : facility}
             </button>
           ))}
         </div>
@@ -214,10 +213,12 @@ export default function Explore() {
             <LoadingState count={6} />
           ) : rooms.length === 0 ? (
             <EmptyState
-              title="Nothing matches those filters."
-              description="Try changing your budget or location."
-              actionLabel="Explore Rooms"
+              title="Nothing perfect yet."
+              description="We couldn't find a room matching everything you selected. Try widening your budget or explore nearby areas."
+              actionLabel="Adjust search"
               actionTo="/findroom/explore"
+              secondaryActionLabel="Tell Dabi what I need"
+              secondaryActionTo="/findroom/request"
             />
           ) : (
             <div className="explore-grid">

@@ -107,7 +107,11 @@ export default function Rooms() {
         ) : sortedRooms.length === 0 ? (
           <EmptyState
             title="Nothing matches this view."
-            description="Try a different search or availability filter."
+            description="Try a different search or availability filter, or let Dabi know what you need."
+            actionLabel="Explore rooms"
+            actionTo="/findroom/explore"
+            secondaryActionLabel="Request a room"
+            secondaryActionTo="/findroom/request"
           />
         ) : (
           <div className="rooms-grid">

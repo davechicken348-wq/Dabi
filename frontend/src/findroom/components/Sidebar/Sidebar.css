@@ -2,9 +2,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 240px;
+  width: var(--sidebar-width);
   height: 100vh;
-  background-color: #fbfcfa;
+  background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
@@ -12,55 +12,94 @@
   z-index: var(--z-sticky);
 }
 
+/* ── Brand ── */
 .sidebar-top {
-  padding: 1.25rem 0.75rem;
+  padding: var(--space-6) var(--space-4) var(--space-5);
+  overflow-y: auto;
+  flex: 1;
 }
 
 .sidebar-brand {
   display: inline-flex;
-  padding: 0.4rem 0.75rem 1.6rem;
+  align-items: center;
+  padding: var(--space-2) var(--space-3) var(--space-6);
 }
 
+/* ── Navigation ── */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
+  gap: var(--space-6);
 }
 
 .sidebar-group {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 2px;
 }
 
 .sidebar-group-label {
-  padding: 0 0.75rem 0.45rem;
-  color: #8a928c;
-  font-size: 0.6875rem;
+  padding: 0 var(--space-3) var(--space-2);
+  color: var(--color-faint);
+  font-size: var(--text-2xs);
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
+/* ── Nav links ── */
 .sidebar-link {
+  position: relative;
   display: flex;
   align-items: center;
-  min-height: 2.25rem;
-  padding: 0.45rem 0.75rem;
-  font-family: var(--font-body);
-  font-size: 0.875rem;
+  min-height: 2.625rem;
+  padding: 0.5rem var(--space-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-muted);
-  border-radius: 0.4rem;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
+.sidebar-link:hover {
+  background-color: var(--color-canvas);
+  color: var(--color-charcoal);
+}
+
+.sidebar-link-active {
+  background-color: var(--color-green-50);
+  color: var(--color-green);
+}
+
+.sidebar-link-active .sidebar-icon {
+  color: var(--color-green);
+}
+
+/* ── Active indicator ── */
+.sidebar-link-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--color-green);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+/* ── Icon ── */
 .sidebar-icon {
   width: 1.125rem;
   height: 1.125rem;
-  flex: 0 0 auto;
-  margin-right: 0.8rem;
-  color: #7b857d;
+  flex-shrink: 0;
+  margin-right: var(--space-3);
+  color: var(--color-faint);
+  transition: color var(--transition-fast);
+}
+
+.sidebar-link:hover .sidebar-icon {
+  color: var(--color-muted);
 }
 
 .sidebar-link span {
@@ -69,28 +108,59 @@
   white-space: nowrap;
 }
 
-.sidebar-link:hover {
-  background-color: var(--color-ivory);
-  color: var(--color-charcoal);
-}
-
-.sidebar-link-active {
-  background-color: #e5efe9;
-  color: var(--color-green);
-}
-
-.sidebar-link-active .sidebar-icon {
-  color: var(--color-green);
-}
-
+/* ── Bottom ── */
 .sidebar-bottom {
-  padding: 0.75rem;
+  padding: var(--space-4);
   border-top: 1px solid var(--color-border);
+  background: var(--color-canvas);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .sidebar-link-ghost {
+  font-size: var(--text-xs);
+  color: var(--color-faint);
+}
+
+.sidebar-link-ghost:hover {
   color: var(--color-muted);
-  font-size: 0.8125rem;
+}
+
+/* ── Request CTA ── */
+.sidebar-request-cta {
+  margin: var(--space-4) var(--space-3) 0;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--color-green-50) 0%, var(--color-sand) 100%);
+  border: 1px solid var(--color-green-100);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+
+.sidebar-request-cta-text {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-3);
+}
+
+.sidebar-request-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.45rem var(--space-4);
+  background: var(--color-green);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.sidebar-request-cta-link:hover {
+  background: var(--color-green-700);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 1024px) {

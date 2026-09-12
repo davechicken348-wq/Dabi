@@ -8,21 +8,19 @@ export function Hero() {
       <div className="hero-bg" aria-hidden="true" />
       <div className="hero-inner">
         <div className="hero-content animate-fade-in-up">
-          <span className="hero-eyebrow">Student Accommodation, Reimagined</span>
           <h1 className="hero-title">
-            Your next room is<br />
-            closer than you think.
+            Stop asking around.<br />
+            Start finding rooms.
           </h1>
           <p className="hero-subtitle">
-            Finding student accommodation shouldn't mean walking around town asking who has a room available.
-            Dabi helps you discover rooms, explore hostels, understand prices and availability, and connect with the people behind them.
+            Dabi brings verified rooms, real prices, and up-to-date availability into one place — so you can find the right student accommodation without the guesswork.
           </p>
           <div className="hero-actions">
             <Link to="/findroom">
               <Button size="lg" variant="primary">Find a Room →</Button>
             </Link>
             <Link to="/about">
-              <Button size="lg" variant="outline">How Dabi Works</Button>
+              <Button size="lg" variant="outline">How Dabi works</Button>
             </Link>
           </div>
         </div>
@@ -31,6 +29,10 @@ export function Hero() {
             <div className="hero-image-card hero-image-card-1" />
             <div className="hero-image-card hero-image-card-2" />
             <div className="hero-image-card hero-image-card-3" />
+            <div className="hero-badge" aria-hidden="true">
+              <span className="hero-badge-dot" />
+              <span>Rooms verified today</span>
+            </div>
           </div>
         </div>
       </div>

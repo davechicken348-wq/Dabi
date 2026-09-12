@@ -7,6 +7,8 @@ interface EmptyStateProps {
   description?: string;
   actionLabel?: string;
   actionTo?: string;
+  secondaryActionLabel?: string;
+  secondaryActionTo?: string;
   icon?: React.ReactNode;
 }
 
@@ -15,20 +17,29 @@ export function EmptyState({
   description,
   actionLabel,
   actionTo,
+  secondaryActionLabel,
+  secondaryActionTo,
   icon,
 }: EmptyStateProps) {
   return (
     <div className="empty-state">
       <div className="empty-state-icon" aria-hidden="true">
-        {icon || '📭'}
+        {icon || '🌱'}
       </div>
       <h3 className="empty-state-title">{title}</h3>
       {description && <p className="empty-state-desc">{description}</p>}
-      {actionLabel && actionTo && (
-        <Link to={actionTo}>
-          <Button variant="primary">{actionLabel}</Button>
-        </Link>
-      )}
+      <div className="empty-state-actions">
+        {actionLabel && actionTo && (
+          <Link to={actionTo}>
+            <Button variant="primary">{actionLabel}</Button>
+          </Link>
+        )}
+        {secondaryActionLabel && secondaryActionTo && (
+          <Link to={secondaryActionTo}>
+            <Button variant="ghost">{secondaryActionLabel}</Button>
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

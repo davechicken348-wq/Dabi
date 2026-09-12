@@ -12,13 +12,11 @@ import { submitEnquiry } from '../../services/enquiryService';
 import { getAvailabilityStatus } from '../../lib/utils';
 import {
   buildRoomShareUrl,
-  canCopyRoomLink,
-  canUseNativeShare,
-  copyRoomLink,
   generateRoomShareMessage,
-  openWhatsAppShare,
   setRoomMetaTags,
 } from '../../lib/sharing';
+import { ShareDialog } from '../components/ShareDialog/ShareDialog';
+import { DistanceMap } from './DistanceMap';
 import type { RoomOption, Hostel } from '../../types';
 import './RoomDetails.css';
 
@@ -56,9 +54,10 @@ export default function RoomDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
-  const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
   const [enquiryError, setEnquiryError] = useState('');
   const [enquirySubmitted, setEnquirySubmitted] = useState(false);
@@ -98,8 +97,9 @@ export default function RoomDetails() {
         setError('Failed to load room details.');
         setLoading(false);
       });
-
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   if (loading) {
@@ -172,56 +172,6 @@ export default function RoomDetails() {
     hostel,
     roomShareUrl,
   );
-
-  const handleShareAction = async (action: 'native' | 'whatsapp' | 'copy') => {
-    setShareStatus(null);
-    setShowShareDialog(false);
-
-    try {
-      if (action === 'native') {
-        if (!canUseNativeShare()) {
-          setShareStatus('Native sharing isn’t available here yet.');
-          return;
-        }
-
-        await navigator.share({
-          title: `${room.name} at ${hostel.name} | Dabi`,
-          text: roomShareText,
-          url: roomShareUrl,
-        });
-
-        setShareStatus('Nice — room shared. 🫶🏽');
-        return;
-      }
-
-      if (action === 'whatsapp') {
-        const opened = openWhatsAppShare(roomShareText);
-
-        if (opened) {
-          setShareStatus('Opening WhatsApp…');
-          return;
-        }
-
-        setShareStatus("Couldn't open WhatsApp. Try copying the link instead.");
-        return;
-      }
-
-      const copied = await copyRoomLink(roomShareUrl);
-
-      if (copied) {
-        setShareStatus('Link copied! 🥳');
-        return;
-      }
-
-      setShareStatus("Couldn't copy the link just yet. 😅");
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        return;
-      }
-
-      setShareStatus("Couldn't share that one just yet. 😅");
-    }
-  };
 
   const openEnquiryModal = () => {
     setEnquiryError('');
@@ -297,9 +247,15 @@ export default function RoomDetails() {
 
         <div className="room-details-main">
           <div className="room-details-gallery">
-            <div className="room-details-main-image">
+            <button
+              type="button"
+              className="room-details-main-image"
+              onClick={() => { setLightboxIndex(selectedPhoto); setLightboxOpen(true); }}
+              aria-label="View full size image"
+            >
               <img src={activePhoto} alt={`${room.name} photo`} />
-            </div>
+              <span className="room-details-zoom-hint" aria-hidden="true">🔍</span>
+            </button>
 
             {galleryPhotos.length > 1 && (
               <div className="room-details-thumbnails">
@@ -308,7 +264,7 @@ export default function RoomDetails() {
                     key={`${photo}-${index}`}
                     type="button"
                     className={`room-thumb ${index === selectedPhoto ? 'room-thumb-active' : ''}`}
-                    onClick={() => setSelectedPhoto(index)}
+                    onClick={() => { setSelectedPhoto(index); setLightboxIndex(index); setLightboxOpen(true); }}
                   >
                     <img src={photo} alt={`${room.name} thumbnail ${index + 1}`} />
                   </button>
@@ -335,43 +291,11 @@ export default function RoomDetails() {
                       type="button"
                       className="room-details-share-button"
                       onClick={() => setShowShareDialog(true)}
-                      aria-expanded={showShareDialog}
                       aria-label="Share this room"
+                      aria-expanded={showShareDialog}
                     >
-                      Share this room ↗
+                      <span aria-hidden="true" style={{fontSize: 18, lineHeight: 1}}>📤</span>
                     </button>
-
-                    {showShareDialog && (
-                      <div className="room-details-share-backdrop" onClick={() => setShowShareDialog(false)}>
-                        <div className="room-details-share-dialog" role="dialog" aria-modal="true" aria-label="Share this room" onClick={(event) => event.stopPropagation()}>
-                          <div className="room-details-share-dialog-header">
-                            <div>
-                              <p className="room-details-share-kicker">Share this room</p>
-                              <h3 className="room-details-share-title">Choose how you want to share</h3>
-                            </div>
-                            <button type="button" className="room-details-share-close" onClick={() => setShowShareDialog(false)} aria-label="Close share dialog">
-                              ×
-                            </button>
-                          </div>
-
-                          <div className="room-details-share-actions">
-                            {canUseNativeShare() && (
-                              <button type="button" className="room-details-share-option" onClick={() => handleShareAction('native')}>
-                                More ways to share
-                              </button>
-                            )}
-                            <button type="button" className="room-details-share-option" onClick={() => handleShareAction('whatsapp')}>
-                              WhatsApp
-                            </button>
-                            {canCopyRoomLink() && (
-                              <button type="button" className="room-details-share-option" onClick={() => handleShareAction('copy')}>
-                                Copy link
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
                 <p className="room-details-hostel">
@@ -381,12 +305,6 @@ export default function RoomDetails() {
                   <span className="room-details-location"> · {hostel.location}</span>
                 </p>
               </div>
-
-              {shareStatus && (
-                <p className="room-details-share-status" role="status">
-                  {shareStatus}
-                </p>
-              )}
 
               <div className="room-details-price">
                 <PriceDisplay price={room.pricePerYear} />
@@ -486,6 +404,9 @@ export default function RoomDetails() {
 
           <section className="room-details-section">
             <h3 className="room-details-section-title">Where you’ll live</h3>
+            {(hostel.latitude != null && hostel.longitude != null) && (
+              <DistanceMap hostel={hostel} />
+            )}
             <div className="room-details-location-box">
               <div>
                 <span className="room-details-location-label">Address</span>
@@ -531,6 +452,58 @@ export default function RoomDetails() {
           )}
         </div>
       </div>
+
+      {lightboxOpen && (
+        <div
+          className="room-details-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Room photo viewer"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <div className="room-details-lightbox-image" onClick={(event) => event.stopPropagation()}>
+            <img src={galleryPhotos[lightboxIndex]} alt={`${room.name} photo ${lightboxIndex + 1}`} />
+            <button
+              type="button"
+              className="room-details-lightbox-close"
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close photo viewer"
+            >
+              ×
+            </button>
+          </div>
+          {galleryPhotos.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="room-details-lightbox-nav room-details-lightbox-prev"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  const nextIndex = (lightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+                  setLightboxIndex(nextIndex);
+                  setSelectedPhoto(nextIndex);
+                }}
+                aria-label="Previous photo"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className="room-details-lightbox-nav room-details-lightbox-next"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  const nextIndex = (lightboxIndex + 1) % galleryPhotos.length;
+                  setLightboxIndex(nextIndex);
+                  setSelectedPhoto(nextIndex);
+                }}
+                aria-label="Next photo"
+              >
+                ›
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {showEnquiryModal && (
         <div className="room-details-modal-backdrop" onClick={closeEnquiryModal}>
@@ -685,6 +658,13 @@ export default function RoomDetails() {
           </div>
         </div>
       )}
+      <ShareDialog
+        open={showShareDialog}
+        title={`${room.name} at ${hostel.name}`}
+        shareText={roomShareText}
+        shareUrl={roomShareUrl}
+        onClose={() => setShowShareDialog(false)}
+      />
     </FindRoomShell>
   );
 }

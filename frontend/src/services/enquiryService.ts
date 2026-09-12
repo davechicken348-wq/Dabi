@@ -53,3 +53,35 @@ export async function submitEnquiry(data: {
 
   return mapBackendEnquiry(created);
 }
+
+export async function submitRoomRequest(data: {
+  studentName: string;
+  phone: string;
+  school?: string;
+  location?: string;
+  roomType?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  moveInDate?: string;
+  message?: string;
+}): Promise<Enquiry> {
+  const created = await createEnquiryApi({
+    name: data.studentName,
+    phone: data.phone,
+    school: data.school,
+    hostelId: '',
+    hostelName: data.location || 'Any location',
+    roomType: data.roomType || 'Any room type',
+    moveInDate: data.moveInDate,
+    message: [
+      data.message,
+      data.budgetMin || data.budgetMax
+        ? `Budget: GH₵${data.budgetMin ?? 0}${data.budgetMax ? ` – GH₵${data.budgetMax}` : '+'}`
+        : '',
+      data.location ? `Preferred area: ${data.location}` : '',
+    ].filter(Boolean).join('\n'),
+    status: 'New',
+  });
+
+  return mapBackendEnquiry(created);
+}

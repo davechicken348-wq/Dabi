@@ -78,4 +78,5 @@ export const IconUser = makeIcon('M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 21a7 7 0
 export const IconWrap = makeIcon('M4 7h12a4 4 0 0 1 0 8H8M8 11l-4 4 4 4');
 export const IconChevronDown = makeIcon('m6 9 6 6 6-6');
 export const IconChevronLeft = makeIcon('m15 6-6 6 6 6');
+export const IconShare = makeIcon('M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13');
 export const IconBookOpen = makeIcon('M4 5a3 3 0 0 1 3-2h5v17H7a3 3 0 0 0-3 2V5ZM20 5a3 3 0 0 0-3-2h-5v17h5a3 3 0 0 1 3 2V5Z');

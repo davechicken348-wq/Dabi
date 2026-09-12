@@ -1,0 +1,66 @@
+.saved-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.saved-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+}
+
+.saved-eyebrow {
+  margin-bottom: var(--space-1);
+  color: var(--color-green);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.saved-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-charcoal);
+}
+
+.saved-subtitle {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.saved-skeleton-card {
+  height: 380px;
+  background: linear-gradient(180deg, var(--color-border) 0%, var(--color-border) 60%, var(--color-white) 60%, var(--color-white) 100%);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.4s infinite linear;
+  background-size: 200% 100%;
+}
+
+@media (max-width: 768px) {
+  .saved-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .saved-title {
+    font-size: var(--text-2xl);
+  }
+
+  .saved-grid {
+    grid-template-columns: 1fr;
+  }
+}

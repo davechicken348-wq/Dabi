@@ -1,20 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { RoomOption } from '../../../types';
 import { PriceDisplay } from '../PriceDisplay/PriceDisplay';
-import { FacilityList } from '../FacilityList/FacilityList';
 import { AvailabilityBadge } from '../AvailabilityBadge/AvailabilityBadge';
 import { FreshnessBadge } from '../FreshnessBadge/FreshnessBadge';
 import { getAvailabilityStatus } from '../../../lib/utils';
 import {
   buildRoomShareUrl,
-  canCopyRoomLink,
-  canUseNativeShare,
-  copyRoomLink,
   generateRoomShareMessage,
-  openWhatsAppShare,
 } from '../../../lib/sharing';
+import { ShareDialog } from '../ShareDialog/ShareDialog';
 import './RoomCard.css';
+
+const SAVED_KEY = 'dabi-saved-rooms';
+
+function getSavedRoomIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(SAVED_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistSavedRoomIds(ids: string[]) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(SAVED_KEY, JSON.stringify(ids));
+}
 
 interface RoomCardProps {
   room: RoomOption & { hostelName?: string; hostelLocation?: string };
@@ -22,8 +35,21 @@ interface RoomCardProps {
 
 export function RoomCard({ room }: RoomCardProps) {
   const availability = getAvailabilityStatus(room.availableUnits, room.totalUnits);
-  const [shareStatus, setShareStatus] = useState<string | null>(null);
-  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setSaved(getSavedRoomIds().includes(room.id));
+  }, [room.id]);
+
+  const toggleSave = () => {
+    const current = getSavedRoomIds();
+    const next = current.includes(room.id)
+      ? current.filter((id) => id !== room.id)
+      : [...current, room.id];
+    persistSavedRoomIds(next);
+    setSaved(next.includes(room.id));
+  };
 
   const hostelShareData = {
     name: room.hostelName ?? 'Hostel',
@@ -45,64 +71,29 @@ export function RoomCard({ room }: RoomCardProps) {
     roomShareUrl,
   );
 
-  const handleShareAction = async (action: 'native' | 'whatsapp' | 'copy') => {
-    setShareStatus(null);
-    setShowShareDialog(false);
-
-    try {
-      if (action === 'native') {
-        if (!canUseNativeShare()) {
-          setShareStatus('Native sharing isn’t available here yet.');
-          return;
-        }
-
-        await navigator.share({
-          title: `${room.name} at ${hostelShareData.name} | Dabi`,
-          text: roomShareText,
-          url: roomShareUrl,
-        });
-
-        setShareStatus('Nice — room shared. 🫶🏽');
-        return;
-      }
-
-      if (action === 'whatsapp') {
-        const opened = openWhatsAppShare(roomShareText);
-
-        if (opened) {
-          setShareStatus('Opening WhatsApp…');
-          return;
-        }
-
-        setShareStatus("Couldn't open WhatsApp. Try copying the link instead.");
-        return;
-      }
-
-      const copied = await copyRoomLink(roomShareUrl);
-
-      if (copied) {
-        setShareStatus('Link copied! 🥳');
-        return;
-      }
-
-      setShareStatus("Couldn't copy the link just yet. 😅");
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        return;
-      }
-
-      setShareStatus("Couldn't share that one just yet. 😅");
-    }
-  };
+  const roomTypeLabel = room.name.toLowerCase().includes('self-contained')
+    ? room.name
+    : `${room.name} room`;
 
   return (
     <div className="room-card">
       <div className="room-card-image">
-        <img src={room.photos[0]} alt={`${room.name} room`} loading="lazy" />
+        <img src={room.photos[0]} alt={`${roomTypeLabel} at ${room.hostelName ?? 'hostel'}`} loading="lazy" />
+        <button
+          type="button"
+          className={`room-card-save ${saved ? 'room-card-save-active' : ''}`}
+          onClick={toggleSave}
+          aria-label={saved ? 'Remove from saved rooms' : 'Save room'}
+          aria-pressed={saved}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
       </div>
       <div className="room-card-body">
         <div className="room-card-header">
-          <h3 className="room-card-title">{room.name}</h3>
+          <h3 className="room-card-title">{roomTypeLabel}</h3>
           <PriceDisplay price={room.pricePerYear} />
         </div>
         <p className="room-card-location">
@@ -110,64 +101,32 @@ export function RoomCard({ room }: RoomCardProps) {
         </p>
         <div className="room-card-meta">
           <AvailabilityBadge status={availability} available={room.availableUnits} total={room.totalUnits} />
-          <FreshnessBadge checkedAt={room.hostelId} />
+          {room.lastCheckedAt && <FreshnessBadge checkedAt={room.lastCheckedAt} />}
         </div>
-        <FacilityList facilities={room.facilities.slice(0, 4)} />
         <div className="room-card-actions">
           <Link to={`/findroom/rooms/${room.id}`} className="room-card-link">
-            View Room →
+            View room →
           </Link>
 
-          <div className="room-card-share-wrapper">
-            <button
-              type="button"
-              className="room-card-share"
-              onClick={() => setShowShareDialog(true)}
-              aria-expanded={showShareDialog}
-              aria-label="Share this room"
-            >
-              ↗ Share
-            </button>
-
-            {showShareDialog && (
-              <div className="room-card-share-backdrop" onClick={() => setShowShareDialog(false)}>
-                <div className="room-card-share-dialog" role="dialog" aria-modal="true" aria-label="Share this room" onClick={(event) => event.stopPropagation()}>
-                  <div className="room-card-share-dialog-header">
-                    <div>
-                      <p className="room-card-share-kicker">Share this room</p>
-                      <h3 className="room-card-share-title">Choose how you want to share</h3>
-                    </div>
-                    <button type="button" className="room-card-share-close" onClick={() => setShowShareDialog(false)} aria-label="Close share dialog">
-                      ×
-                    </button>
-                  </div>
-
-                  <div className="room-card-share-actions">
-                    {canUseNativeShare() && (
-                      <button type="button" className="room-card-share-option" onClick={() => handleShareAction('native')}>
-                        More ways to share
-                      </button>
-                    )}
-                    <button type="button" className="room-card-share-option" onClick={() => handleShareAction('whatsapp')}>
-                      WhatsApp
-                    </button>
-                    {canCopyRoomLink() && (
-                      <button type="button" className="room-card-share-option" onClick={() => handleShareAction('copy')}>
-                        Copy link
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <button
+            type="button"
+            className="room-card-share"
+            onClick={() => setShareOpen(true)}
+            aria-label="Share this room"
+            aria-expanded={shareOpen}
+          >
+            <span aria-hidden="true" style={{fontSize: 18, lineHeight: 1}}>📤</span>
+          </button>
         </div>
-        {shareStatus && (
-          <p className="room-card-share-status" role="status">
-            {shareStatus}
-          </p>
-        )}
       </div>
+
+      <ShareDialog
+        open={shareOpen}
+        title={`${room.name} at ${hostelShareData.name}`}
+        shareText={roomShareText}
+        shareUrl={roomShareUrl}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 }

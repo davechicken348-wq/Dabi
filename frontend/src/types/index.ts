@@ -14,6 +14,7 @@ export interface RoomOption {
   hostelName?: string;
   hostelLocation?: string;
   pricingPeriod?: 'AcademicYear' | 'Semester' | 'Month';
+  lastCheckedAt?: string;
 }
 
 export interface Hostel {

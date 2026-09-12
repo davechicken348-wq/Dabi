@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import type { Hostel } from '../../../types';
 import { Badge } from '../../../shared/Badge/Badge';
 import { PriceDisplay } from '../PriceDisplay/PriceDisplay';
-import { FacilityList } from '../FacilityList/FacilityList';
 import { AvailabilityBadge } from '../AvailabilityBadge/AvailabilityBadge';
 import { FreshnessBadge } from '../FreshnessBadge/FreshnessBadge';
 import './HostelCard.css';
@@ -28,7 +27,6 @@ export function HostelCard({ hostel }: HostelCardProps) {
         <p className="hostel-card-location">{hostel.location}</p>
         <PriceDisplay price={cheapestRoom} label="From" />
         <p className="hostel-card-summary">{hostel.roomOptions.length} room options available</p>
-        <FacilityList facilities={hostel.facilities.slice(0, 5)} />
         <div className="hostel-card-meta">
           <AvailabilityBadge status={availability} available={totalAvailable} total={totalRooms} />
           <FreshnessBadge checkedAt={hostel.checkedAt} />

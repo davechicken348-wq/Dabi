@@ -17,6 +17,8 @@ const pageTitles: Record<string, string> = {
   '/findroom/rooms': 'Rooms',
   '/findroom/locations': 'Locations',
   '/findroom/enquiries': 'My enquiries',
+  '/findroom/saved': 'Saved rooms',
+  '/findroom/request': 'Request a room',
 };
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');

@@ -12,6 +12,8 @@ import Locations from '../findroom/locations/Locations';
 import RoomDetails from '../findroom/rooms/RoomDetails';
 import MyEnquiries from '../findroom/enquiries/MyEnquiries';
 import HelpPage from '../findroom/help/HelpPage';
+import SavedRooms from '../findroom/saved/SavedRooms';
+import RequestHelp from '../findroom/request/RequestHelp';
 import { RouteError } from '../shared/RouteError/RouteError';
 import AdminLogin from '../admin/Login/Login';
 import AdminLayout from '../admin/AdminLayout';
@@ -49,6 +51,8 @@ export const router = createBrowserRouter([
       { path: 'findroom/rooms/:id', element: <RoomDetails /> },
       { path: 'findroom/enquiries', element: <MyEnquiries /> },
       { path: 'findroom/help', element: <HelpPage /> },
+      { path: 'findroom/saved', element: <SavedRooms /> },
+      { path: 'findroom/request', element: <RequestHelp /> },
       { path: 'admin/login', element: <AdminLogin /> },
       {
         path: 'admin',

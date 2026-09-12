@@ -13,7 +13,7 @@ import { getFreshnessLabel, getAvailabilityStatus, cn } from '../../lib/utils';
 import './Map.css';
 
 const AREA_COORDINATES: Record<string, [number, number]> = {
-  'Campus': [-2.325, 7.337],
+  'Campus': [-2.3167, 7.3214],
   'New Dormaa': [-2.35, 7.345],
   'Penkwase': [-2.31, 7.355],
   'Magazine': [-2.34, 7.32],
@@ -48,8 +48,8 @@ const HOSTEL_MARKER_POSITIONS = [
 ];
 
 const STU_COORDINATES = {
-  mapLibre: [-2.3175, 7.3201] as [number, number],
-  leaflet: [7.3201, -2.3175] as [number, number],
+  mapLibre: [-2.3167, 7.3214] as [number, number],
+  leaflet: [7.3214, -2.3167] as [number, number],
 };
 
 function getAreaPosition(area: string) {

@@ -1,7 +1,7 @@
 .loading-state {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
 }
 
 .loading-card {
@@ -9,6 +9,7 @@
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .loading-card-body {
@@ -25,7 +26,7 @@
   min-height: 31rem;
   background: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
 }
 
 .locations-skeleton-list,
@@ -91,9 +92,9 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.9rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
 

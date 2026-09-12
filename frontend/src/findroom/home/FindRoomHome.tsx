@@ -84,9 +84,11 @@ export default function FindRoomHome() {
               </select>
             </div>
 
-            <button type="button" className="findroom-quick-clear" onClick={() => { setQuickLocation(''); setQuickOccupancy(null); }}>
-              Clear filters
-            </button>
+            <div className="findroom-quick-filter findroom-quick-filter-full">
+              <button type="button" className="findroom-quick-clear" onClick={() => { setQuickLocation(''); setQuickOccupancy(null); }}>
+                Clear filters
+              </button>
+            </div>
           </div>
         </section>
       </div>

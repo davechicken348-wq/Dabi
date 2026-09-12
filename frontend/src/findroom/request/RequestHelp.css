@@ -207,6 +207,23 @@
     grid-template-columns: 1fr;
   }
 
+  .request-header {
+    text-align: left;
+  }
+
+  .request-subtitle {
+    margin: 0;
+  }
+
+  .request-success {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .request-success-actions {
+    justify-content: flex-start;
+  }
+
   .request-success-summary {
     grid-template-columns: 1fr;
   }

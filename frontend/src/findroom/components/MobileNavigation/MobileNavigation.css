@@ -18,10 +18,8 @@
 
 .mobile-nav-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
   flex: 1;
   height: 100%;
   color: var(--color-muted);
@@ -46,11 +44,20 @@
   border-radius: 0 0 var(--radius-full) var(--radius-full);
 }
 
-.mobile-nav-label {
-  font-size: 0.7rem;
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.mobile-nav-icon {
+  width: clamp(1.1rem, 3vw, 1.35rem);
+  height: clamp(1.1rem, 3vw, 1.35rem);
+  flex-shrink: 0;
+  color: var(--color-faint);
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav-item-active .mobile-nav-icon {
+  color: var(--color-green);
+}
+
+.mobile-nav-item:hover .mobile-nav-icon {
+  color: var(--color-muted);
 }
 
 @media (max-width: 1024px) {

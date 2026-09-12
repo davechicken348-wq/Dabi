@@ -4,6 +4,135 @@
   gap: var(--space-8);
 }
 
+.room-details-skeleton {
+  pointer-events: none;
+}
+
+.room-details-skeleton-back,
+.room-details-skeleton-image,
+.room-details-skeleton-thumbnails span,
+.room-details-skeleton-line,
+.room-details-skeleton-facts span,
+.room-details-skeleton-button {
+  display: block;
+  background: linear-gradient(100deg, rgba(214, 217, 210, 0.55) 30%, rgba(255, 255, 255, 0.9) 50%, rgba(214, 217, 210, 0.55) 70%);
+  background-size: 200% 100%;
+  animation: room-details-shimmer 1.6s ease-in-out infinite;
+}
+
+.room-details-skeleton-back {
+  width: 9rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+}
+
+.room-details-skeleton-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-2xl);
+}
+
+.room-details-skeleton-thumbnails {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.room-details-skeleton-thumbnails span {
+  width: 5.5rem;
+  height: 4.25rem;
+  border-radius: var(--radius-md);
+}
+
+.room-details-skeleton-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.room-details-skeleton-line {
+  height: 0.9rem;
+  border-radius: var(--radius-full);
+}
+
+.room-details-skeleton-line-short {
+  width: 35%;
+}
+
+.room-details-skeleton-line-title {
+  width: 72%;
+  height: 2.2rem;
+}
+
+.room-details-skeleton-line-medium {
+  width: 54%;
+}
+
+.room-details-skeleton-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.room-details-skeleton-facts span {
+  height: 3.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.room-details-skeleton-button {
+  width: 100%;
+  height: 3.25rem;
+  border-radius: var(--radius-md);
+}
+
+.room-details-skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+}
+
+.room-details-skeleton-line-section {
+  width: 28%;
+  height: 1.4rem;
+}
+
+.room-details-skeleton-line-wide {
+  width: 92%;
+}
+
+.room-details-spinner {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: var(--color-white);
+  border-radius: 50%;
+  animation: room-details-spin 0.7s linear infinite;
+}
+
+@keyframes room-details-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes room-details-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .room-details-skeleton-back,
+  .room-details-skeleton-image,
+  .room-details-skeleton-thumbnails span,
+  .room-details-skeleton-line,
+  .room-details-skeleton-facts span,
+  .room-details-skeleton-button,
+  .room-details-spinner {
+    animation: none;
+  }
+}
+
 .room-details-modal-backdrop {
   position: fixed;
   inset: 0;

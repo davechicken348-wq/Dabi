@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
-import { LoadingState } from '../components/LoadingState/LoadingState';
 import { ErrorState } from '../components/ErrorState/ErrorState';
 import { Badge } from '../../shared/Badge/Badge';
 import { AvailabilityBadge } from '../components/AvailabilityBadge/AvailabilityBadge';
@@ -106,7 +105,34 @@ export default function RoomDetails() {
   if (loading) {
     return (
       <FindRoomShell>
-        <LoadingState count={1} />
+        <div className="room-details room-details-skeleton" aria-label="Loading room details" role="status">
+          <span className="room-details-skeleton-back" />
+          <div className="room-details-main">
+            <div className="room-details-gallery">
+              <div className="room-details-skeleton-image" />
+              <div className="room-details-skeleton-thumbnails">
+                <span /><span /><span />
+              </div>
+            </div>
+            <aside className="room-details-sidebar">
+              <div className="room-details-summary room-details-skeleton-summary">
+                <div className="room-details-skeleton-line room-details-skeleton-line-short" />
+                <div className="room-details-skeleton-line room-details-skeleton-line-title" />
+                <div className="room-details-skeleton-line room-details-skeleton-line-medium" />
+                <div className="room-details-skeleton-facts">
+                  <span /><span /><span /><span />
+                </div>
+                <div className="room-details-skeleton-button" />
+              </div>
+            </aside>
+          </div>
+          <div className="room-details-skeleton-content">
+            <div className="room-details-skeleton-line room-details-skeleton-line-section" />
+            <div className="room-details-skeleton-line room-details-skeleton-line-wide" />
+            <div className="room-details-skeleton-line room-details-skeleton-line-wide" />
+            <div className="room-details-skeleton-line room-details-skeleton-line-medium" />
+          </div>
+        </div>
       </FindRoomShell>
     );
   }
@@ -651,7 +677,8 @@ export default function RoomDetails() {
                 </div>
 
                 <button type="submit" className="room-details-modal-action" disabled={enquirySubmitting}>
-                  {enquirySubmitting ? 'Sending it to Dabi…' : 'Send My Enquiry 🫶🏽'}
+                  {enquirySubmitting && <span className="room-details-spinner" aria-hidden="true" />}
+                  <span>{enquirySubmitting ? 'Sending it to Dabi…' : 'Send My Enquiry 🫶🏽'}</span>
                 </button>
               </form>
             )}

@@ -152,18 +152,22 @@ export async function listHostels(): Promise<HostelDTO[]> {
   });
 }
 
-export async function getHostel(id: string): Promise<HostelDTO> {
+export async function getHostel(identifier: string): Promise<HostelDTO> {
   const hostel = await prisma.hostel.findUnique({
-    where: { id },
+    where: { id: identifier },
     include: { facilities: true, roomOfferings: true },
   });
-  if (!hostel) throw new ApiError(404, "Hostel not found");
+  const resolvedHostel = hostel ?? await prisma.hostel.findUnique({
+    where: { slug: identifier },
+    include: { facilities: true, roomOfferings: true },
+  });
+  if (!resolvedHostel) throw new ApiError(404, "Hostel not found");
   const active = await prisma.tenancy.findMany({
-    where: { hostelId: id, status: "Active" },
+    where: { hostelId: resolvedHostel.id, status: "Active" },
     select: { beds: true },
   });
   const activeBeds = active.reduce((sum, t) => sum + (t.beds ?? 0), 0);
-  return toDTO(hostel, activeBeds);
+  return toDTO(resolvedHostel, activeBeds);
 }
 
 export async function createHostel(input: HostelCreate): Promise<HostelDTO> {

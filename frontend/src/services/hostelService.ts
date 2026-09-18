@@ -18,6 +18,7 @@ type BackendRoomOffering = {
 
 type BackendHostel = {
   id: string;
+  slug?: string;
   name: string;
   location: string;
   pricePerYear: number;
@@ -60,6 +61,7 @@ function toRoomOption(hostel: BackendHostel, roomOffering?: BackendRoomOffering)
   return {
     id: roomOffering?.id ?? `${hostel.id}-room`,
     hostelId: hostel.id,
+    hostelSlug: hostel.slug,
     roomOfferingId: roomOffering?.id,
     name: roomType,
     description: roomOffering?.description || hostel.note || `Room option at ${hostel.name} in ${hostel.location}.`,
@@ -85,6 +87,7 @@ function toHostel(hostel: BackendHostel): Hostel {
 
   return {
     id: hostel.id,
+    slug: hostel.slug,
     name: hostel.name,
     location: hostel.location,
     address: hostel.address,

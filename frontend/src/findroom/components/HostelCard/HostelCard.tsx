@@ -71,7 +71,7 @@ export function HostelCard({ hostel }: HostelCardProps) {
           <AvailabilityBadge status={availability} available={totalAvailable} total={totalRooms} />
           <FreshnessBadge checkedAt={hostel.checkedAt} />
         </div>
-        <Link to={`/findroom/rooms?hostel=${hostel.id}`} className="hostel-card-link">
+        <Link to={`/findroom/rooms?hostel=${encodeURIComponent(hostel.slug ?? hostel.id)}`} className="hostel-card-link">
           View Hostel →
         </Link>
       </div>

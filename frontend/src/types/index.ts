@@ -1,6 +1,7 @@
 export interface RoomOption {
   id: string;
   hostelId: string;
+  hostelSlug?: string;
   roomOfferingId?: string;
   name: string;
   description: string;
@@ -19,6 +20,7 @@ export interface RoomOption {
 
 export interface Hostel {
   id: string;
+  slug?: string;
   name: string;
   location: string;
   address?: string;

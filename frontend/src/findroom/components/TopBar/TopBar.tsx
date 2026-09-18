@@ -5,6 +5,7 @@ import './TopBar.css';
 
 interface HostelSearchResult {
   id: string;
+  slug?: string;
   name: string;
   location: string;
   pricePerYear: number;
@@ -141,7 +142,7 @@ export function TopBar() {
               {searchError && <p className="topbar-search-message-error">{searchError}</p>}
               {!searching && !searchError && query.trim() && results.length === 0 && <p className="topbar-search-hint">No hostels matched that search.</p>}
               {results.map((hostel) => (
-                <Link key={hostel.id} to={`/findroom/rooms?hostel=${hostel.id}`} className="topbar-search-result" onClick={closeSearch}>
+                <Link key={hostel.id} to={`/findroom/rooms?hostel=${encodeURIComponent(hostel.slug ?? hostel.id)}`} className="topbar-search-result" onClick={closeSearch}>
                   <span className="topbar-search-result-icon" aria-hidden="true">⌂</span>
                   <span><strong>{hostel.name}</strong><small>{hostel.location} · From GH₵{hostel.pricePerYear.toLocaleString()}/year</small></span>
                   <span className="topbar-search-result-arrow" aria-hidden="true">→</span>

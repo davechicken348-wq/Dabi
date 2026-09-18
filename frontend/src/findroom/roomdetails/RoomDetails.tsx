@@ -180,7 +180,7 @@ export default function RoomDetails() {
           <div className="room-details-main">
             <div className="room-details-eyebrow">{room.hostelLocation ?? 'Student living'} · {room.availabilityStatus ?? 'Available'}{distanceLabel ? ` · ${distanceLabel}` : ''}</div>
             <h1>{roomLabel(room)}</h1>
-            <p className="room-details-hostel"><Link to={`/findroom/rooms?hostel=${room.hostelId}`}>{room.hostelName ?? 'Dabi hostel'}</Link></p>
+            <p className="room-details-hostel"><Link to={`/findroom/rooms?hostel=${encodeURIComponent(hostel?.slug ?? room.hostelSlug ?? room.hostelId)}`}>{room.hostelName ?? 'Dabi hostel'}</Link></p>
             {hostel?.description && <p className="room-details-hostel-description">{hostel.description}</p>}
             <p className="room-details-description">{room.description}</p>
 

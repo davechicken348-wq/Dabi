@@ -13,6 +13,7 @@ export default function Rooms() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const locationFilter = searchParams.get('location') ?? '';
+  const hostelFilter = searchParams.get('hostel') ?? '';
   const [query, setQuery] = useState('');
   const [rooms, setRooms] = useState<RoomOption[]>([]);
   const [activeTag, setActiveTag] = useState('Featured');
@@ -54,6 +55,9 @@ export default function Rooms() {
       .toLowerCase();
 
     if (locationFilter && room.hostelLocation !== locationFilter) {
+      return false;
+    }
+    if (hostelFilter && room.hostelSlug !== hostelFilter && room.hostelId !== hostelFilter) {
       return false;
     }
 

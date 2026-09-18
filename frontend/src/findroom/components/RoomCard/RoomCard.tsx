@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { RoomOption } from '../../../types';
-import { PriceDisplay } from '../PriceDisplay/PriceDisplay';
-import { AvailabilityBadge } from '../AvailabilityBadge/AvailabilityBadge';
-import { FreshnessBadge } from '../FreshnessBadge/FreshnessBadge';
-import { getAvailabilityStatus } from '../../../lib/utils';
 import {
   buildRoomShareUrl,
   generateRoomShareMessage,
@@ -31,10 +27,10 @@ function persistSavedRoomIds(ids: string[]) {
 
 interface RoomCardProps {
   room: RoomOption & { hostelName?: string; hostelLocation?: string };
+  index?: number;
 }
 
-export function RoomCard({ room }: RoomCardProps) {
-  const availability = getAvailabilityStatus(room.availableUnits, room.totalUnits);
+export function RoomCard({ room, index = 0 }: RoomCardProps) {
   const [shareOpen, setShareOpen] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -48,6 +44,7 @@ export function RoomCard({ room }: RoomCardProps) {
       ? current.filter((id) => id !== room.id)
       : [...current, room.id];
     persistSavedRoomIds(next);
+    window.dispatchEvent(new Event('dabi-saved-rooms-changed'));
     setSaved(next.includes(room.id));
   };
 
@@ -74,50 +71,150 @@ export function RoomCard({ room }: RoomCardProps) {
   const roomTypeLabel = room.name.toLowerCase().includes('self-contained')
     ? room.name
     : `${room.name} room`;
+  const initials = room.hostelName
+    ? room.hostelName
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
+    : 'DB';
 
   return (
-    <div className="room-card">
-      <div className="room-card-image">
-        <img src={room.photos[0]} alt={`${roomTypeLabel} at ${room.hostelName ?? 'hostel'}`} loading="lazy" />
-        <button
-          type="button"
-          className={`room-card-save ${saved ? 'room-card-save-active' : ''}`}
-          onClick={toggleSave}
-          aria-label={saved ? 'Remove from saved rooms' : 'Save room'}
-          aria-pressed={saved}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-        </button>
-      </div>
-      <div className="room-card-body">
-        <div className="room-card-header">
-          <h3 className="room-card-title">{roomTypeLabel}</h3>
-          <PriceDisplay price={room.pricePerYear} />
-        </div>
-        <p className="room-card-location">
-          {room.hostelName} · {room.hostelLocation}
-        </p>
-        <div className="room-card-meta">
-          <AvailabilityBadge status={availability} available={room.availableUnits} total={room.totalUnits} />
-          {room.lastCheckedAt && <FreshnessBadge checkedAt={room.lastCheckedAt} />}
-        </div>
-        <div className="room-card-actions">
-          <Link to={`/findroom/rooms/${room.id}`} className="room-card-link">
-            View room →
+    <figure
+      className="room-card room-card-photo"
+      data-testid="asset-grid-masonry-figure"
+      data-masonryposition={index}
+      itemScope
+      itemType="https://schema.org/ImageObject"
+    >
+      <div className="room-card-container">
+        <div className="room-card-inner">
+          <Link
+            className="room-card-photo-link"
+            to={`/findroom/rooms/${room.id}`}
+            title={roomTypeLabel}
+            aria-label={`View ${roomTypeLabel} at ${room.hostelName ?? 'hostel'}`}
+            data-page-modal="true"
+            data-discover="true"
+          >
+            <img
+              alt={roomTypeLabel}
+              loading="lazy"
+              sizes="(min-width: 1359px) 416px, (min-width: 992px) calc((100vw - 96px) / 3), (min-width: 768px) calc((100vw - 72px) / 2), 100vw"
+              src={room.photos[0]}
+              className="room-card-img"
+              data-testid="asset-grid-masonry-img"
+              itemProp="thumbnailUrl"
+              style={{
+                backgroundImage: `url(${room.photos[0]})`,
+                backgroundSize: 'cover',
+                backgroundColor: 'var(--color-border)',
+              }}
+            />
           </Link>
 
-          <button
-            type="button"
-            className="room-card-share"
-            onClick={() => setShareOpen(true)}
-            aria-label="Share this room"
-            aria-expanded={shareOpen}
-          >
-            <span aria-hidden="true" style={{fontSize: 18, lineHeight: 1}}>📤</span>
-          </button>
+          <div className="room-card-overlay">
+            <div className="room-card-overlay-background showOnHover" />
+            <div className="room-card-overlay-foreground">
+              <div className="room-card-actions-top">
+                <div>
+                  <Link
+                    className="room-card-plus-link"
+                    rel="nofollow"
+                    to={`/findroom/rooms/${room.id}`}
+                    data-discover="true"
+                  >
+                    <svg className="room-card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M11.281 8.3H8.156V3.125L11.281 1v7.3Zm.316 4.05H4.955V7.868L1.5 10.636v4.55h6.656V22h4.713l3.552-2.84h-4.824v-6.81Zm4.24 0v2.835h4.587l2.911-2.834h-7.497Z" />
+                    </svg>
+                  </Link>
+                </div>
+                <div className="room-card-actions-top-right">
+                  <div className="showOnHover">
+                    <button
+                      type="button"
+                      className={`room-card-save ${saved ? 'room-card-save-active' : ''}`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        toggleSave();
+                      }}
+                      aria-label={saved ? 'Remove from saved rooms' : 'Save room'}
+                      aria-pressed={saved}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="showOnHover">
+                    <button
+                      type="button"
+                      className="room-card-add"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setShareOpen(true);
+                      }}
+                      aria-label="Share this room"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                        <path d="m8.7 14.7 6.6 3.6M15.3 5.7l-6.6 3.6" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="room-card-actions-bottom">
+                <div className="room-card-user-link-container">
+                  <span>
+                    <Link className="room-card-user-link" to={`/findroom/rooms/${room.id}`} data-discover="true">
+                      <div className="room-card-avatar-container">
+                        <div className="room-card-avatar-border">
+                          <div className="room-card-avatar" aria-hidden="true">
+                            {initials}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                    <div className="room-card-info-container">
+                      <Link className="room-card-name" to={`/findroom/rooms/${room.id}`} data-discover="true">
+                        {room.hostelName ?? 'Dabi room'}
+                      </Link>
+                      <div className="room-card-secondary-label">
+                        {room.hostelLocation ?? room.hostelName ?? ''}
+                      </div>
+                    </div>
+                  </span>
+                </div>
+                <div className="showOnHover room-card-download-container">
+                  <Link
+                    className="room-card-download"
+                    rel="nofollow"
+                    to={`/findroom/rooms/${room.id}`}
+                    aria-label="View room details"
+                    data-base-ui-tooltip-trigger=""
+                  >
+                    <svg className="room-card-download-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M10.9911 15.4012V4H13v11.4012l4.7138-4.3142 1.2865 1.5386L12.0004 19 5 12.6256l1.3675-1.5386z" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <meta itemProp="name" content={roomTypeLabel} />
+      <meta itemProp="description" content={room.description} />
+      <link itemProp="license" href="https://dabi.com/license" />
+      <link itemProp="acquireLicensePage" href="/findroom/rooms" />
+      <meta itemProp="creditText" content={room.hostelName ?? 'Dabi'} />
+      <meta itemProp="copyrightNotice" content={room.hostelName ?? 'Dabi'} />
+      <div itemProp="creator" itemScope itemType="https://schema.org/Person">
+        <meta itemProp="name" content={room.hostelName ?? 'Dabi'} />
       </div>
 
       <ShareDialog
@@ -127,6 +224,6 @@ export function RoomCard({ room }: RoomCardProps) {
         shareUrl={roomShareUrl}
         onClose={() => setShareOpen(false)}
       />
-    </div>
+    </figure>
   );
 }

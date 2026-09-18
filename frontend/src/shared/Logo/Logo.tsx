@@ -27,7 +27,10 @@ export function Logo({ size = 'md', variant = 'default' }: LogoProps) {
           <circle cx="16" cy="14" r="2" stroke="#f8f6ef" strokeWidth="2" />
         </svg>
       </span>
-      <span className="logo-text">Dabi</span>
+      <span className="logo-text" aria-label="Dabi">
+        <span className="logo-dab">Dab</span>
+        <span className="logo-i">i</span>
+      </span>
     </span>
   );
 }

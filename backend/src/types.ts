@@ -19,6 +19,7 @@ export interface RoomOfferingDTO {
 
 export interface HostelDTO {
   id: string;
+  slug: string;
   name: string;
   location: string;
   address?: string;
@@ -48,7 +49,8 @@ export interface HostelDTO {
   createdAt: string;
 }
 
-export type HostelCreate = Omit<HostelDTO, "id" | "createdAt"> & {
+export type HostelCreate = Omit<HostelDTO, "id" | "createdAt" | "slug"> & {
+  slug?: string;
   roomOfferings?: Array<
     Omit<RoomOfferingDTO, "id" | "hostelId" | "createdAt" | "updatedAt"> & {
       id?: string;

@@ -1,13 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import { Search } from '../components/Search/Search';
 import { RoomCard } from '../components/RoomCard/RoomCard';
 import { LoadingState } from '../components/LoadingState/LoadingState';
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { fetchRooms, fetchFilterFacilities } from '../../services/roomService';
+import { fetchHostels } from '../../services/hostelService';
 import type { RoomOption, SearchFilters } from '../../types';
-import { LOCATIONS, FACILITIES, OCCUPANCY_OPTIONS, PRICE_RANGES, FACILITY_EMOJIS } from '../../lib/constants';
+import { FACILITIES, OCCUPANCY_OPTIONS, PRICE_RANGES, FACILITY_EMOJIS } from '../../lib/constants';
 import './Explore.css';
+import homeImage from '../../assets/images/home.jpg';
+import motelImage from '../../assets/images/motel.jpg';
+import cameraImage from '../../assets/images/camera.jpg';
+import bedImage from '../../assets/images/bed.jpg';
+import graffitiImage from '../../assets/images/graffiti.webp';
+import wallImage from '../../assets/images/wall.webp';
 
 type FilterIconName = 'location' | 'rooms' | 'availability' | 'price' | 'facility';
 
@@ -55,11 +63,12 @@ function FilterDropdown({ label, icon, value, options, onChange }: { label: stri
 }
 
 export default function Explore() {
+  const [searchParams] = useSearchParams();
   const [rooms, setRooms] = useState<RoomOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SearchFilters>({
-    query: '',
+    query: searchParams.get('query') ?? '',
     minPrice: null,
     maxPrice: null,
     location: '',
@@ -69,6 +78,8 @@ export default function Explore() {
   });
   const [sortBy, setSortBy] = useState<'checked' | 'price-low' | 'price-high'>('checked');
   const [backendFacilities, setBackendFacilities] = useState<string[]>(FACILITIES as unknown as string[]);
+  const [backendLocations, setBackendLocations] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +106,13 @@ export default function Explore() {
       if (facilities.length) setBackendFacilities(facilities);
     }).catch(() => {
       // Keep the local labels available when the backend is offline.
+    });
+
+    fetchHostels().then((hostels) => {
+      const locations = Array.from(new Set(hostels.map((hostel) => hostel.location).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+      setBackendLocations(locations);
+    }).catch(() => {
+      setBackendLocations([]);
     });
   }, []);
 
@@ -140,93 +158,148 @@ export default function Explore() {
   return (
     <FindRoomShell>
       <div className="explore-page">
-        <div className="explore-header">
-          <div>
-            <p className="explore-eyebrow">Room discovery</p>
-            <h1 className="explore-title">Explore rooms</h1>
-            <p className="explore-subtitle">Compare room types, prices, and availability across hostels.</p>
-          </div>
-          <span className="explore-freshness">Availability checked by Dabi</span>
-        </div>
-        <div className="explore-search">
-          <Search onSearch={handleSearch} />
-        </div>
+        <nav className="explore-breadcrumbs" aria-label="Breadcrumb">
+          <Link to="/findroom" className="explore-breadcrumb-link">FindRoom</Link>
+          <span className="explore-breadcrumb-separator" aria-hidden="true">›</span>
+          <Link to="/findroom/explore" className="explore-breadcrumb-link">Explore</Link>
+          <span className="explore-breadcrumb-separator" aria-hidden="true">›</span>
+          <span className="explore-breadcrumb-current" aria-current="page">Rooms</span>
+        </nav>
 
-        <div className="explore-filters">
-          <div className="explore-filter-heading">
-            <span>Filter results</span>
-            {activeFilterCount > 0 && <strong>{activeFilterCount} active</strong>}
-          </div>
-          <div className="filter-group">
-            <FilterDropdown label="Location" icon="location" value={filters.location} options={[{ value: '', label: 'All locations' }, ...LOCATIONS.map((loc) => ({ value: loc, label: loc }))]} onChange={(value) => setFilters((prev) => ({ ...prev, location: value }))} />
-          </div>
+        <div className="explore-hero-modules" aria-label="Explore Dabi rooms">
+          <section className="explore-hero-module explore-hero-discovery">
+            <div className="explore-hero-copy">
+              <p className="explore-hero-kicker">DABI / EXPLORE ROOMS</p>
+              <h1 className="explore-hero-title"><span className="findroom-heading-hash">#</span> Rooms for the way you live.</h1>
+              <p className="explore-hero-description">Search verified hostels, compare room options, and find a place that fits your budget and routine.</p>
+            </div>
+            <div className="explore-hero-art" aria-hidden="true">
+              <img className="explore-hero-art-main" src={homeImage} alt="" />
+              <img className="explore-hero-art-soft explore-hero-art-soft-one" src={motelImage} alt="" />
+              <img className="explore-hero-art-soft explore-hero-art-soft-two" src={cameraImage} alt="" />
+              <img className="explore-hero-art-accent explore-hero-art-accent-one" src={bedImage} alt="" />
+              <img className="explore-hero-art-accent explore-hero-art-accent-two" src={graffitiImage} alt="" />
+              <img className="explore-hero-art-accent explore-hero-art-accent-three" src={wallImage} alt="" />
+            </div>
+          </section>
 
-          <div className="filter-group">
-            <FilterDropdown label="Occupancy" icon="rooms" value={filters.occupancy?.toString() ?? ''} options={[{ value: '', label: 'Any room type' }, ...OCCUPANCY_OPTIONS.map((n) => ({ value: n.toString(), label: `${n} in 1` }))]} onChange={(value) => setFilters((prev) => ({ ...prev, occupancy: value ? Number(value) : null }))} />
-          </div>
+          <button className="explore-hero-module explore-hero-compare" type="button" onClick={() => document.querySelector('.explore-filters')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+            <div>
+              <h2>Compare your first room</h2>
+              <p>Filter by location, price, availability, and facilities.</p>
+            </div>
+            <div className="explore-hero-compare-frame" aria-hidden="true">
+              <img src={bedImage} alt="" />
+              <img className="explore-hero-compare-secondary" src={wallImage} alt="" />
+              <span className="explore-hero-compare-plus">+</span>
+            </div>
+          </button>
 
-          <div className="filter-group">
-            <FilterDropdown label="Availability" icon="availability" value={filters.availability} options={[{ value: 'all', label: 'All rooms' }, { value: 'available', label: 'Available now' }, { value: 'limited', label: 'Limited' }]} onChange={(value) => setFilters((prev) => ({ ...prev, availability: value as SearchFilters['availability'] }))} />
-          </div>
-
-          <div className="filter-group">
-            <FilterDropdown label="Price range" icon="price" value={filters.minPrice?.toString() ?? ''} options={[{ value: '', label: 'Any price' }, ...PRICE_RANGES.map((range) => ({ value: range.min.toString(), label: range.label }))]} onChange={(value) => { const range = PRICE_RANGES.find((item) => item.min.toString() === value); setFilters((prev) => ({ ...prev, minPrice: range?.min ?? null, maxPrice: range?.max ?? null })); }} />
-          </div>
-
-          <button type="button" className="filter-clear" onClick={clearFilters} disabled={activeFilterCount === 0}>
-            Clear all
+          <button className="explore-hero-module explore-hero-featured" type="button" onClick={() => handleSearch('verified')}>
+            <img src={cameraImage} alt="" />
+            <span className="explore-hero-featured-overlay" />
+            <span className="explore-hero-featured-copy">
+              <strong>Verified rooms</strong>
+              <small>Freshly checked on Dabi</small>
+            </span>
           </button>
         </div>
 
-        <div className="explore-facilities">
-          <span className="explore-facilities-label"><FilterIcon name="facility" />Facilities</span>
-          {backendFacilities.map((facility) => (
-            <button
-              key={facility}
-              type="button"
-              className={`facility-chip ${filters.facilities.includes(facility) ? 'facility-chip-active' : ''}`}
-              onClick={() => toggleFacility(facility)}
-            >
-              {FACILITY_EMOJIS[facility] ? `${FACILITY_EMOJIS[facility]} ${facility}` : facility}
-            </button>
-          ))}
-        </div>
-
-        <div className="explore-results">
-          <div className="explore-results-header">
-            <div>
-              <h2 className="explore-results-title">Available rooms</h2>
-              {!loading && !error && <p className="explore-results-count">{rooms.length} room options found</p>}
-            </div>
-            <label className="explore-sort">
-              <span>Sort by</span>
-              <select value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)}>
-                <option value="checked">Recently checked</option>
-                <option value="price-low">Price: low to high</option>
-                <option value="price-high">Price: high to low</option>
-              </select>
-            </label>
+        <div className="explore-content">
+          <div className="explore-search">
+            <Search onSearch={handleSearch} placeholder="Search hostels, room types or locations" />
+            <Link to="/findroom/map" className="explore-map-link">Map view</Link>
           </div>
-          {error ? (
-            <EmptyState title={error} description="Please try again later." />
-          ) : loading ? (
-            <LoadingState count={6} />
-          ) : rooms.length === 0 ? (
-            <EmptyState
-              title="Nothing perfect yet."
-              description="We couldn't find a room matching everything you selected. Try widening your budget or explore nearby areas."
-              actionLabel="Adjust search"
-              actionTo="/findroom/explore"
-              secondaryActionLabel="Tell Dabi what I need"
-              secondaryActionTo="/findroom/request"
-            />
-          ) : (
-            <div className="explore-grid">
-              {sortedRooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
+
+          <button
+            type="button"
+            className="explore-filter-toggle"
+            aria-expanded={filtersOpen}
+            aria-controls="explore-filters-panel"
+            onClick={() => setFiltersOpen(true)}
+          >
+            <span>Filter rooms</span>
+            {activeFilterCount > 0 && <strong>{activeFilterCount}</strong>}
+            <span aria-hidden="true">☷</span>
+          </button>
+
+          {filtersOpen && <button type="button" className="explore-filters-backdrop" aria-label="Close filters" onClick={() => setFiltersOpen(false)} />}
+
+          <div id="explore-filters-panel" className={`explore-filters ${filtersOpen ? 'explore-filters-open' : ''}`}>
+            <div className="explore-filter-heading">
+              <span>Filter rooms</span>
+              {activeFilterCount > 0 && <strong>{activeFilterCount} active</strong>}
+              <button type="button" className="explore-filter-close" aria-label="Close filters" onClick={() => setFiltersOpen(false)}>×</button>
+            </div>
+            <div className="filter-group">
+              <FilterDropdown label="Location" icon="location" value={filters.location} options={[{ value: '', label: 'All locations' }, ...backendLocations.map((loc) => ({ value: loc, label: loc }))]} onChange={(value) => setFilters((prev) => ({ ...prev, location: value }))} />
+            </div>
+
+            <div className="filter-group">
+              <FilterDropdown label="Occupancy" icon="rooms" value={filters.occupancy?.toString() ?? ''} options={[{ value: '', label: 'Any room type' }, ...OCCUPANCY_OPTIONS.map((n) => ({ value: n.toString(), label: `${n} in 1` }))]} onChange={(value) => setFilters((prev) => ({ ...prev, occupancy: value ? Number(value) : null }))} />
+            </div>
+
+            <div className="filter-group">
+              <FilterDropdown label="Availability" icon="availability" value={filters.availability} options={[{ value: 'all', label: 'All rooms' }, { value: 'available', label: 'Available now' }, { value: 'limited', label: 'Limited' }]} onChange={(value) => setFilters((prev) => ({ ...prev, availability: value as SearchFilters['availability'] }))} />
+            </div>
+
+            <div className="filter-group">
+              <FilterDropdown label="Price range" icon="price" value={filters.minPrice?.toString() ?? ''} options={[{ value: '', label: 'Any price' }, ...PRICE_RANGES.map((range) => ({ value: range.min.toString(), label: range.label }))]} onChange={(value) => { const range = PRICE_RANGES.find((item) => item.min.toString() === value); setFilters((prev) => ({ ...prev, minPrice: range?.min ?? null, maxPrice: range?.max ?? null })); }} />
+            </div>
+
+            <button type="button" className="filter-clear" onClick={clearFilters} disabled={activeFilterCount === 0}>
+              Clear all
+            </button>
+
+            <div className="explore-facilities">
+              <span className="explore-facilities-label"><FilterIcon name="facility" />Facilities</span>
+              {backendFacilities.map((facility) => (
+                <button
+                  key={facility}
+                  type="button"
+                  className={`facility-chip ${filters.facilities.includes(facility) ? 'facility-chip-active' : ''}`}
+                  onClick={() => toggleFacility(facility)}
+                >
+                  {FACILITY_EMOJIS[facility] ? `${FACILITY_EMOJIS[facility]} ${facility}` : facility}
+                </button>
               ))}
             </div>
-          )}
+          </div>
+
+          <div className="explore-results">
+            <div className="explore-results-header">
+              <div>
+                <h2 className="explore-results-title">Room options</h2>
+                {!loading && !error && <p className="explore-results-count">{rooms.length} room options found</p>}
+              </div>
+              <label className="explore-sort">
+                <span>Sort by</span>
+                <select value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)}>
+                  <option value="checked">Recently checked</option>
+                  <option value="price-low">Price: low to high</option>
+                  <option value="price-high">Price: high to low</option>
+                </select>
+              </label>
+            </div>
+            {error ? (
+              <EmptyState title={error} description="Please try again later." />
+            ) : loading ? (
+              <LoadingState count={6} />
+            ) : rooms.length === 0 ? (
+              <EmptyState
+                title="Nothing perfect yet."
+                description="We couldn't find a room matching everything you selected. Try widening your budget or explore nearby areas."
+                actionLabel="Adjust search"
+                actionTo="/findroom/explore"
+              />
+            ) : (
+              <div className="explore-masonry">
+                {sortedRooms.map((room) => (
+                  <RoomCard key={room.id} room={room} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </FindRoomShell>

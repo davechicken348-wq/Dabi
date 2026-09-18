@@ -7,29 +7,32 @@ const PROBLEMS = [
   {
     label: 'No single source of truth',
     detail: 'Students ask around, call unknown numbers, and walk hostel to hostel — just to find out a room is already taken.',
+    icon: 'M9.172 16.172a4 4 0 0 1 5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
   },
   {
     label: 'Prices are a mystery',
     detail: 'Owners quote different prices to different people. There\'s no way to compare what you\'re getting for what you\'re paying.',
+    icon: 'M12 2v20M17 5.5c-.8-1-2.1-1.5-4-1.5-2.2 0-4 1.2-4 3s1.6 2.5 4 3 4 1.1 4 3-1.8 3-4 3c-1.9 0-3.2-.5-4-1.5',
   },
   {
     label: 'Information goes stale fast',
     detail: 'Rooms fill up quickly. By the time you act on information you heard two weeks ago, the room is gone.',
+    icon: 'M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
   },
 ] as const;
 
 const STEPS = [
-  { number: '01', title: 'Browse', body: 'Explore hostels and room types across locations near your campus.' },
-  { number: '02', title: 'Compare', body: 'See prices, facilities, and photos side by side — no guessing.' },
-  { number: '03', title: 'Check freshness', body: 'Every listing shows when it was last verified so you know if it\'s still current.' },
-  { number: '04', title: 'Enquire', body: 'Submit your interest directly through Dabi.' },
-  { number: '05', title: 'Connect', body: 'Dabi helps connect you with the owner to complete the process.' },
+  { number: '01', title: 'Browse', body: 'Explore hostels and room types across locations near your campus.', icon: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z' },
+  { number: '02', title: 'Compare', body: 'See prices, facilities, and photos side by side — no guessing.', icon: 'M9 19v-6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v6m-6 0h6m-6 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14' },
+  { number: '03', title: 'Check freshness', body: 'Every listing shows when it was last verified so you know if it\'s still current.', icon: 'M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' },
+  { number: '04', title: 'Enquire', body: 'Submit your interest directly through Dabi.', icon: 'M3 8l7.89 4.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2Z' },
+  { number: '05', title: 'Connect', body: 'Dabi helps connect you with the owner to complete the process.', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z' },
 ] as const;
 
 const ROOM_OPTIONS = [
-  { type: '1 in 1', price: 'GH₵3,000', count: '2 available' },
-  { type: '2 in 1', price: 'GH₵2,400', count: '4 available' },
-  { type: '3 in 1', price: 'GH₵2,000', count: '1 available' },
+  { type: '1 in 1', price: 'GH₵3,000', count: '2 available', color: '#15694b' },
+  { type: '2 in 1', price: 'GH₵2,400', count: '4 available', color: '#1a7352' },
+  { type: '3 in 1', price: 'GH₵2,000', count: '1 available', color: '#22a070' },
 ] as const;
 
 export default function MarketingHome() {
@@ -45,6 +48,9 @@ export default function MarketingHome() {
             <div className="problem-strip-grid">
               {PROBLEMS.map((p) => (
                 <div className="problem-strip-item" key={p.label}>
+                  <div className="problem-strip-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={p.icon} /></svg>
+                  </div>
                   <h3 className="problem-strip-label">{p.label}</h3>
                   <p className="problem-strip-detail">{p.detail}</p>
                 </div>
@@ -81,7 +87,7 @@ export default function MarketingHome() {
                 <div className="home-concept-hostel-label">Hostel</div>
                 <div className="home-concept-hostel-name">Sunrise Lodge</div>
                 <div className="home-concept-hostel-location">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /></svg>
                   New Dormaa
                 </div>
               </div>
@@ -113,8 +119,13 @@ export default function MarketingHome() {
                     {i < STEPS.length - 1 && <div className="home-step-line" />}
                   </div>
                   <div className="home-step-number" aria-hidden="true">{s.number}</div>
-                  <h4 className="home-step-title">{s.title}</h4>
-                  <p className="home-step-body">{s.body}</p>
+                  <div className="home-step-content">
+                    <div className="home-step-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={s.icon} /></svg>
+                    </div>
+                    <h4 className="home-step-title">{s.title}</h4>
+                    <p className="home-step-body">{s.body}</p>
+                  </div>
                 </li>
               ))}
             </ol>

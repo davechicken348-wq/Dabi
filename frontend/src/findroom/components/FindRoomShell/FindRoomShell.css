@@ -7,21 +7,28 @@
 /* ── Main content area ── */
 .findroom-main {
   flex: 1;
-  margin-left: var(--sidebar-width);
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background: var(--color-white);
 }
 
 .findroom-content {
   flex: 1;
   padding: var(--space-8) var(--space-8) var(--space-16);
   width: 100%;
+  background: var(--color-white);
 }
 
 /* Map page gets full bleed */
 .findroom-content:has(.map-page) {
   padding: 0;
+}
+
+.findroom-content:has(.dabi-map-page) {
+  padding: 0;
+  height: calc(100vh - 64px);
 }
 
 @media (max-width: 1024px) {
@@ -36,5 +43,11 @@
 @media (max-width: 640px) {
   .findroom-content {
     padding: var(--space-5) var(--space-4) calc(var(--mobile-nav-height) + var(--space-8));
+  }
+}
+
+@media (max-width: 425px) {
+  .findroom-content {
+    padding: 0 0 calc(var(--mobile-nav-height) + var(--space-8));
   }
 }

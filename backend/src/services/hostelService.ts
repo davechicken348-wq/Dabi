@@ -19,9 +19,32 @@ async function resolveFacilities(keys: string[]) {
   );
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "hostel";
+}
+
+async function generateUniqueSlug(name: string, existingId?: string): Promise<string> {
+  const base = slugify(name);
+  let candidate = base;
+  let index = 1;
+
+  while (true) {
+    const match = await prisma.hostel.findUnique({ where: { slug: candidate } });
+    if (!match || (existingId && match.id === existingId)) return candidate;
+    candidate = `${base}-${index}`;
+    index += 1;
+  }
+}
+
 function toDTO(
   h: {
     id: string;
+    slug: string;
     name: string;
     location: string;
     pricePerYear: number | null;
@@ -83,6 +106,7 @@ function toDTO(
 
   return {
     id: h.id,
+    slug: h.slug,
     name: h.name,
     location: h.location,
     address: h.address ?? undefined,
@@ -144,8 +168,10 @@ export async function getHostel(id: string): Promise<HostelDTO> {
 
 export async function createHostel(input: HostelCreate): Promise<HostelDTO> {
   const facilities = await resolveFacilities(input.facilities ?? []);
+  const slug = await generateUniqueSlug(input.slug ?? input.name, undefined);
   const hostel = await prisma.hostel.create({
     data: {
+      slug,
       name: input.name,
       location: input.location,
       pricePerYear: input.pricePerYear,
@@ -218,6 +244,11 @@ export async function updateHostel(id: string, patch: HostelUpdate): Promise<Hos
   if (!existing) throw new ApiError(404, "Hostel not found");
 
   const data: Record<string, unknown> = { ...patch };
+  if (patch.name) {
+    data.slug = await generateUniqueSlug(patch.name, id);
+  } else if (patch.slug) {
+    data.slug = await generateUniqueSlug(patch.slug, id);
+  }
   if (patch.facilities) {
     const facilities = await resolveFacilities(patch.facilities);
     data.facilities = { set: facilities.map((f) => ({ id: f.id })) };

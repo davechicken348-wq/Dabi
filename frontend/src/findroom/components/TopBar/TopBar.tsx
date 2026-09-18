@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import './TopBar.css';
 
@@ -10,36 +10,15 @@ interface HostelSearchResult {
   pricePerYear: number;
 }
 
-const pageTitles: Record<string, string> = {
-  '/findroom': 'Welcome',
-  '/findroom/explore': 'Explore rooms',
-  '/findroom/map': 'Map',
-  '/findroom/rooms': 'Rooms',
-  '/findroom/locations': 'Locations',
-  '/findroom/enquiries': 'My enquiries',
-  '/findroom/saved': 'Saved rooms',
-  '/findroom/request': 'Request a room',
-};
-
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 
 export function TopBar() {
-  const location = useLocation();
   const { user } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<HostelSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const pageTitle = pageTitles[location.pathname]
-    || (location.pathname.startsWith('/findroom/rooms/') ? 'Room details' : 'FindRoom');
-  const initials = user?.name
-    ?.split(' ')
-    .map((part) => part[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -97,25 +76,42 @@ export function TopBar() {
     <header className="topbar">
       <div className="topbar-inner">
         <div className="topbar-left">
-          <span className="topbar-context">FindRoom</span>
-          <span className="topbar-page">{pageTitle}</span>
+          <Link to="/findroom" className="topbar-brand">FindRoom</Link>
+          <nav className="topbar-nav" aria-label="FindRoom">
+            <Link to="/findroom/explore">Explore</Link>
+            <Link to="/findroom/rooms">Rooms</Link>
+            <Link to="/findroom/saved">Saved</Link>
+          </nav>
         </div>
+
         <div className="topbar-right">
-          <button type="button" className="topbar-search" aria-label="Search hostels" onClick={() => setSearchOpen(true)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.3" /><path d="m16 16 4.5 4.5" /></svg>
-            <span>Search hostels</span>
-            <kbd>⌘ K</kbd>
-          </button>
-          {user && (
-            <Link to="/admin/login" className="topbar-icon-button" aria-label="Owner notifications" title="Owner notifications">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
-            </Link>
-          )}
-          <Link to="/admin/login" className="topbar-avatar" aria-label={user ? 'Open Dabi owner admin' : 'Sign in to Dabi owner admin'} title={user ? 'Dabi owner admin' : 'Sign in to Dabi owner admin'}>
-            {user ? initials : (
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a4 4 0 0 1 4 4v2M8 9V7a4 4 0 0 1 4-4M5 21v-3a7 7 0 0 1 14 0v3M9 14h6" /></svg>
+          <form className="topbar-search-form" role="search" onSubmit={(event) => { event.preventDefault(); setSearchOpen(true); }}>
+            <button type="submit" className="topbar-search-button" aria-label="Search" title="Search Unsplash">
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <path d="M16.5 15c.9-1.2 1.5-2.8 1.5-4.5C18 6.4 14.6 3 10.5 3S3 6.4 3 10.5 6.4 18 10.5 18c1.7 0 3.2-.5 4.5-1.5l4.6 4.5 1.4-1.5-4.5-4.5zm-6 1c-3 0-5.5-2.5-5.5-5.5S7.5 5 10.5 5 16 7.5 16 10.5 13.5 16 10.5 16z" />
+              </svg>
+            </button>
+            <div className="topbar-search-input-wrap">
+              <input
+                type="search"
+                className="topbar-search-input"
+                placeholder="Search rooms and hostels"
+                readOnly
+                onFocus={() => setSearchOpen(true)}
+              />
+            </div>
+            <button type="button" className="topbar-icon-button" aria-label="Visual search" title="Visual search">
+              <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4ZM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5Zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2Zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4ZM12 8c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2Z" />
+              </svg>
+            </button>
+          </form>
+
+          <div className="topbar-links">
+            {!user && (
+              <Link to="/login" className="topbar-link">Log in</Link>
             )}
-          </Link>
+          </div>
         </div>
       </div>
 
@@ -123,12 +119,20 @@ export function TopBar() {
         <div className="topbar-search-backdrop" role="presentation" onMouseDown={closeSearch}>
           <section className="topbar-search-dialog" role="dialog" aria-modal="true" aria-labelledby="topbar-search-title" onMouseDown={(event) => event.stopPropagation()}>
             <div className="topbar-search-dialog-header">
-              <div><p className="topbar-search-eyebrow">FindRoom search</p><h2 id="topbar-search-title">Find a hostel</h2></div>
+              <div>
+                <p className="topbar-search-eyebrow">FindRoom search</p>
+                <h2 id="topbar-search-title">Find a hostel</h2>
+              </div>
               <button type="button" className="topbar-search-close" onClick={closeSearch} aria-label="Close search">×</button>
             </div>
             <div className="topbar-search-field">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.8" cy="10.8" r="6.3" /><path d="m16 16 4.5 4.5" /></svg>
-              <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by hostel or area..." />
+              <input
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by hostel or area..."
+              />
               {query && <button type="button" onClick={() => setQuery('')} aria-label="Clear search">×</button>}
             </div>
             <div className="topbar-search-results" aria-live="polite">

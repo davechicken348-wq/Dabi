@@ -3,23 +3,30 @@ import './WelcomePage.css';
 
 export default function WelcomePage() {
   return (
-    <div className="welcome-page-shell">
-      <div className="welcome-page-card">
-        <div className="welcome-brand">
-          <div className="welcome-logo">D</div>
-          <span className="welcome-brand-name">Dabi</span>
+    <main className="welcome-page-shell">
+      <section className="welcome-page-hero" aria-label="Welcome to Dabi">
+        <div className="welcome-brand-row">
+          <span className="welcome-brand-mark">✦</span>
+          <span className="welcome-brand-name" aria-label="Dabi">
+            <span className="welcome-brand-dab">Dab</span>
+            <span className="welcome-brand-i">i</span>
+          </span>
         </div>
 
-        <p className="welcome-kicker">Welcome</p>
-        <h1>Finding your next room should feel easy.</h1>
+        <p className="welcome-kicker">Welcome home</p>
+        <h1>
+          <span className="welcome-hash">#</span>
+          Your next great room starts here.
+        </h1>
         <p className="welcome-copy">
-          We’re preparing your student housing journey and getting you to the best places to live.
+          Discover cosy, verified places to stay near campus — with real options,
+          easy comparisons, and a little more peace of mind.
         </p>
 
-        <Link to="/marketing" className="welcome-cta">
-          Go to homepage
-        </Link>
-      </div>
-    </div>
+        <div className="welcome-actions">
+          <Link className="welcome-primary-cta" to="/marketing">Explore the homepage</Link>
+        </div>
+      </section>
+    </main>
   );
 }

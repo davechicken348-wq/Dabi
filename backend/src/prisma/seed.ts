@@ -71,6 +71,7 @@ const owners: OwnerDTO[] = [
 
 function hostel(
   id: string,
+  slug: string,
   name: string,
   location: string,
   pricePerYear: number,
@@ -84,6 +85,7 @@ function hostel(
 ): HostelDTO {
   return {
     id,
+    slug,
     name,
     location,
     pricePerYear,
@@ -102,16 +104,16 @@ function hostel(
 }
 
 const hostels: HostelDTO[] = [
-  hostel("golden-view", "Golden View Hostel", "Fiapre", 2400, "2-in-1", "Available", true, ["water", "electricity", "wifi", "security", "furnished"], 7.3667, -2.35, "owner_comfort"),
-  hostel("peace-villa", "Peace Villa", "New Dormaa", 2100, "3-in-1", "Available", true, ["water", "electricity", "wifi", "kitchen"], 7.318, -2.272, "owner_comfort"),
-  hostel("dormaa-queen", "Dormaa Queen", "Dormaa Ahenkro", 1900, "4-in-1", "Limited", true, ["water", "electricity", "security"], 7.2833, -2.45, "owner_comfort"),
-  hostel("royal-heights", "Royal Heights", "Abesim", 2800, "2-in-1", "Limited", true, ["water", "electricity", "wifi", "security", "furnished", "washing"], 7.3167, -2.25, "owner_kwame"),
-  hostel("kwadaso-pride", "Kwadaso Pride", "Kwadaso", 2200, "3-in-1", "Full", true, ["water", "electricity", "wifi", "bathroom"], 7.34, -2.3, "owner_kwame"),
-  hostel("campus-lodge", "Campus View Lodge", "STU Gate", 2600, "1-in-1", "Available", true, ["water", "electricity", "wifi", "security", "furnished"], 7.345, -2.317, "owner_abena"),
-  hostel("stu-gate-lodge", "STU Gate Lodge", "STU Gate", 2000, "2-in-1", "Limited", false, ["water", "electricity"], 7.348, -2.314, "owner_abena"),
-  hostel("fiapre-heights", "Fiapre Heights", "Fiapre", 2500, "4-in-1", "Available", true, ["water", "electricity", "wifi", "security"], 7.371, -2.346, "owner_yaw"),
-  hostel("abesim-comfort", "Abesim Comfort", "Abesim", 1800, "3-in-1", "Full", false, ["water", "electricity"], 7.313, -2.253, "owner_yaw"),
-  hostel("sunyani-view", "Sunyani View", "Sunyani", 2300, "2-in-1", "Available", true, ["water", "electricity", "wifi", "furnished"], 7.3399, -2.3268, "owner_yaw"),
+  hostel("golden-view", "golden-view", "Golden View Hostel", "Fiapre", 2400, "2-in-1", "Available", true, ["water", "electricity", "wifi", "security", "furnished"], 7.3667, -2.35, "owner_comfort"),
+  hostel("peace-villa", "peace-villa", "Peace Villa", "New Dormaa", 2100, "3-in-1", "Available", true, ["water", "electricity", "wifi", "kitchen"], 7.318, -2.272, "owner_comfort"),
+  hostel("dormaa-queen", "dormaa-queen", "Dormaa Queen", "Dormaa Ahenkro", 1900, "4-in-1", "Limited", true, ["water", "electricity", "security"], 7.2833, -2.45, "owner_comfort"),
+  hostel("royal-heights", "royal-heights", "Royal Heights", "Abesim", 2800, "2-in-1", "Limited", true, ["water", "electricity", "wifi", "security", "furnished", "washing"], 7.3167, -2.25, "owner_kwame"),
+  hostel("kwadaso-pride", "kwadaso-pride", "Kwadaso Pride", "Kwadaso", 2200, "3-in-1", "Full", true, ["water", "electricity", "wifi", "bathroom"], 7.34, -2.3, "owner_kwame"),
+  hostel("campus-lodge", "campus-view-lodge", "Campus View Lodge", "STU Gate", 2600, "1-in-1", "Available", true, ["water", "electricity", "wifi", "security", "furnished"], 7.345, -2.317, "owner_abena"),
+  hostel("stu-gate-lodge", "stu-gate-lodge", "STU Gate Lodge", "STU Gate", 2000, "2-in-1", "Limited", false, ["water", "electricity"], 7.348, -2.314, "owner_abena"),
+  hostel("fiapre-heights", "fiapre-heights", "Fiapre Heights", "Fiapre", 2500, "4-in-1", "Available", true, ["water", "electricity", "wifi", "security"], 7.371, -2.346, "owner_yaw"),
+  hostel("abesim-comfort", "abesim-comfort", "Abesim Comfort", "Abesim", 1800, "3-in-1", "Full", false, ["water", "electricity"], 7.313, -2.253, "owner_yaw"),
+  hostel("sunyani-view", "sunyani-view", "Sunyani View", "Sunyani", 2300, "2-in-1", "Available", true, ["water", "electricity", "wifi", "furnished"], 7.3399, -2.3268, "owner_yaw"),
 ];
 
 const enquiries: EnquiryDTO[] = [
@@ -164,6 +166,7 @@ async function populate() {
     await prisma.hostel.create({
       data: {
         id: h.id,
+        slug: h.slug,
         name: h.name,
         location: h.location,
         pricePerYear: h.pricePerYear,

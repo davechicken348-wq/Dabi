@@ -2,10 +2,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-brand);
+  font-weight: 400;
   color: var(--color-charcoal);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
+  text-decoration: none;
 }
 
 .logo-sm {
@@ -35,4 +36,20 @@
 
 .logo-mark svg {
   display: block;
+}
+
+.logo-text {
+  font-family: var(--font-brand);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.logo-dab {
+  color: var(--color-green);
+}
+
+.logo-i {
+  color: #f4c75d;
+  display: inline-block;
+  margin-left: -0.02em;
 }

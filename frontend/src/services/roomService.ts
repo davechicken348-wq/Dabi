@@ -112,17 +112,3 @@ export async function fetchRooms(filters?: SearchFilters): Promise<RoomOption[]>
   return rooms;
 }
 
-export async function fetchRoomById(id: string): Promise<RoomOption | undefined> {
-  const response = await fetch(`${API_URL}/api/hostels`);
-  if (!response.ok) return undefined;
-
-  const hostels = (await response.json()) as BackendHostel[];
-  const flattened = hostels.flatMap((hostel) => {
-    if (Array.isArray(hostel.roomOfferings) && hostel.roomOfferings.length > 0) {
-      return hostel.roomOfferings.map((roomOffering) => toRoomOption(hostel, roomOffering));
-    }
-    return [toRoomOption(hostel)];
-  });
-
-  return flattened.find((room) => room.id === id) ?? undefined;
-}

@@ -37,7 +37,8 @@ enum TenancyStatus {
 }
 
 model Hostel {
-  id              String       @id @default(cuid())
+  id              String       @id @default(uuid())
+  slug            String       @unique
   name            String
   location        String
   description     String?
@@ -78,7 +79,7 @@ model Hostel {
 }
 
 model Owner {
-  id       String   @id @default(cuid())
+  id       String   @id @default(uuid())
   name     String
   phone    String
   email    String?  @unique
@@ -91,7 +92,7 @@ model Owner {
 }
 
 model RoomOffering {
-  id            String        @id @default(cuid())
+  id            String        @id @default(uuid())
   hostelId      String
   hostel        Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
   roomType      String
@@ -115,7 +116,7 @@ model RoomOffering {
 }
 
 model Enquiry {
-  id             String        @id @default(cuid())
+  id             String        @id @default(uuid())
   name           String
   phone          String
   school         String?
@@ -140,7 +141,7 @@ model Enquiry {
 // source of truth for "smart" availability: active tenancies reduce the free
 // bed count, ended tenancies free it back up. Dabi confirms a pending request.
 model Tenancy {
-  id            String        @id @default(cuid())
+  id            String        @id @default(uuid())
   hostelId      String?
   hostel        Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
   roomOfferingId String?
@@ -163,7 +164,7 @@ model Tenancy {
 }
 
 model Deal {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   title           String
   description     String?
   code            String   @unique
@@ -179,7 +180,7 @@ model Deal {
 }
 
 model Facility {
-  id      String   @id @default(cuid())
+  id      String   @id @default(uuid())
   key     String   @unique
   label   String
   /// Icon key from the frontend icon registry (e.g. "wifi", "droplet").
@@ -192,7 +193,7 @@ model Facility {
 // Admin accounts back the admin login (Login page). Passwords are stored
 // hashed; see auth work when the frontend is wired to the API.
 model Admin {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   email     String   @unique
   password  String

@@ -1,5 +1,5 @@
 import type { Hostel, RoomOption } from '../types/index';
-import { fetchHostel as fetchHostelApi, fetchHostels as fetchHostelsApi } from './api';
+import { fetchHostels as fetchHostelsApi } from './api';
 
 type BackendRoomOffering = {
   id: string;
@@ -110,27 +110,9 @@ export async function fetchHostels(): Promise<Hostel[]> {
   return hostels.map(toHostel);
 }
 
-export async function fetchHostelById(id: string): Promise<Hostel | undefined> {
-  const hostel = await fetchHostelApi(id);
-  return hostel ? toHostel(hostel) : undefined;
-}
-
 export async function fetchRooms(): Promise<RoomOption[]> {
   const hostels = await fetchHostels();
   return hostels.flatMap((hostel) => hostel.roomOptions);
-}
-
-export async function fetchRoomById(id: string): Promise<RoomOption | undefined> {
-  const hostels = await fetchHostels();
-  const flattened = hostels.flatMap((hostel) => hostel.roomOptions);
-
-  if (id.endsWith('-room')) {
-    const hostelId = id.slice(0, -5);
-    const hostel = hostels.find((item) => item.id === hostelId);
-    return hostel?.roomOptions[0] ?? flattened.find((room) => room.id === id);
-  }
-
-  return flattened.find((room) => room.id === id) ?? undefined;
 }
 
 export async function searchHostels(query: string): Promise<Hostel[]> {

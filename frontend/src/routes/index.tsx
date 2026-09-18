@@ -7,13 +7,11 @@ import Contact from '../marketing/contact/Contact';
 import FindRoomHome from '../findroom/home/FindRoomHome';
 import Explore from '../findroom/explore/Explore';
 import Rooms from '../findroom/rooms/Rooms';
-import Map from '../findroom/map/Map';
-import Locations from '../findroom/locations/Locations';
-import RoomDetails from '../findroom/rooms/RoomDetails';
-import MyEnquiries from '../findroom/enquiries/MyEnquiries';
-import HelpPage from '../findroom/help/HelpPage';
 import SavedRooms from '../findroom/saved/SavedRooms';
-import RequestHelp from '../findroom/request/RequestHelp';
+import RoomDetails from '../findroom/roomdetails/RoomDetails';
+import Locations from '../findroom/locations/Locations';
+import HelpPage from '../findroom/help/HelpPage';
+import MapPage from '../findroom/map/MapPage';
 import { RouteError } from '../shared/RouteError/RouteError';
 import AdminLogin from '../admin/Login/Login';
 import AdminLayout from '../admin/AdminLayout';
@@ -46,13 +44,11 @@ export const router = createBrowserRouter([
       },
       { path: 'findroom/explore', element: <Explore /> },
       { path: 'findroom/rooms', element: <Rooms /> },
-      { path: 'findroom/map', element: <Map /> },
-      { path: 'findroom/locations', element: <Locations /> },
-      { path: 'findroom/rooms/:id', element: <RoomDetails /> },
-      { path: 'findroom/enquiries', element: <MyEnquiries /> },
-      { path: 'findroom/help', element: <HelpPage /> },
       { path: 'findroom/saved', element: <SavedRooms /> },
-      { path: 'findroom/request', element: <RequestHelp /> },
+      { path: 'findroom/rooms/:roomId', element: <RoomDetails /> },
+      { path: 'findroom/locations', element: <Locations /> },
+      { path: 'findroom/map', element: <MapPage /> },
+      { path: 'findroom/help', element: <HelpPage /> },
       { path: 'admin/login', element: <AdminLogin /> },
       {
         path: 'admin',

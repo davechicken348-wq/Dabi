@@ -21,33 +21,17 @@ export function LoadingState({ count = 6 }: { count?: number }) {
 export function LocationsSkeleton() {
   return (
     <div className="locations-skeleton" aria-label="Loading locations" role="status">
-      <div className="locations-skeleton-list">
-        <div className="skeleton-panel-heading">
-          <Skeleton width="7rem" height={18} borderRadius="var(--radius-sm)" />
-          <Skeleton width="10rem" height={12} borderRadius="var(--radius-sm)" />
-        </div>
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div className="locations-skeleton-row" key={index}>
-            <Skeleton width={56} height={56} borderRadius="var(--radius-sm)" />
-            <div>
-              <Skeleton width="8rem" height={15} borderRadius="var(--radius-sm)" />
-              <Skeleton width="11rem" height={11} borderRadius="var(--radius-sm)" />
+      <div className="locations-skeleton-grid">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div className="locations-skeleton-card" key={index}>
+            <Skeleton height={180} borderRadius="var(--radius-lg)" />
+            <div className="locations-skeleton-card-body">
+              <Skeleton width="60%" height={18} borderRadius="var(--radius-sm)" />
+              <Skeleton width="40%" height={14} borderRadius="var(--radius-sm)" />
+              <Skeleton width="5rem" height={24} borderRadius="var(--radius-full)" />
             </div>
-            <Skeleton width="5rem" height={12} borderRadius="var(--radius-sm)" />
           </div>
         ))}
-      </div>
-      <div className="locations-skeleton-detail">
-        <Skeleton height={176} borderRadius="var(--radius-sm)" />
-        <Skeleton width="7rem" height={12} borderRadius="var(--radius-sm)" />
-        <Skeleton width="12rem" height={22} borderRadius="var(--radius-sm)" />
-        <Skeleton width="100%" height={14} borderRadius="var(--radius-sm)" />
-        <Skeleton width="90%" height={14} borderRadius="var(--radius-sm)" />
-        <div className="locations-skeleton-stats">
-          <Skeleton height={54} borderRadius="var(--radius-sm)" />
-          <Skeleton height={54} borderRadius="var(--radius-sm)" />
-          <Skeleton height={54} borderRadius="var(--radius-sm)" />
-        </div>
       </div>
     </div>
   );

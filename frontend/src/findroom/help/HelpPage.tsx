@@ -5,7 +5,7 @@ import './HelpPage.css';
 const helpCards = [
   {
     title: 'Explore quickly',
-    description: 'Start with Explore, Locations, or the map to discover rooms in the areas that interest you.',
+    description: 'Start with Explore and Locations to discover rooms in the areas that interest you.',
     action: { label: 'Open explore', to: '/findroom/explore' },
   },
   {
@@ -14,16 +14,16 @@ const helpCards = [
     action: { label: 'Browse locations', to: '/findroom/locations' },
   },
   {
-    title: 'Track your enquiries',
-    description: 'Keep an eye on every room you have asked about from the My Enquiries page.',
-    action: { label: 'View enquiries', to: '/findroom/enquiries' },
+    title: 'Compare room options',
+    description: 'Browse room cards to compare availability, facilities, pricing, and hostel information.',
+    action: { label: 'Browse rooms', to: '/findroom/rooms' },
   },
 ];
 
 const steps = [
   {
     title: 'Explore the options',
-    text: 'Visit Explore, Map, or Rooms to see the hostels and room types currently available.',
+    text: 'Visit Explore or Rooms to see the hostels and room types currently available.',
   },
   {
     title: 'Narrow by location',
@@ -42,15 +42,15 @@ const faq = [
   },
   {
     question: 'Can I look at rooms without searching?',
-    answer: 'Yes. Open the Rooms page to browse all room options, or use the map for a visual overview of hostels by area.',
+    answer: 'Yes. Open the Rooms page to browse all room options and compare listings side by side.',
   },
   {
     question: 'How do I enquire about a room?',
-    answer: 'Open a room card or details page, then use the Enquire button to send your request to the provider.',
+    answer: 'Review a room card, then use the enquiry flow to send your request to the provider.',
   },
   {
     question: 'What if I am not sure where to start?',
-    answer: 'Start on the FindRoom home page, where you can jump to Explore, Locations, Map, Rooms, or My Enquiries.',
+    answer: 'Start on the FindRoom home page, where you can jump to Explore, Locations, Rooms, or My Enquiries.',
   },
 ];
 

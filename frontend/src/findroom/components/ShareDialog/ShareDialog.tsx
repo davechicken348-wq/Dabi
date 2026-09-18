@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { IconShare } from '../../../components/Icons/Icons';
 import { canCopyRoomLink, canUseNativeShare, copyRoomLink, openWhatsAppShare } from '../../../lib/sharing';
 import './ShareDialog.css';
 
@@ -64,28 +63,36 @@ export function ShareDialog({ open, title, shareText, shareUrl, onClose }: Share
       >
         <div className="share-dialog-header">
           <div>
-            <p className="share-dialog-kicker">Share this room</p>
-            <h3 className="share-dialog-title">Choose how you want to share</h3>
+            <h3 className="share-dialog-title">Share</h3>
           </div>
-          <button type="button" className="share-dialog-close" onClick={onClose} aria-label="Close share dialog">
-            <IconShare size={18} />
-          </button>
+          <button type="button" className="share-dialog-close" onClick={onClose} aria-label="Close share dialog">×</button>
+        </div>
+
+        <div className="share-dialog-tabs" role="group" aria-label="Share options">
+          {canUseNativeShare() && (
+            <button type="button" className="share-dialog-tab" onClick={handleNativeShare}>More ways</button>
+          )}
+          <button type="button" className="share-dialog-tab" onClick={handleWhatsApp}>WhatsApp</button>
+          {canCopyRoomLink() && (
+            <button type="button" className="share-dialog-tab" onClick={handleCopy}>Copy link</button>
+          )}
+        </div>
+
+        <p className="share-dialog-description">Share this room with someone who is looking for a place to stay.</p>
+
+        <div className="share-dialog-access">
+          <div className="share-dialog-access-heading">
+            <span className="share-dialog-access-icon" aria-hidden="true">↗</span>
+            <span><strong>Room link</strong><small>Anyone with the link can view this room</small></span>
+          </div>
+          <div className="share-dialog-link-row">
+            <input value={shareUrl} readOnly aria-label="Room share link" />
+            {canCopyRoomLink() && <button type="button" onClick={handleCopy}>Copy link</button>}
+          </div>
         </div>
 
         <div className="share-dialog-actions">
-          {canUseNativeShare() && (
-            <button type="button" className="share-dialog-option" onClick={handleNativeShare}>
-              More ways to share
-            </button>
-          )}
-          <button type="button" className="share-dialog-option" onClick={handleWhatsApp}>
-            WhatsApp
-          </button>
-          {canCopyRoomLink() && (
-            <button type="button" className="share-dialog-option" onClick={handleCopy}>
-              Copy link
-            </button>
-          )}
+          <button type="button" className="share-dialog-done" onClick={onClose}>Done</button>
         </div>
       </div>
     </div>,

@@ -1,97 +1,122 @@
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
-import { LOCATIONS, OCCUPANCY_OPTIONS, PRICE_RANGES } from '../../lib/constants';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './FindRoomHome.css';
 
-export default function FindRoomHome() {
-  const [quickLocation, setQuickLocation] = useState('');
-  const [quickOccupancy, setQuickOccupancy] = useState<number | null>(null);
-  const [searchParams] = useSearchParams();
+const quickSearchSuggestions = [
+  { label: 'Private rooms', value: 'private room', route: '/findroom/rooms?availability=available' },
+  { label: 'Verified hostels', value: 'verified', route: '/findroom/explore?query=verified' },
+  { label: 'Near campus', value: 'campus', route: '/findroom/locations' },
+  { label: 'Budget rooms', value: 'budget', route: '/findroom/explore?query=budget' },
+  { label: 'Shared rooms', value: 'shared room', route: '/findroom/explore?query=shared room' },
+  { label: 'Fresh listings', value: 'fresh', route: '/findroom/explore?query=fresh' },
+];
 
-  useEffect(() => {
-    const locationParam = searchParams.get('location');
-    if (locationParam) setQuickLocation(locationParam);
-  }, [searchParams]);
+export default function FindRoomHome() {
+  const [query, setQuery] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    const target = trimmed
+      ? `/findroom/explore?query=${encodeURIComponent(trimmed)}`
+      : '/findroom/explore';
+    navigate(target);
+  };
+
+  const chooseSuggestion = (suggestion: { label: string; value: string; route: string }) => {
+    setQuery(suggestion.value);
+    setDropdownOpen(false);
+    navigate(suggestion.route);
+  };
 
   return (
-    <FindRoomShell>
-      <div className="findroom-home">
-        <section className="findroom-hero" aria-labelledby="findroom-hero-title">
-          <p className="findroom-hero-eyebrow">FindRoom</p>
-          <h1 id="findroom-hero-title" className="findroom-hero-title">Find your room.</h1>
-          <p className="findroom-hero-subtitle">Tell us what you are looking for and we will help you narrow it down.</p>
+    <div className="findroom-home reference-home">
+      <header className="reference-header">
+        <div className="reference-brand">
+          <span className="reference-brand-icon">✦</span>
+          <span className="reference-brand-name" aria-label="Dabi">
+            <span className="reference-brand-dab">Dab</span>
+            <span className="reference-brand-i">i</span>
+          </span>
+        </div>
+        <nav className="reference-nav" aria-label="Findroom navigation">
+          <Link className="reference-nav-link active" to="/findroom/explore">Explore</Link>
+          <Link className="reference-nav-link" to="/findroom/locations">Locations</Link>
+          <Link className="reference-nav-link" to="/findroom/map">Map</Link>
+          <Link className="reference-nav-link" to="/findroom/rooms">Rooms</Link>
+        </nav>
+      </header>
 
-          <div className="findroom-hero-search">
-            <Link to={`/findroom/explore${quickLocation ? `?location=${encodeURIComponent(quickLocation)}` : ''}`} className="findroom-hero-search-input" aria-label="Search rooms and hostels">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="10.5" cy="10.5" r="6.5" />
-                <path d="m16 16 4.5 4.5" />
-              </svg>
-              <span>Search rooms and hostels...</span>
-              <kbd>⌘ K</kbd>
-            </Link>
-          </div>
-
-          <div className="findroom-quick-filters">
-            <div className="findroom-quick-filter">
-              <label className="findroom-quick-filter-label" htmlFor="quick-location">Location</label>
-              <select
-                id="quick-location"
-                value={quickLocation}
-                onChange={(e) => setQuickLocation(e.target.value)}
-                className="findroom-quick-select"
-              >
-                <option value="">Anywhere</option>
-                {LOCATIONS.map((loc) => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
+      <section className="reference-hero">
+        <div className="reference-hero-copy">
+          <h1><span className="findroom-heading-hash">#</span> Find verified rooms near your campus, without the guesswork.</h1>
+          <form className="reference-search" onSubmit={handleSearch}>
+            <span className="reference-category">Rooms</span>
+            <div className="reference-search-wrap">
+              <input
+                className="reference-search-text"
+                type="text"
+                value={query}
+                placeholder="Search hostels and room types"
+                aria-label="Search hostels and room types"
+                onChange={(event) => setQuery(event.target.value)}
+                onFocus={() => setDropdownOpen(true)}
+                onBlur={() => window.setTimeout(() => setDropdownOpen(false), 120)}
+              />
+              {dropdownOpen && (
+                <div className="reference-search-dropdown">
+                  <div className="reference-search-dropdown-panel">
+                    <div className="reference-search-dropdown-block">
+                      <h4>Popular searches</h4>
+                      <div className="reference-search-suggestion-list">
+                        {quickSearchSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion.label}
+                            className="reference-search-suggestion"
+                            type="button"
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() => chooseSuggestion(suggestion)}
+                          >
+                            <span className="reference-search-suggestion-icon">✦</span>
+                            <span>{suggestion.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+            <button className="reference-search-icon" type="submit" aria-label="Search">
+              ⌕
+            </button>
+          </form>
+        </div>
+        <div className="reference-photo-stack" aria-label="student accommodation photos">
+          <button className="reference-photo-tile tile-one" type="button" onClick={() => navigate('/findroom/rooms?availability=available')}>
+            <span className="reference-photo-label">Private rooms<br />Compare →</span>
+          </button>
+          <button className="reference-photo-tile tile-two" type="button" onClick={() => navigate('/findroom/locations')}>
+            <span className="reference-photo-label">Local hostels<br />Browse →</span>
+          </button>
+        </div>
+      </section>
 
-            <div className="findroom-quick-filter">
-              <label className="findroom-quick-filter-label" htmlFor="quick-occupancy">Room type</label>
-              <select
-                id="quick-occupancy"
-                value={quickOccupancy ?? ''}
-                onChange={(e) => setQuickOccupancy(e.target.value ? Number(e.target.value) : null)}
-                className="findroom-quick-select"
-              >
-                <option value="">Any type</option>
-                {OCCUPANCY_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n}-in-1</option>
-                ))}
-              </select>
-            </div>
+      <section className="reference-chips" aria-label="Findroom categories">
+        <Link className="reference-chip active" to="/findroom">Home</Link>
+        <Link className="reference-chip" to="/findroom/explore">Explore</Link>
+        <Link className="reference-chip" to="/findroom/locations">Locations</Link>
+        <Link className="reference-chip" to="/findroom/rooms">Room Types</Link>
+        <Link className="reference-chip" to="/findroom/explore">Freshness</Link>
+        <Link className="reference-chip" to="/findroom/help">Student Guide</Link>
+        <Link className="reference-chip free" to="/findroom/explore">Verified</Link>
+      </section>
 
-            <div className="findroom-quick-filter">
-              <label className="findroom-quick-filter-label" htmlFor="quick-price">Budget</label>
-              <select
-                id="quick-price"
-                className="findroom-quick-select"
-                onChange={(e) => {
-                  const range = PRICE_RANGES.find((r) => r.label === e.target.value);
-                  if (range) {
-                    window.location.href = `/findroom/explore?minPrice=${range.min}${range.max !== null ? `&maxPrice=${range.max}` : ''}`;
-                  }
-                }}
-                defaultValue=""
-              >
-                <option value="" disabled>Any budget</option>
-                {PRICE_RANGES.map((range) => (
-                  <option key={range.label} value={range.label}>{range.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="findroom-quick-filter findroom-quick-filter-full">
-              <button type="button" className="findroom-quick-clear" onClick={() => { setQuickLocation(''); setQuickOccupancy(null); }}>
-                Clear filters
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </FindRoomShell>
+      <section className="reference-gallery">
+      </section>
+    </div>
   );
 }

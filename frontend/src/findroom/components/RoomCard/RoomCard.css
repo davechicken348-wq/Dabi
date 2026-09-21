@@ -189,6 +189,27 @@
   color: var(--color-white);
 }
 
+.room-card-pricing-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.room-card-price {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.room-card-fee {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .room-card-download-container {
   flex-shrink: 0;
 }

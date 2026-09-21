@@ -5,6 +5,8 @@ import {
   buildRoomShareUrl,
   generateRoomShareMessage,
 } from '../../../lib/sharing';
+import { formatGhanaCedi, getDabiFeeSummary } from '../../../lib/pricing';
+import { formatPricePeriod } from '../../../lib/utils';
 import { ShareDialog } from '../ShareDialog/ShareDialog';
 import './RoomCard.css';
 
@@ -54,6 +56,7 @@ export function RoomCard({ room, index = 0 }: RoomCardProps) {
     verified: false,
     photos: room.photos,
   };
+  const feeSummary = getDabiFeeSummary(room.pricePerYear);
   const roomShareUrl = buildRoomShareUrl(room.id);
   const roomShareText = generateRoomShareMessage(
     {
@@ -184,6 +187,10 @@ export function RoomCard({ room, index = 0 }: RoomCardProps) {
                       </Link>
                       <div className="room-card-secondary-label">
                         {room.hostelLocation ?? room.hostelName ?? ''}
+                      </div>
+                      <div className="room-card-pricing-row">
+                        <span className="room-card-price">{formatGhanaCedi(room.pricePerYear)}/{formatPricePeriod(room.pricingPeriod)}</span>
+                        <span className="room-card-fee">5% • {formatGhanaCedi(feeSummary.fee)}</span>
                       </div>
                     </div>
                   </span>

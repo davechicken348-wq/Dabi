@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 import { ApiError } from "../utils/errors";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -69,7 +70,26 @@ export async function saveImage(
   origin?: string,
   folder?: string,
 ): Promise<string> {
-  const ext = path.extname(originalName).toLowerCase().slice(0, 12) || ".jpg";
+  const originalExt = path.extname(originalName).toLowerCase().slice(0, 12);
+  const isSvg = mimetype === "image/svg+xml" || originalExt === ".svg";
+  let imageBuffer = buffer;
+  let ext = originalExt || ".jpg";
+  let contentType = mimetype;
+
+  if (!isSvg) {
+    try {
+      imageBuffer = await sharp(buffer)
+        .rotate()
+        .resize({ width: 2400, height: 2400, fit: "inside", withoutEnlargement: true })
+        .avif({ quality: 58, effort: 4 })
+        .toBuffer();
+      ext = ".avif";
+      contentType = "image/avif";
+    } catch {
+      throw new ApiError(400, "The uploaded file is not a valid image");
+    }
+  }
+
   const filename = `${randomUUID()}${ext}`;
   const dir = sanitizeFolder(folder) ?? "uncategorized";
   const objectPath = `${dir}/${filename}`;
@@ -78,7 +98,7 @@ export async function saveImage(
     await ensureBucket();
     const { error } = await client.storage
       .from(bucket)
-      .upload(objectPath, buffer, { contentType: mimetype, upsert: true });
+      .upload(objectPath, imageBuffer, { contentType, upsert: true });
     if (error) {
       // eslint-disable-next-line no-console
       console.error(`[storage] Upload to "${bucket}/${objectPath}" failed:`, error.message);
@@ -98,7 +118,7 @@ export async function saveImage(
   }
 
   await fs.mkdir(path.join(uploadDir, dir), { recursive: true });
-  await fs.writeFile(path.join(uploadDir, dir, filename), buffer);
+  await fs.writeFile(path.join(uploadDir, dir, filename), imageBuffer);
   // eslint-disable-next-line no-console
   console.log(`[storage] Saved locally: ./uploads/${objectPath}`);
   // Return an absolute URL so the image resolves from any frontend origin

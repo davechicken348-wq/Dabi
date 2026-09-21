@@ -5,6 +5,18 @@ export function formatPrice(amount: number): string {
 export function formatCurrency(amount: number): string {
   return `GH₵${amount.toLocaleString('en-GH')}`;
 }
+export type PricingPeriod = 'AcademicYear' | 'Semester' | 'Month';
+export function formatPricePeriod(period?: PricingPeriod): string {
+  switch (period) {
+    case 'Semester':
+      return 'semester';
+    case 'Month':
+      return 'mo';
+    case 'AcademicYear':
+    default:
+      return 'yr';
+  }
+}
 
 export function getFreshnessLabel(checkedAt: string): string {
   const date = new Date(checkedAt);

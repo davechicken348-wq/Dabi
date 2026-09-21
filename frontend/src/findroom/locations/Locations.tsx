@@ -14,7 +14,15 @@ interface LocationSummary {
   roomOptions: number;
   availableUnits: number;
   startingPrice: number;
+  startingPricingPeriod?: 'AcademicYear' | 'Semester' | 'Month';
+  hasMixedPricingPeriods: boolean;
   photo: string;
+}
+
+function formatPricePeriod(period?: LocationSummary['startingPricingPeriod']): string {
+  if (period === 'Month') return 'mo';
+  if (period === 'Semester') return 'semester';
+  return 'yr';
 }
 
 export default function Locations() {
@@ -50,13 +58,19 @@ export default function Locations() {
 
     return [...groups.entries()].map(([name, areaHostels]) => {
       const rooms = areaHostels.flatMap((hostel) => hostel.roomOptions);
+      const startingRoom = rooms.reduce((lowest, room) => (
+        !lowest || room.pricePerYear < lowest.pricePerYear ? room : lowest
+      ), rooms[0]);
+      const pricingPeriods = new Set(rooms.map((room) => room.pricingPeriod ?? 'AcademicYear'));
       return {
         name,
         hostels: areaHostels,
         roomOptions: rooms.length,
         availableUnits: rooms.reduce((total, room) => total + room.availableUnits, 0),
-        startingPrice: Math.min(...rooms.map((room) => room.pricePerYear)),
-        photo: areaHostels[0].photos[0],
+        startingPrice: startingRoom?.pricePerYear ?? 0,
+        startingPricingPeriod: startingRoom?.pricingPeriod,
+        hasMixedPricingPeriods: pricingPeriods.size > 1,
+        photo: areaHostels[0].photos[0] ?? '/placeholder-room.svg',
       };
     });
   }, [hostels]);
@@ -66,6 +80,8 @@ export default function Locations() {
     return !search || location.name.toLowerCase().includes(search)
       || location.hostels.some((hostel) => hostel.name.toLowerCase().includes(search));
   });
+
+  const availableRooms = locations.reduce((total, location) => total + location.availableUnits, 0);
 
   if (error) {
     return (
@@ -82,19 +98,38 @@ export default function Locations() {
       <div className="locations-page">
         <div className="locations-head">
           <div className="locations-head-text">
-            <p className="locations-eyebrow">Discover by area</p>
-            <h1 className="locations-title">Locations</h1>
+            <p className="locations-eyebrow"><span className="locations-eyebrow-dot" /> Discover by area</p>
+            <h1 className="locations-title"><span className="locations-title-mark">#</span> Locations</h1>
             <p className="locations-subtitle">
               Browse neighbourhoods and find the rooms that fit your budget and lifestyle.
             </p>
           </div>
           <div className="locations-head-actions">
-            <Link to="/findroom/map" className="locations-map-link">View on map</Link>
             <div className="locations-head-search">
               <Search onSearch={(value) => setQuery(value)} />
             </div>
+            <Link to="/findroom/map" className="locations-map-link"><span aria-hidden="true">⌖</span> View on map</Link>
           </div>
         </div>
+
+        <div className="locations-overview" aria-label="Location overview">
+          <div className="locations-overview-stat"><strong>{locations.length}</strong><span>areas to explore</span></div>
+          <div className="locations-overview-stat"><strong>{locations.reduce((total, location) => total + location.hostels.length, 0)}</strong><span>hostels listed</span></div>
+          <div className="locations-overview-stat"><strong>{availableRooms}</strong><span>rooms available</span></div>
+          <div className="locations-overview-note"><span className="locations-overview-pulse" /> Updated from current listings</div>
+        </div>
+
+        {locations.length > 0 && (
+          <div className="locations-quick-browse" aria-label="Quick browse areas">
+            <span className="locations-quick-label">Quick browse</span>
+            {locations.slice(0, 5).map((location) => (
+              <Link key={location.name} to={`/findroom/rooms?location=${encodeURIComponent(location.name)}`}>
+                {location.name}<span aria-hidden="true">↗</span>
+              </Link>
+            ))}
+            {locations.length > 5 && <span className="locations-quick-more">+{locations.length - 5} more</span>}
+          </div>
+        )}
 
         {loading ? (
           <LocationsSkeleton />
@@ -113,17 +148,21 @@ export default function Locations() {
               >
                 <div className="location-card-image">
                   <img src={location.photo} alt={location.name} loading="lazy" />
-                  <div className="location-card-gradient" />
-                </div>
-                <div className="location-card-content">
-                  <h2>{location.name}</h2>
-                  <p>
-                    {location.hostels.length} {location.hostels.length === 1 ? 'hostel' : 'hostels'} ·{' '}
-                    {location.roomOptions} room options
-                  </p>
-                  <span className="location-card-price">
-                    From GH₵{location.startingPrice.toLocaleString()}
-                  </span>
+                  <div className="location-card-overlay" />
+                  <span className="location-card-count">{location.hostels.length} {location.hostels.length === 1 ? 'hostel' : 'hostels'}</span>
+                  <span className="location-card-arrow" aria-hidden="true">↗</span>
+                  <div className="location-card-content">
+                    <p className="location-card-kicker">Explore area</p>
+                    <h2>{location.name}</h2>
+                    <div className="location-card-meta">
+                      <span>{location.roomOptions} room options</span>
+                      <span>{location.availableUnits} available</span>
+                    </div>
+                    <span className="location-card-price">
+                      From GH₵{location.startingPrice.toLocaleString('en-GH')}/{formatPricePeriod(location.startingPricingPeriod)}
+                    </span>
+                    {location.hasMixedPricingPeriods && <small className="location-card-mixed">Mixed billing periods</small>}
+                  </div>
                 </div>
               </Link>
             ))}

@@ -1,5 +1,6 @@
 import { Input } from '../../shared/Input/Input';
 import { Button } from '../../shared/Button/Button';
+import { DABI_COMMUNITY_LINK, DABI_EMAIL, DABI_PHONE_URL, DABI_WHATSAPP_URL } from '../../lib/dabiContact';
 import './Contact.css';
 
 function IconWhatsApp() {
@@ -31,23 +32,20 @@ const CHANNELS = [
   {
     Icon: IconWhatsApp,
     label: 'WhatsApp',
-    value: '+233 XX XXX XXXX',
-    detail: 'Message us about a room or hostel. We usually respond within a few hours.',
-    href: 'https://wa.me/233XXXXXXXXX',
+    action: 'Reach out to Dabi',
+    href: DABI_WHATSAPP_URL,
   },
   {
     Icon: IconPhone,
     label: 'Phone',
-    value: '+233 XX XXX XXXX',
-    detail: 'Call the Dabi team directly during business hours.',
-    href: 'tel:+233XXXXXXXXX',
+    action: 'Call Dabi',
+    href: DABI_PHONE_URL,
   },
   {
     Icon: IconMail,
     label: 'Email',
-    value: 'hello@dabi.com',
-    detail: 'For questions, feedback, or partnership enquiries.',
-    href: 'mailto:hello@dabi.com',
+    action: 'Email Dabi',
+    href: `mailto:${DABI_EMAIL}`,
   },
 ] as const;
 
@@ -75,15 +73,14 @@ export default function Contact() {
             <div className="contact-channels-col">
               <p className="contact-col-kicker">Ways to reach us</p>
               <div className="contact-channels">
-                {CHANNELS.map(({ Icon, label, value, detail, href }) => (
-                  <a className="contact-channel" key={label} href={href} target="_blank" rel="noopener noreferrer">
+                {CHANNELS.map(({ Icon, label, action, href }) => (
+                  <a className="contact-channel" key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={action}>
                     <div className="contact-channel-icon">
                       <Icon />
                     </div>
                     <div className="contact-channel-body">
                       <p className="contact-channel-label">{label}</p>
-                      <p className="contact-channel-value">{value}</p>
-                      <p className="contact-channel-detail">{detail}</p>
+                      <p className="contact-channel-value">{action}</p>
                     </div>
                   </a>
                 ))}
@@ -121,6 +118,7 @@ export default function Contact() {
                   />
                 </div>
                 <Button size="lg" variant="primary" fullWidth>Send Message</Button>
+                <a className="contact-community-link" href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer">💚 Join the Dabi Community</a>
               </form>
             </div>
 

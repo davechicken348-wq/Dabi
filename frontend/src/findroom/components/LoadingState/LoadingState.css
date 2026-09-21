@@ -1,7 +1,92 @@
 .loading-state {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-4);
+  columns: 3 260px;
+  column-gap: var(--space-5);
+}
+
+.room-card-skeleton {
+  display: block;
+  width: 100%;
+  break-inside: avoid;
+  margin: 0 0 var(--space-5);
+  background: var(--color-border);
+  pointer-events: none;
+}
+
+.room-card-skeleton-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.room-card-skeleton-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, var(--color-border) 20%, var(--color-sand-50) 45%, var(--color-border) 70%);
+  background-size: 220% 100%;
+  animation: room-card-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.room-card-skeleton-actions {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.room-card-skeleton-actions span,
+.room-card-skeleton-avatar {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: var(--shadow-xs);
+}
+
+.room-card-skeleton-actions span {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+}
+
+.room-card-skeleton-details {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.room-card-skeleton-avatar {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.room-card-skeleton-lines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.room-card-skeleton-lines span {
+  display: block;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.room-card-skeleton-lines span:first-child { width: 72%; }
+.room-card-skeleton-lines span:nth-child(2) { width: 48%; }
+.room-card-skeleton-lines span:last-child { width: 58%; }
+
+@keyframes room-card-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -20% 0; }
 }
 
 .loading-card {
@@ -20,24 +105,62 @@
 }
 
 .locations-skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-4);
+  columns: 3 260px;
+  column-gap: var(--space-5);
 }
 
-.locations-skeleton-card {
-  background-color: var(--color-white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+.location-card-skeleton {
+  position: relative;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  break-inside: avoid;
+  margin-bottom: var(--space-5);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  background: var(--color-border);
+  pointer-events: none;
 }
 
-.locations-skeleton-card-body {
-  padding: var(--space-5);
+.location-card-skeleton-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, var(--color-border) 20%, var(--color-sand-50) 45%, var(--color-border) 70%);
+  background-size: 220% 100%;
+  animation: room-card-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.location-card-skeleton-count,
+.location-card-skeleton-arrow {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-4);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.location-card-skeleton-count {
+  left: var(--space-4);
+  width: 5rem;
+  height: 1.35rem;
+  border-radius: var(--radius-full);
+}
+
+.location-card-skeleton-arrow {
+  right: var(--space-4);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+}
+
+.location-card-skeleton-content {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: 0.45rem;
 }
 
 .map-skeleton {
@@ -97,7 +220,41 @@
 .map-skeleton-marker-three { top: 70%; left: 24%; }
 
 @media (max-width: 640px) {
+  .loading-state {
+    columns: 2 180px;
+    column-gap: var(--space-3);
+  }
+
+  .room-card-skeleton {
+    margin-bottom: var(--space-3);
+  }
+
   .locations-skeleton-grid {
-    grid-template-columns: 1fr;
+    columns: 2 180px;
+    column-gap: var(--space-3);
+  }
+
+  .location-card-skeleton {
+    margin-bottom: var(--space-3);
+  }
+}
+
+@media (max-width: 420px) {
+  .loading-state {
+    columns: 1;
+  }
+
+  .locations-skeleton-grid {
+    columns: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .room-card-skeleton-shimmer {
+    animation: none;
+  }
+
+  .location-card-skeleton-shimmer {
+    animation: none;
   }
 }

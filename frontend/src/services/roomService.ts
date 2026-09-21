@@ -72,7 +72,7 @@ function toRoomOption(hostel: BackendHostel, roomOffering?: BackendRoomOffering)
     photos,
     hostelName: hostel.name,
     hostelLocation: hostel.location,
-    pricingPeriod: roomOffering?.pricingPeriod,
+    pricingPeriod: roomOffering?.pricingPeriod ?? 'AcademicYear',
     lastCheckedAt: hostel.lastCheckedAt ?? hostel.checkedAt,
   };
 }

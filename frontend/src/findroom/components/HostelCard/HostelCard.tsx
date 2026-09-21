@@ -25,7 +25,7 @@ function getSavedHostelIds(): string[] {
 
 export function HostelCard({ hostel }: HostelCardProps) {
   const [saved, setSaved] = useState(false);
-  const cheapestRoom = hostel.roomOptions.reduce((min, r) => (r.pricePerYear < min ? r.pricePerYear : min), Infinity);
+  const cheapestRoom = hostel.roomOptions.reduce((min, room) => (room.pricePerYear < min.pricePerYear ? room : min), hostel.roomOptions[0]);
   const totalAvailable = hostel.roomOptions.reduce((sum, r) => sum + r.availableUnits, 0);
   const totalRooms = hostel.roomOptions.reduce((sum, r) => sum + r.totalUnits, 0);
   const availability = totalAvailable === 0 ? 'full' : totalAvailable <= Math.max(1, Math.floor(totalRooms * 0.3)) ? 'limited' : 'available';
@@ -65,7 +65,7 @@ export function HostelCard({ hostel }: HostelCardProps) {
         <p className="hostel-card-location">{hostel.location}</p>
         <p className="hostel-card-description">{hostel.description}</p>
         {distanceLabel && <p className="hostel-card-distance">{distanceLabel}</p>}
-        <PriceDisplay price={cheapestRoom} label="From" />
+        {cheapestRoom && <PriceDisplay price={cheapestRoom.pricePerYear} pricingPeriod={cheapestRoom.pricingPeriod} label="From" />}
         <p className="hostel-card-summary">{hostel.roomOptions.length} room options available</p>
         <div className="hostel-card-meta">
           <AvailabilityBadge status={availability} available={totalAvailable} total={totalRooms} />

@@ -7,15 +7,10 @@ import { LoadingState } from '../components/LoadingState/LoadingState';
 import { EmptyState } from '../components/EmptyState/EmptyState';
 import { fetchRooms, fetchFilterFacilities } from '../../services/roomService';
 import { fetchHostels } from '../../services/hostelService';
+import { DABI_COMMUNITY_LINK } from '../../lib/dabiContact';
 import type { RoomOption, SearchFilters } from '../../types';
 import { FACILITIES, OCCUPANCY_OPTIONS, PRICE_RANGES, FACILITY_EMOJIS } from '../../lib/constants';
 import './Explore.css';
-import homeImage from '../../assets/images/home.jpg';
-import motelImage from '../../assets/images/motel.jpg';
-import cameraImage from '../../assets/images/camera.jpg';
-import bedImage from '../../assets/images/bed.jpg';
-import graffitiImage from '../../assets/images/graffiti.webp';
-import wallImage from '../../assets/images/wall.webp';
 
 type FilterIconName = 'location' | 'rooms' | 'availability' | 'price' | 'facility';
 
@@ -167,42 +162,26 @@ export default function Explore() {
         </nav>
 
         <div className="explore-hero-modules" aria-label="Explore Dabi rooms">
-          <section className="explore-hero-module explore-hero-discovery">
-            <div className="explore-hero-copy">
-              <p className="explore-hero-kicker">DABI / EXPLORE ROOMS</p>
-              <h1 className="explore-hero-title"><span className="findroom-heading-hash">#</span> Rooms for the way you live.</h1>
-              <p className="explore-hero-description">Search verified hostels, compare room options, and find a place that fits your budget and routine.</p>
-            </div>
-            <div className="explore-hero-art" aria-hidden="true">
-              <img className="explore-hero-art-main" src={homeImage} alt="" />
-              <img className="explore-hero-art-soft explore-hero-art-soft-one" src={motelImage} alt="" />
-              <img className="explore-hero-art-soft explore-hero-art-soft-two" src={cameraImage} alt="" />
-              <img className="explore-hero-art-accent explore-hero-art-accent-one" src={bedImage} alt="" />
-              <img className="explore-hero-art-accent explore-hero-art-accent-two" src={graffitiImage} alt="" />
-              <img className="explore-hero-art-accent explore-hero-art-accent-three" src={wallImage} alt="" />
+          <section className="explore-hero-module explore-hero-community">
+            <div className="explore-hero-copy explore-hero-copy-plain">
+              <p className="explore-hero-kicker">DABI / COMMUNITY</p>
+              <h1 className="explore-hero-title"><span className="findroom-heading-hash">#</span> A room search powered by the people around you.</h1>
+              <p className="explore-hero-description">Dabi brings together verified hostels, trusted student recommendations, and real community insight so you can choose a place that actually fits your life.</p>
+              <div className="explore-hero-actions">
+                <Link to="/findroom/rooms" className="explore-hero-primary">Explore rooms</Link>
+                <a href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer" className="explore-hero-secondary">💚 Join Dabi Community</a>
+              </div>
             </div>
           </section>
 
-          <button className="explore-hero-module explore-hero-compare" type="button" onClick={() => document.querySelector('.explore-filters')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-            <div>
-              <h2>Compare your first room</h2>
-              <p>Filter by location, price, availability, and facilities.</p>
+          <Link to="/findroom/request" className="explore-hero-module explore-hero-request">
+            <div className="explore-hero-request-copy">
+              <p className="explore-hero-kicker">ROOM REQUEST</p>
+              <h2>Need a room matched to you?</h2>
+              <p>Tell us your budget, preferred area, and room type. We’ll help narrow it down and keep the search moving.</p>
+              <span className="explore-hero-request-button">Request a room →</span>
             </div>
-            <div className="explore-hero-compare-frame" aria-hidden="true">
-              <img src={bedImage} alt="" />
-              <img className="explore-hero-compare-secondary" src={wallImage} alt="" />
-              <span className="explore-hero-compare-plus">+</span>
-            </div>
-          </button>
-
-          <button className="explore-hero-module explore-hero-featured" type="button" onClick={() => handleSearch('verified')}>
-            <img src={cameraImage} alt="" />
-            <span className="explore-hero-featured-overlay" />
-            <span className="explore-hero-featured-copy">
-              <strong>Verified rooms</strong>
-              <small>Freshly checked on Dabi</small>
-            </span>
-          </button>
+          </Link>
         </div>
 
         <div className="explore-content">

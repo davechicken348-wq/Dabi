@@ -1,6 +1,8 @@
+import { formatPricePeriod } from '../../lib/utils';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
+import { formatGhanaCedi, getDabiFeeSummary } from '../../lib/pricing';
 import { ErrorState } from '../components/ErrorState/ErrorState';
 import { RoomCard } from '../components/RoomCard/RoomCard';
 import { ShareDialog } from '../components/ShareDialog/ShareDialog';
@@ -24,11 +26,6 @@ function getSavedRoomIds(): string[] {
   } catch {
     return [];
   }
-}
-
-function formatPrice(room: RoomOption): string {
-  const period = room.pricingPeriod === 'Month' ? 'month' : room.pricingPeriod === 'Semester' ? 'semester' : 'academic year';
-  return `GHS ${room.pricePerYear.toLocaleString()} / ${period}`;
 }
 
 function roomLabel(room: RoomOption): string {
@@ -137,6 +134,7 @@ export default function RoomDetails() {
   const photos = room.photos.length > 0 ? room.photos : ['/placeholder-room.svg'];
   const availability = room.availableUnits > 0 ? `${room.availableUnits} available` : 'Currently full';
   const distanceLabel = formatDistanceFromStu(hostel ? getDistanceFromStu(hostel) : undefined);
+  const feeSummary = getDabiFeeSummary(room.pricePerYear);
   const roomShareUrl = buildRoomShareUrl(room.id);
   const roomShareText = generateRoomShareMessage(
     {
@@ -212,7 +210,18 @@ export default function RoomDetails() {
               </div>
             ) : (
               <>
-                <div className="room-details-price"><strong>{formatPrice(room)}</strong><span>Clear pricing, no hidden fees</span></div>
+                <div className="room-details-price">
+                  <strong>{formatGhanaCedi(room.pricePerYear)}/{formatPricePeriod(room.pricingPeriod)}</strong>
+                  <div className="room-details-fee-breakdown">
+                    <span>Dabi service fee</span>
+                    <strong>5% • {formatGhanaCedi(feeSummary.fee)}</strong>
+                  </div>
+                  <div className="room-details-total-row">
+                    <span>Total with Dabi service</span>
+                    <strong>{formatGhanaCedi(feeSummary.total)}</strong>
+                  </div>
+                  <small className="room-details-fee-note">Your Dabi service fee helps us connect you with the property, coordinate your room search and assist you through the process.</small>
+                </div>
                 <div className="room-details-enquiry-heading">
                   <h2>Interested in this room?</h2>
                   <p>Share your details and Dabi will help with availability and viewing times.</p>

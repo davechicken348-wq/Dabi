@@ -14,7 +14,7 @@
   inset: -1px;
   background-image:
     linear-gradient(90deg, rgba(17, 37, 31, 0.7) 0%, rgba(17, 37, 31, 0.5) 42%, rgba(17, 37, 31, 0.3) 100%),
-    url('../../../assets/images/home.jpg');
+    url('../../../assets/images/home.avif');
   background-position: center;
   background-size: cover;
 }

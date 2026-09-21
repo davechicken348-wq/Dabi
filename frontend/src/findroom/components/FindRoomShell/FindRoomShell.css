@@ -40,6 +40,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .findroom-content:has(.rooms-page) {
+    padding-inline: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .findroom-content {
     padding: var(--space-5) var(--space-4) calc(var(--mobile-nav-height) + var(--space-8));

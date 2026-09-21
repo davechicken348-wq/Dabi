@@ -48,7 +48,7 @@
   background-color: #19342d;
   background-image:
     linear-gradient(180deg, rgba(17, 37, 31, 0.45) 0%, rgba(17, 37, 31, 0.78) 70%, rgba(17, 37, 31, 0.95) 100%),
-    url('../../assets/images/motel.jpg');
+    url('../../assets/images/motel.avif');
   background-position: center;
   background-size: cover;
   padding: clamp(4rem, 8vw, 7rem) var(--space-6) clamp(5rem, 9vw, 8rem);

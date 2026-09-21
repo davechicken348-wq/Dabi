@@ -6,6 +6,7 @@ import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import { fetchHostels } from '../../services/hostelService';
 import type { Hostel, RoomOption } from '../../types';
 import { FACILITY_EMOJIS } from '../../lib/constants';
+import { formatPricePeriod } from '../../lib/utils';
 import { STU } from '../../data/geo';
 import './MapPage.css';
 
@@ -16,11 +17,13 @@ type FilterType = 'all' | 'available' | 'limited' | 'full';
 type AreaSummary = {
   location: string;
   count: number;
-  avgPrice: number;
+  lowestPrice: number;
+  lowestPricingPeriod?: RoomOption['pricingPeriod'];
+  pricingPeriods: Set<string>;
   status: string;
 };
 
-const formatPrice = (price: number) => `GH₵${price.toLocaleString()}/yr`;
+const formatPrice = (price: number, pricingPeriod?: RoomOption['pricingPeriod']) => `GH₵${price.toLocaleString('en-GH')}/${formatPricePeriod(pricingPeriod)}`;
 
 function getStatusColor(status?: string) {
   if (status === 'Limited') return '#d39b2a';
@@ -102,6 +105,7 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [availabilityFilter, setAvailabilityFilter] = useState<FilterType>('all');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedHostel, setSelectedHostel] = useState<Hostel | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -251,7 +255,7 @@ export default function MapPage() {
               </div>
               <div class="map-cluster-meta">
                 <span class="map-popup-status map-popup-status-${getStatusClass(status)}">${status}</span>
-                <span>${cheapestRoom ? formatPrice(cheapestRoom.pricePerYear) : 'Price on request'}</span>
+                <span>${cheapestRoom ? formatPrice(cheapestRoom.pricePerYear, cheapestRoom.pricingPeriod) : 'Price on request'}</span>
               </div>
             </div>
           `;
@@ -325,25 +329,35 @@ export default function MapPage() {
 
   const areaSummaries: AreaSummary[] = Array.from(
     filteredHostels.reduce((map, hostel) => {
-      const existing = map.get(hostel.location) ?? { location: hostel.location, count: 0, avgPrice: 0, status: 'Available' };
+      const existing = map.get(hostel.location) ?? {
+        location: hostel.location,
+        count: 0,
+        lowestPrice: Number.POSITIVE_INFINITY,
+        pricingPeriods: new Set<string>(),
+        status: 'Available',
+      };
       const cheapest = hostel.roomOptions.reduce<RoomOption | undefined>((best, room) => {
         if (!best || room.pricePerYear < best.pricePerYear) return room;
         return best;
       }, undefined);
 
       existing.count += 1;
-      existing.avgPrice += cheapest?.pricePerYear ?? 0;
+      if (cheapest) {
+        existing.pricingPeriods.add(cheapest.pricingPeriod ?? 'AcademicYear');
+        if (cheapest.pricePerYear < existing.lowestPrice) {
+          existing.lowestPrice = cheapest.pricePerYear;
+          existing.lowestPricingPeriod = cheapest.pricingPeriod;
+        }
+      }
       if (hostel.roomOptions[0]?.availabilityStatus === 'Limited' && existing.status === 'Available') existing.status = 'Limited';
       if (hostel.roomOptions[0]?.availabilityStatus === 'Full') existing.status = 'Full';
       map.set(hostel.location, existing);
       return map;
     }, new Map<string, AreaSummary>()).values(),
-  ).map((area) => ({
-    ...area,
-    avgPrice: Math.round(area.avgPrice / area.count),
-  })).sort((a, b) => b.count - a.count);
+  ).sort((a, b) => b.count - a.count);
 
   const selectedRoom = selectedHostel?.roomOptions[0];
+  const activeFilterCount = [searchQuery, selectedLocation, availabilityFilter !== 'all' ? availabilityFilter : ''].filter(Boolean).length;
 
   return (
     <FindRoomShell>
@@ -366,7 +380,12 @@ export default function MapPage() {
             )}
           </div>
 
-          <div className="map-filters">
+          <button type="button" className="map-mobile-filter-toggle" onClick={() => setFiltersOpen(true)} aria-expanded={filtersOpen} aria-controls="map-filter-drawer">
+            <span aria-hidden="true">☷</span>
+            Filters{activeFilterCount > 0 ? ` · ${activeFilterCount} active` : ''}
+          </button>
+
+          <div className="map-filters map-filters-inline">
             <select
               className="map-filter-select"
               value={selectedLocation}
@@ -410,18 +429,67 @@ export default function MapPage() {
                 >
                   <span>{area.location}</span>
                   <strong>{area.count}</strong>
-                  <small>{formatPrice(area.avgPrice)}</small>
+                  {Number.isFinite(area.lowestPrice) && (
+                    <small>From {formatPrice(area.lowestPrice, area.lowestPricingPeriod)}</small>
+                  )}
+                  {area.pricingPeriods.size > 1 && <em>Mixed billing periods</em>}
                 </button>
               ))}
             </div>
           )}
 
+          <div className="map-legend map-legend-inline">
+            <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#15694b' }} /> Available</span>
+            <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#d39b2a' }} /> Limited</span>
+            <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#7f8791' }} /> Full</span>
+            <span className="map-legend-item"><span className="map-legend-dot map-legend-stu" /> STU</span>
+          </div>
+
+        </div>
+
+        {filtersOpen && <button type="button" className="map-filter-backdrop" onClick={() => setFiltersOpen(false)} aria-label="Close map filters" />}
+        <div id="map-filter-drawer" className={`map-filter-drawer ${filtersOpen ? 'map-filter-drawer-open' : ''}`}>
+          <div className="map-filter-drawer-header">
+            <div>
+              <span className="map-filter-drawer-kicker">Map controls</span>
+              <h2>Filter hostels</h2>
+            </div>
+            <button type="button" className="map-filter-drawer-close" onClick={() => setFiltersOpen(false)} aria-label="Close map filters">×</button>
+          </div>
+          <div className="map-filters">
+            <select
+              className="map-filter-select"
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              aria-label="Filter by location"
+            >
+              <option value="">All locations</option>
+              {locationOptions.map((loc) => <option key={loc} value={loc}>{loc}</option>)}
+            </select>
+            <select
+              className="map-filter-select"
+              value={availabilityFilter}
+              onChange={(e) => setAvailabilityFilter(e.target.value as FilterType)}
+              aria-label="Filter by availability"
+            >
+              <option value="all">All statuses</option>
+              <option value="available">Available</option>
+              <option value="limited">Limited</option>
+              <option value="full">Full</option>
+            </select>
+            {(searchQuery || selectedLocation || availabilityFilter !== 'all') && (
+              <button type="button" className="map-filter-clear" onClick={() => { setSearchQuery(''); setSelectedLocation(''); setAvailabilityFilter('all'); }}>
+                Clear filters
+              </button>
+            )}
+          </div>
           <div className="map-legend">
             <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#15694b' }} /> Available</span>
             <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#d39b2a' }} /> Limited</span>
             <span className="map-legend-item"><span className="map-legend-dot" style={{ background: '#7f8791' }} /> Full</span>
             <span className="map-legend-item"><span className="map-legend-dot map-legend-stu" /> STU</span>
           </div>
+          <button type="button" className="map-filter-drawer-done" onClick={() => setFiltersOpen(false)}>Show results</button>
         </div>
 
         {loading && (
@@ -493,7 +561,7 @@ export default function MapPage() {
                 </span>
                 {selectedHostel.landmark && <span className="map-side-panel-landmark">{selectedHostel.landmark}</span>}
                 {selectedRoom && (
-                  <span className="map-side-panel-price">{formatPrice(selectedRoom.pricePerYear)}</span>
+                  <span className="map-side-panel-price">{formatPrice(selectedRoom.pricePerYear, selectedRoom.pricingPeriod)}</span>
                 )}
                 <div className="map-side-panel-status-row">
                   <span className={`map-side-panel-status map-side-panel-status-${(selectedRoom?.availabilityStatus ?? 'Available').toLowerCase()}`}>
@@ -525,7 +593,7 @@ export default function MapPage() {
                         <span className="map-side-panel-room-name">{room.name}</span>
                         <small>{room.availableUnits} of {room.totalUnits} available</small>
                       </div>
-                      <strong>{formatPrice(room.pricePerYear)}</strong>
+                      <strong>{formatPrice(room.pricePerYear, room.pricingPeriod)}</strong>
                     </Link>
                   ))}
                 </div>

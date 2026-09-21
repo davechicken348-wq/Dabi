@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { DABI_COMMUNITY_LINK } from '../../lib/dabiContact';
 import './FindRoomHome.css';
 
 const quickSearchSuggestions = [
@@ -47,6 +48,7 @@ export default function FindRoomHome() {
           <Link className="reference-nav-link" to="/findroom/locations">Locations</Link>
           <Link className="reference-nav-link" to="/findroom/map">Map</Link>
           <Link className="reference-nav-link" to="/findroom/rooms">Rooms</Link>
+          <a className="reference-nav-link" href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer">Join Community</a>
         </nav>
       </header>
 
@@ -102,6 +104,17 @@ export default function FindRoomHome() {
           <button className="reference-photo-tile tile-two" type="button" onClick={() => navigate('/findroom/locations')}>
             <span className="reference-photo-label">Local hostels<br />Browse →</span>
           </button>
+        </div>
+      </section>
+
+      <section className="reference-cta-panel" aria-label="Need help finding a room">
+        <div>
+          <p className="reference-cta-kicker">Still haven't found your room? 🥺</p>
+          <h2>That’s okay. Tell Dabi what you’re looking for and we’ll try to find a suitable match for you.</h2>
+        </div>
+        <div className="reference-cta-actions">
+          <Link to="/findroom/request" className="reference-action-primary">Help Me Find a Room →</Link>
+          <a href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer" className="reference-action-secondary">💚 Join Dabi Community</a>
         </div>
       </section>
 

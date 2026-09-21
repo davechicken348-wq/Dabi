@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { DABI_COMMUNITY_LINK } from '../../lib/dabiContact';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import { RoomCard } from '../components/RoomCard/RoomCard';
+import { RoomCardSkeleton } from '../components/LoadingState/LoadingState';
 import { ErrorState } from '../components/ErrorState/ErrorState';
 import { fetchRooms } from '../../services/roomService';
 import type { RoomOption } from '../../types';
@@ -74,46 +76,18 @@ export default function Rooms() {
       default: return true;
     }
   });
-  const heroRooms = rooms.filter((room) => room.photos[0]).slice(0, 6);
-  const featuredRoom = heroRooms[0];
-
   return (
     <FindRoomShell>
       <div className="rooms-page rooms-unsplash">
-        <section className="rooms-hero-modules" aria-label="Dabi room discovery">
-          <article className="rooms-hero-module rooms-hero-discovery">
-            <div className="rooms-hero-copy">
-              <p className="rooms-unsplash-kicker">DABI / FINDROOMS</p>
-              <h1 className="rooms-hero-title"><span className="findroom-heading-hash">#</span> Find a room that feels like home.</h1>
-              <p className="rooms-hero-description">Verified rooms, trusted hostels, and clear prices for student living.</p>
-              <button className="rooms-hero-button" type="button" onClick={() => navigate('/findroom/explore')}>Explore rooms</button>
+        <section className="rooms-community-hero" aria-label="Dabi community hero">
+          <div className="rooms-community-hero-copy">
+            <p className="rooms-community-hero-kicker">DABI / COMMUNITY</p>
+            <h1><span className="findroom-heading-hash">#</span> Find rooms that fit your life and the people around you.</h1>
+            <p>Verified rooms, trusted hostels, and a community of students making the search easier.</p>
+            <div className="rooms-community-hero-actions">
+              <a href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer" className="rooms-community-hero-secondary">💚 Join Dabi Community</a>
             </div>
-            <div className="rooms-hero-collage" aria-hidden="true">
-              {heroRooms.length > 0 ? heroRooms.map((room, index) => (
-                <img key={room.id} className={`rooms-hero-collage-image rooms-hero-collage-image-${index + 1}`} src={room.photos[0]} alt="" />
-              )) : Array.from({ length: 6 }).map((_, index) => <span key={index} className={`rooms-hero-collage-image rooms-hero-collage-image-${index + 1} rooms-hero-collage-placeholder`} />)}
-            </div>
-          </article>
-
-          <button className="rooms-hero-module rooms-hero-compare" type="button" onClick={() => navigate('/findroom/explore')}>
-            <div className="rooms-hero-compare-copy">
-              <h2>Compare your room options</h2>
-              <p>Private, shared, studio, or self-contained.</p>
-            </div>
-            <div className="rooms-hero-compare-frame" aria-hidden="true">
-              {heroRooms.slice(1, 3).map((room) => <img key={room.id} src={room.photos[0]} alt="" />)}
-              <span className="rooms-hero-plus">+</span>
-            </div>
-          </button>
-
-          <button className="rooms-hero-module rooms-hero-featured" type="button" onClick={() => navigate('/findroom/rooms')}>
-            {featuredRoom ? <img src={featuredRoom.photos[0]} alt="" /> : <span className="rooms-hero-featured-placeholder" />}
-            <span className="rooms-hero-featured-overlay" />
-            <span className="rooms-hero-featured-copy">
-              <strong>{featuredRoom?.hostelName ?? 'Featured hostel'}</strong>
-              <small>{featuredRoom?.hostelLocation ?? 'Verified rooms on Dabi'}</small>
-            </span>
-          </button>
+          </div>
         </section>
 
         <form className="rooms-unsplash-search-bar" onSubmit={submitSearch}>
@@ -142,18 +116,30 @@ export default function Rooms() {
         {error && <ErrorState description={error} />}
 
         {!error && (
-          <section className="rooms-unsplash-grid" data-testid="masonry-grid-count-three">
-            {loading
-              ? Array.from({ length: 12 }).map((_, index) => (
-                  <article key={index} className="rooms-unsplash-tile rooms-unsplash-tile-skeleton" />
-                ))
-              : filteredRooms.map((room, index) => (
-                  <RoomCard key={room.id} room={room} index={index} />
-                ))}
-            {!loading && filteredRooms.length === 0 && (
-              <p className="rooms-empty-filter">No rooms match “{activeTag}” yet.</p>
-            )}
-          </section>
+          <>
+            <section className="rooms-unsplash-grid" data-testid="masonry-grid-count-three">
+              {loading
+                ? Array.from({ length: 12 }).map((_, index) => (
+                    <RoomCardSkeleton key={index} />
+                  ))
+                : filteredRooms.map((room, index) => (
+                    <RoomCard key={room.id} room={room} index={index} />
+                  ))}
+              {!loading && filteredRooms.length === 0 && (
+                <p className="rooms-empty-filter">No rooms match “{activeTag}” yet.</p>
+              )}
+            </section>
+
+            <section className="rooms-end-cta" aria-label="Need room help">
+              <p className="rooms-end-cta-kicker">Still haven’t found your room? 🥺</p>
+              <h2>Your perfect match might not be listed yet.</h2>
+              <p>Tell Dabi what you need and we’ll look for it with you.</p>
+              <div className="rooms-end-cta-actions">
+                <Link to="/findroom/request" className="rooms-end-cta-primary">Help Me Find a Room →</Link>
+                <a href={DABI_COMMUNITY_LINK} target="_blank" rel="noreferrer" className="rooms-end-cta-secondary">💚 Join Dabi Community</a>
+              </div>
+            </section>
+          </>
         )}
       </div>
     </FindRoomShell>

@@ -37,7 +37,9 @@ import {
 
 import styles from "./HostelManage.module.css";
 
-const FALLBACK_IMAGE = "/src/assets/images/camera.jpg";
+import fallbackImage from "../../assets/images/camera.avif";
+
+const FALLBACK_IMAGE = fallbackImage;
 
 const AVAILABILITY: { id: Availability; label: string; color: string; desc: string }[] = [
   {

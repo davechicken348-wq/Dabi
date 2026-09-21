@@ -1,5 +1,5 @@
 const DEFAULT_DABI_WHATSAPP_NUMBER = '233508417951';
-const DEFAULT_DABI_COMMUNITY_LINK = 'https://chat.whatsapp.com/BZPLJJyBFml2eweZwb3fwV';
+const DEFAULT_DABI_COMMUNITY_LINK = 'https://chat.whatsapp.com/BZPLJJyBFml2eweZwb3FwV';
 export const DABI_EMAIL = 'davechicken348@gmail.com';
 
 export const DABI_WHATSAPP_NUMBER = (import.meta.env.VITE_DABI_WHATSAPP_NUMBER ?? DEFAULT_DABI_WHATSAPP_NUMBER).replace(/\s+/g, '');

@@ -7,6 +7,7 @@ function toDTO(e: {
   id: string;
   name: string;
   phone: string;
+  email: string | null;
   school: string | null;
   hostelId: string | null;
   hostelName: string | null;
@@ -21,6 +22,7 @@ function toDTO(e: {
     id: e.id,
     name: e.name,
     phone: e.phone,
+    email: e.email ?? undefined,
     school: e.school ?? undefined,
     hostelId: e.hostelId ?? undefined,
     hostelName: e.hostelName ?? undefined,
@@ -45,6 +47,7 @@ export async function listEnquiries(): Promise<EnquiryDTO[]> {
 export async function createEnquiry(input: EnquiryCreate): Promise<EnquiryDTO> {
   const name = input.name?.trim();
   const phone = input.phone?.trim();
+  const email = input.email?.trim().toLowerCase() || null;
 
   if (!name) {
     throw new ApiError(400, "Full name is required.");
@@ -52,6 +55,10 @@ export async function createEnquiry(input: EnquiryCreate): Promise<EnquiryDTO> {
 
   if (!phone) {
     throw new ApiError(400, "Phone number is required.");
+  }
+
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    throw new ApiError(400, "Email address is invalid.");
   }
 
   const roomOfferingId = input.roomOfferingId?.trim();
@@ -96,6 +103,7 @@ export async function createEnquiry(input: EnquiryCreate): Promise<EnquiryDTO> {
     data: {
       name,
       phone,
+      email,
       school: input.school?.trim() || null,
       hostelId,
       roomOfferingId,

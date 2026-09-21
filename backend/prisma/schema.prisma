@@ -119,6 +119,7 @@ model Enquiry {
   id             String        @id @default(uuid())
   name           String
   phone          String
+  email          String?
   school         String?
   hostelId       String?
   hostel         Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
@@ -135,6 +136,21 @@ model Enquiry {
   @@index([roomOfferingId])
   @@index([status])
   @@index([createdAt])
+}
+
+model StudentAlertSubscription {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  preferredArea   String?
+  roomType        String?
+  budget          String?
+  facilities      String[] @default([])
+  active          Boolean  @default(true)
+  unsubscribeToken String  @unique @default(uuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([active])
 }
 
 // A tenancy is a confirmed (or pending) room booking for a hostel. It is the

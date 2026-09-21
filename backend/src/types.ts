@@ -101,6 +101,7 @@ export interface EnquiryDTO {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   school?: string;
   hostelId?: string;
   hostelName?: string;
@@ -117,6 +118,14 @@ export type EnquiryUpdate = Partial<Omit<EnquiryDTO, "id" | "createdAt">>;
 export type EnquiryCreate = Omit<EnquiryDTO, "id" | "createdAt" | "status"> & {
   status?: EnquiryStatus;
 };
+
+export interface StudentAlertSubscriptionCreate {
+  email: string;
+  preferredArea?: string;
+  roomType?: string;
+  budget?: string;
+  facilities?: string[];
+}
 
 export type TenancyStatus = "Pending" | "Active" | "Ended";
 

@@ -308,6 +308,38 @@
   line-height: 1.4;
 }
 
+.request-alert-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-green-50);
+  color: var(--color-charcoal);
+  cursor: pointer;
+}
+
+.request-alert-consent input {
+  margin-top: 0.2rem;
+  accent-color: var(--color-green);
+}
+
+.request-alert-consent span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: var(--text-sm);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.request-alert-consent small {
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
 .request-choice-list {
   display: flex;
   flex-wrap: wrap;

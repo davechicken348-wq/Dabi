@@ -35,12 +35,14 @@ export async function submitEnquiry(data: {
   message?: string;
   studentName?: string;
   phone?: string;
+  email?: string;
   school?: string;
   moveInDate?: string;
 }): Promise<Enquiry> {
   const created = await createEnquiryApi({
     name: data.studentName ?? 'Student',
     phone: data.phone ?? '',
+    email: data.email,
     school: data.school,
     hostelId: data.hostelId,
     ...(data.roomId ? { roomOfferingId: data.roomId } : {}),

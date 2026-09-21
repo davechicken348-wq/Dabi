@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DABI_AREA_OPTIONS, DABI_FACILITY_OPTIONS, DABI_ROOM_TYPE_OPTIONS } from '../../lib/constants';
 import { DABI_COMMUNITY_LINK, DABI_WHATSAPP_URL, buildDabiRoomRequestMessage, openDabiWhatsApp } from '../../lib/dabiContact';
+import { subscribeToStudentAlerts } from '../../services/api';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import './RequestHelp.css';
 
@@ -13,6 +14,8 @@ export default function RequestHelp() {
   const [form, setForm] = useState({
     name: '',
     phone: '',
+    email: '',
+    alerts: true,
     school: '',
     location: '',
     roomType: '',
@@ -44,7 +47,7 @@ export default function RequestHelp() {
     setFacilityInput('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -66,6 +69,15 @@ export default function RequestHelp() {
     });
 
     setSubmitting(true);
+    if (form.email.trim() && form.alerts) {
+      await subscribeToStudentAlerts({
+        email: form.email.trim(),
+        preferredArea: form.location,
+        roomType: form.roomType,
+        budget: form.budget,
+        facilities: form.preferences,
+      }).catch(() => undefined);
+    }
     const opened = openDabiWhatsApp(message);
     if (!opened) {
       window.location.href = `${DABI_WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
@@ -168,7 +180,17 @@ export default function RequestHelp() {
               <span>WhatsApp number</span>
               <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="0500000000" required />
             </label>
+
+            <label className="request-field">
+              <span>Email for room alerts <em>Optional</em></span>
+              <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="you@example.com" />
+            </label>
           </div>
+
+          <label className="request-alert-consent">
+            <input type="checkbox" checked={form.alerts} onChange={(e) => setForm((prev) => ({ ...prev, alerts: e.target.checked }))} />
+            <span><strong>Alert me when Dabi adds matching rooms.</strong><small>We’ll only use your email for useful room updates. You can unsubscribe anytime.</small></span>
+          </label>
 
           <div className="request-form-row">
             <label className="request-field">

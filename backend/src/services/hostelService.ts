@@ -3,6 +3,7 @@ import { ApiError } from "../utils/errors";
 import { computeLiveAvailability } from "../utils/availability";
 import { cached } from "../utils/cache";
 import { relocateImages } from "./storage";
+import { notifyStudentsAboutNewRooms } from "./studentAlertService";
 import type { HostelCreate, HostelDTO, HostelUpdate } from "../types";
 
 async function resolveFacilities(keys: string[]) {
@@ -235,12 +236,16 @@ export async function createHostel(input: HostelCreate): Promise<HostelDTO> {
         data: { photos, image },
         include: { facilities: true, roomOfferings: true },
       });
-      return toDTO(updated);
+      const updatedDTO = toDTO(updated);
+      await notifyStudentsAboutNewRooms(updatedDTO);
+      return updatedDTO;
     }
   }
 
   if (!createdHostel) throw new ApiError(404, "Hostel not found");
-  return toDTO(createdHostel);
+  const createdDTO = toDTO(createdHostel);
+  await notifyStudentsAboutNewRooms(createdDTO);
+  return createdDTO;
 }
 
 export async function updateHostel(id: string, patch: HostelUpdate): Promise<HostelDTO> {
@@ -298,7 +303,9 @@ export async function updateHostel(id: string, patch: HostelUpdate): Promise<Hos
     include: { facilities: true, roomOfferings: true },
   });
   if (!updated) throw new ApiError(404, "Hostel not found");
-  return toDTO(updated);
+  const updatedDTO = toDTO(updated);
+  if (patch.roomOfferings) await notifyStudentsAboutNewRooms(updatedDTO);
+  return updatedDTO;
 }
 
 export async function deleteHostel(id: string): Promise<void> {

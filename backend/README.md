@@ -44,8 +44,16 @@ The API runs on http://localhost:4000.
 | Owner    | Has many Hostels                                             |
 | Enquiry  | Optional `hostelId` (Hostel)                                 |
 | Deal     | Optional `hostelId` (Hostel), unique `code`                  |
-| Facility | Lookup table joined to Hostels                              |
+| Facility | Lookup table joined to Hostels                               |
 | Admin    | Admin login accounts (password stored scrypt-hashed)         |
+
+## Optional Brevo Environment Keys
+
+To enable student room alerts, verify a sender in Brevo, then set these optional environment variables in your `.env` file:
+
+BREVO_API_KEY=<your_brevo_api_key>
+EMAIL_FROM=your-verified-sender@example.com
+EMAIL_FROM_NAME=Dabi
 
 ## API (mounted under `/api`)
 

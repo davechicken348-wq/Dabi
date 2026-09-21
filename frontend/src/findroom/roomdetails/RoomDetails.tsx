@@ -8,6 +8,7 @@ import { RoomCard } from '../components/RoomCard/RoomCard';
 import { ShareDialog } from '../components/ShareDialog/ShareDialog';
 import { fetchHostels, fetchRooms } from '../../services/hostelService';
 import { submitEnquiry } from '../../services/enquiryService';
+import { subscribeToStudentAlerts } from '../../services/api';
 import { buildRoomShareUrl, generateRoomShareMessage } from '../../lib/sharing';
 import { formatDistanceFromStu, getDistanceFromStu } from '../../lib/distance';
 import type { Hostel } from '../../types';
@@ -43,9 +44,11 @@ export default function RoomDetails() {
   const [enquiryDialogOpen, setEnquiryDialogOpen] = useState(false);
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
   const [enquiryError, setEnquiryError] = useState('');
+  const [roomAlerts, setRoomAlerts] = useState(true);
   const [enquiryForm, setEnquiryForm] = useState({
     name: '',
     phone: '',
+    email: '',
     school: '',
     moveInDate: '',
     message: '',
@@ -103,6 +106,14 @@ export default function RoomDetails() {
     setEnquirySubmitting(true);
 
     try {
+      if (enquiryForm.email.trim() && roomAlerts) {
+        await subscribeToStudentAlerts({
+          email: enquiryForm.email.trim(),
+          roomType: selectedRoom.name,
+          facilities: selectedRoom.facilities,
+          preferredArea: selectedRoom.hostelLocation,
+        }).catch(() => undefined);
+      }
       await submitEnquiry({
         roomId: selectedRoom.id,
         hostelId: selectedRoom.hostelId,
@@ -110,6 +121,7 @@ export default function RoomDetails() {
         hostelName: selectedRoom.hostelName ?? 'Dabi hostel',
         studentName: enquiryForm.name.trim(),
         phone: enquiryForm.phone.trim(),
+        email: enquiryForm.email.trim() || undefined,
         school: enquiryForm.school.trim() || undefined,
         moveInDate: enquiryForm.moveInDate || undefined,
         message: enquiryForm.message.trim() || undefined,
@@ -230,6 +242,8 @@ export default function RoomDetails() {
                   {enquiryError && <div className="room-details-enquiry-error" role="alert">{enquiryError}</div>}
                   <label><span>Full name</span><input type="text" value={enquiryForm.name} onChange={(event) => updateEnquiryField('name', event.target.value)} placeholder="What should we call you?" required /></label>
                   <label><span>Phone number</span><input type="tel" value={enquiryForm.phone} onChange={(event) => updateEnquiryField('phone', event.target.value)} placeholder="024 XXX XXXX" required /></label>
+                  <label><span>Email for updates <em>Optional</em></span><input type="email" value={enquiryForm.email} onChange={(event) => updateEnquiryField('email', event.target.value)} placeholder="you@example.com" /></label>
+                  <label className="room-details-alert-consent"><input type="checkbox" checked={roomAlerts} onChange={(event) => setRoomAlerts(event.target.checked)} /><span>Alert me when Dabi adds similar rooms.</span></label>
                   <label><span>School <em>Optional</em></span><input type="text" value={enquiryForm.school} onChange={(event) => updateEnquiryField('school', event.target.value)} placeholder="Your school or workplace" /></label>
                   <label><span>Preferred move-in date <em>Optional</em></span><input type="date" value={enquiryForm.moveInDate} onChange={(event) => updateEnquiryField('moveInDate', event.target.value)} /></label>
                   <label><span>Message <em>Optional</em></span><textarea rows={3} value={enquiryForm.message} onChange={(event) => updateEnquiryField('message', event.target.value)} placeholder="Ask about viewing times or anything else..." /></label>

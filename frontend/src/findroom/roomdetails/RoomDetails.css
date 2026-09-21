@@ -131,6 +131,9 @@
 .room-details-enquiry-form { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-4); }
 .room-details-enquiry-form label { display: flex; flex-direction: column; gap: var(--space-1); }
 .room-details-enquiry-form label > span { color: var(--color-muted); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+.room-details-enquiry-form .room-details-alert-consent { flex-direction: row; align-items: flex-start; gap: 0.55rem; padding: 0.65rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-green-50); cursor: pointer; }
+.room-details-alert-consent input { width: auto; margin-top: 0.2rem; accent-color: var(--color-green); }
+.room-details-alert-consent span { color: var(--color-charcoal); font-size: var(--text-xs); font-weight: 600; text-transform: none; letter-spacing: 0; }
 .room-details-enquiry-form em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: 0; }
 .room-details-enquiry-form input,
 .room-details-enquiry-form textarea { width: 100%; padding: 0.65rem 0.75rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); background: var(--color-white); color: var(--color-charcoal); font: inherit; font-size: var(--text-sm); resize: vertical; }

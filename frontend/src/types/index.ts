@@ -46,6 +46,7 @@ export interface Enquiry {
   hostelId: string;
   roomName: string;
   hostelName: string;
+  email?: string;
   status: 'new' | 'reviewing' | 'contacted' | 'resolved';
   submittedAt: string;
   message?: string;

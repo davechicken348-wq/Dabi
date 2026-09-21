@@ -35,6 +35,7 @@ export async function updateOwner(id: string, value: unknown): Promise<any> { re
 export async function deleteOwner(id: string): Promise<void> { return request(`/owners/${id}`, remove()); }
 export async function fetchEnquiries(): Promise<any[]> { return request('/enquiries'); }
 export async function createEnquiry(value: unknown): Promise<any> { return request('/enquiries', body(value)); }
+export async function subscribeToStudentAlerts(value: unknown): Promise<any> { return request('/student-alerts', body(value)); }
 export async function updateEnquiry(id: string, value: unknown): Promise<any> { return request(`/enquiries/${id}`, patch(value)); }
 export async function deleteEnquiry(id: string): Promise<void> { return request(`/enquiries/${id}`, remove()); }
 export async function fetchDeals(): Promise<any[]> { return request('/deals'); }

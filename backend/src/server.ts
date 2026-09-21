@@ -16,6 +16,7 @@ import { requireAuth } from "./middleware/requireAuth";
 import { errorHandler } from "./middleware/errorHandler";
 import { seedIfEmpty } from "./prisma/seed";
 import { clearCache } from "./utils/cache";
+import studentAlertRoutes from "./routes/studentAlertRoutes";
 
 // GET endpoints consumed by the public site stay open; everything else under
 // /api requires a valid admin token.
@@ -23,7 +24,8 @@ const PUBLIC_GET = [/^\/hostels(\/[^/]+)?$/, /^\/facilities(\/[^/]+)?$/, /^\/enq
 
 // Public mutations that don't need an admin token — the enquiry form on the
 // public site is a lead-capture flow, so anonymous visitors must be able to POST.
-const PUBLIC_POST = [/^\/enquiries$/];
+const PUBLIC_POST = [/^\/enquiries$/, /^\/student-alerts$/];
+const PUBLIC_ALERT_GET = [/^\/student-alerts\/unsubscribe\/[A-Za-z0-9-]+$/];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.resolve(__dirname, "../uploads");
@@ -53,6 +55,7 @@ app.use("/api", (req, res, next) => {
   if (req.method === "POST" && PUBLIC_POST.some((re) => re.test(req.path))) {
     return next();
   }
+  if (req.method === "GET" && PUBLIC_ALERT_GET.some((re) => re.test(req.path))) return next();
   if (req.method !== "GET") {
     // Any mutation invalidates the read cache so list/dashboard views stay fresh.
     clearCache();
@@ -64,6 +67,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/hostels", hostelRoutes);
 app.use("/api/owners", ownerRoutes);
 app.use("/api/enquiries", enquiryRoutes);
+app.use("/api/student-alerts", studentAlertRoutes);
 app.use("/api/tenancies", tenancyRoutes);
 app.use("/api/deals", dealRoutes);
 app.use("/api/dashboard", dashboardRoutes);

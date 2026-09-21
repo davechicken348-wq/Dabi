@@ -1,6 +1,7 @@
 import { prisma } from "../prisma";
 import { ApiError } from "../utils/errors";
 import { cached } from "../utils/cache";
+import { sendAdminEnquiryNotification } from "./emailService";
 import type { EnquiryDTO, EnquiryUpdate, EnquiryCreate } from "../types";
 
 function toDTO(e: {
@@ -114,6 +115,18 @@ export async function createEnquiry(input: EnquiryCreate): Promise<EnquiryDTO> {
       status: input.status ?? "New",
     },
   });
+
+  await sendAdminEnquiryNotification({
+    name,
+    phone,
+    email,
+    school: input.school?.trim() || null,
+    hostelName,
+    roomType,
+    moveInDate: input.moveInDate ?? null,
+    message: input.message?.trim() || null,
+  });
+
   return toDTO(enquiry);
 }
 

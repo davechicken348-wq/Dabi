@@ -10,6 +10,7 @@ interface EnvConfig {
   DATABASE_URL: string;
   CLIENT_URL: string;
   JWT_SECRET: string;
+  ADMIN_EMAIL?: string;
   BREVO_API_KEY?: string;
   EMAIL_FROM?: string;
   EMAIL_FROM_NAME?: string;
@@ -72,6 +73,7 @@ export const env: EnvConfig = {
   DATABASE_URL,
   CLIENT_URL,
   JWT_SECRET,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL?.trim() || undefined,
   BREVO_API_KEY: process.env.BREVO_API_KEY?.trim() || undefined,
   EMAIL_FROM: process.env.EMAIL_FROM?.trim() || undefined,
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME?.trim() || "Dabi",

@@ -34,6 +34,7 @@ test("sendAdminEnquiryNotification posts to Brevo for the admin inbox", async ()
   assert.equal(calls[0].init.method, "POST");
   const body = JSON.parse(String(calls[0].init.body));
   assert.equal(body.to[0].email, "admin@dabi.com");
+  assert.ok(body.htmlContent.includes("New enquiry received"));
   assert.match(body.subject, /new enquiry/i);
 
   process.env.BREVO_API_KEY = originalBrevo;

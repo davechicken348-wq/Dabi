@@ -33,9 +33,11 @@ export async function sendAdminEnquiryNotification(payload: AdminEnquiryNotifica
     },
     body: JSON.stringify({
       sender: { email: env.EMAIL_FROM, name: env.EMAIL_FROM_NAME ?? "Dabi" },
-      to: [{ email: adminEmail }],
+      to: [{ email: adminEmail, name: "Dabi Admin" }],
+      replyTo: payload.email ? { email: payload.email, name: payload.name } : undefined,
       subject: `New enquiry from ${payload.name}`,
-      html: `
+      htmlContent: `
+        <html><body>
         <p><strong>New enquiry received</strong></p>
         <p><strong>Name:</strong> ${payload.name}<br>
         <strong>Phone:</strong> ${payload.phone}<br>
@@ -45,12 +47,24 @@ export async function sendAdminEnquiryNotification(payload: AdminEnquiryNotifica
         <strong>Room:</strong> ${payload.roomType ?? "Not provided"}<br>
         <strong>Move-in date:</strong> ${payload.moveInDate ?? "Not provided"}</p>
         <p><strong>Message:</strong><br>${payload.message ?? "No message"}</p>
+        </body></html>
       `,
+      textContent: [
+        `Name: ${payload.name}`,
+        `Phone: ${payload.phone}`,
+        `Email: ${payload.email ?? "Not provided"}`,
+        `School: ${payload.school ?? "Not provided"}`,
+        `Hostel: ${payload.hostelName ?? "Not provided"}`,
+        `Room: ${payload.roomType ?? "Not provided"}`,
+        `Move-in date: ${payload.moveInDate ?? "Not provided"}`,
+        `Message: ${payload.message ?? "No message"}`,
+      ].join("\n"),
     }),
   });
 
   if (!response.ok) {
-    console.error(`[email] Failed to send enquiry notification to admin ${adminEmail}: ${response.status}`);
+    const bodyText = await response.text();
+    console.error(`[email] Failed to send enquiry notification to admin ${adminEmail}: ${response.status} ${bodyText}`);
     return { sent: false };
   }
 

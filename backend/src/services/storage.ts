@@ -78,13 +78,13 @@ export async function saveImage(
 
   if (!isSvg) {
     try {
-      imageBuffer = await sharp(buffer)
-        .rotate()
-        .resize({ width: 2400, height: 2400, fit: "inside", withoutEnlargement: true })
-        .avif({ quality: 58, effort: 4 })
-        .toBuffer();
-      ext = ".avif";
-      contentType = "image/avif";
+      const metadata = await sharp(buffer).metadata();
+      if (!metadata.format) {
+        throw new Error("Missing image format");
+      }
+      imageBuffer = buffer;
+      ext = originalExt || ".jpg";
+      contentType = mimetype || `image/${metadata.format === "jpeg" ? "jpeg" : metadata.format}`;
     } catch {
       throw new ApiError(400, "The uploaded file is not a valid image");
     }

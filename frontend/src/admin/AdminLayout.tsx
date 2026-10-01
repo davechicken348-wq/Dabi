@@ -47,6 +47,7 @@ const groups: { items: { to: string; label: string; icon: NavIcon; end: boolean 
       items: [
         { to: "/admin/tenancies", label: "Tenancies", icon: SbList, end: false },
         { to: "/admin/deals", label: "Deals", icon: SbTag, end: false },
+        { to: "/admin/contact-unlocks", label: "Unlocks", icon: SbSliders, end: false },
         { to: "/admin/facilities", label: "Facilities", icon: SbSliders, end: false },
         { to: "/admin/docs", label: "Docs", icon: IconBook, end: false },
       ],
@@ -60,6 +61,7 @@ const titleMap: Record<string, string> = {
   "/admin/enquiries": "Enquiries",
   "/admin/tenancies": "Tenancies",
   "/admin/deals": "Deals",
+  "/admin/contact-unlocks": "Contact Unlocks",
   "/admin/facilities": "Facilities",
 };
 

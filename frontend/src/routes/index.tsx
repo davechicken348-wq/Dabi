@@ -27,6 +27,7 @@ import Tenancies from '../admin/Tenancies/Tenancies';
 import Deals from '../admin/Deals/Deals';
 import Facilities from '../admin/Facilities/Facilities';
 import Docs from '../admin/Docs/Docs';
+import ContactUnlocks from '../admin/ContactUnlocks/ContactUnlocks';
 import { FacilitiesProvider } from '../context/FacilitiesContext';
 
 export const router = createBrowserRouter([
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
           { path: 'deals', element: <Deals /> },
           { path: 'facilities', element: <Facilities /> },
           { path: 'docs', element: <Docs /> },
+          { path: 'contact-unlocks', element: <ContactUnlocks /> },
         ],
       },
     ],

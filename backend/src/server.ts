@@ -17,6 +17,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import { seedIfEmpty } from "./prisma/seed";
 import { clearCache } from "./utils/cache";
 import studentAlertRoutes from "./routes/studentAlertRoutes";
+import contactUnlockRoutes from "./routes/contactUnlockRoutes";
 
 // GET endpoints consumed by the public site stay open; everything else under
 // /api requires a valid admin token.
@@ -26,6 +27,10 @@ const PUBLIC_GET = [/^\/hostels(\/[^/]+)?$/, /^\/facilities(\/[^/]+)?$/, /^\/enq
 // public site is a lead-capture flow, so anonymous visitors must be able to POST.
 const PUBLIC_POST = [/^\/enquiries$/, /^\/student-alerts$/];
 const PUBLIC_ALERT_GET = [/^\/student-alerts\/unsubscribe\/[A-Za-z0-9-]+$/];
+
+// Public GET/POST routes for contact unlock (student-facing)
+const PUBLIC_UNLOCK_GET = [/^\/contact-unlocks\/fee$/, /^\/contact-unlocks\/check$/, /^\/contact-unlocks\/contact$/];
+const PUBLIC_UNLOCK_POST = [/^\/contact-unlocks\/initialize$/, /^\/contact-unlocks\/verify$/, /^\/contact-unlocks\/webhook$/];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.resolve(__dirname, "../uploads");
@@ -55,6 +60,8 @@ app.use("/api", (req, res, next) => {
   if (req.method === "POST" && PUBLIC_POST.some((re) => re.test(req.path))) {
     return next();
   }
+  if (req.method === "GET" && PUBLIC_UNLOCK_GET.some((re) => re.test(req.path))) return next();
+  if (req.method === "POST" && PUBLIC_UNLOCK_POST.some((re) => re.test(req.path))) return next();
   if (req.method === "GET" && PUBLIC_ALERT_GET.some((re) => re.test(req.path))) return next();
   if (req.method !== "GET") {
     // Any mutation invalidates the read cache so list/dashboard views stay fresh.
@@ -73,6 +80,7 @@ app.use("/api/deals", dealRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/facilities", facilityRoutes);
+app.use("/api/contact-unlocks", contactUnlockRoutes);
 
 app.use(errorHandler);
 

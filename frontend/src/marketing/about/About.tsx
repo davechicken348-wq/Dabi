@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import graffitiBg from '../../assets/images/graffiti4.avif';
 import './About.css';
 
 const DIFFERENTIATORS = [
@@ -36,15 +37,19 @@ export default function About() {
       <main>
 
         {/* ── Hero ── */}
-        <section className="about-hero">
-          <div className="about-hero-inner animate-fade-in-up">
-            <span className="about-eyebrow">About Dabi</span>
+        <section className="about-hero" style={{ backgroundImage: `url(${graffitiBg})` }}>
+          <div className="about-hero-overlay" aria-hidden="true" />
+          <div className="about-hero-inner">
             <h1 className="about-title">
-              Built because finding<br />a room shouldn't be this hard.
+              Built because finding a room shouldn't be this hard.
             </h1>
             <p className="about-subtitle">
-              Dabi started with a simple observation: students in Ghana spend weeks searching for accommodation near campus — calling numbers, walking streets, asking anyone who might know. The information exists. It's just scattered, unverified, and impossible to compare.
+              Students in Ghana spend weeks searching for accommodation near campus — calling numbers, walking streets, asking anyone who might know. The information exists. It's just scattered, unverified, and impossible to compare.
             </p>
+            <Link to="/findroom" className="about-hero-cta">
+              See what we've built
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M15.789 8C12.256 8 9.398 11.13 9.398 15M15.724 8C12.191 8 9.333 4.87 9.333 1M16 8H0" stroke="currentColor" strokeWidth="2"/></svg>
+            </Link>
           </div>
         </section>
 

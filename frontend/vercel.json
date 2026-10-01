@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/findroom/rooms/:roomId", "destination": "/api/room-og" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

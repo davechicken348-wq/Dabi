@@ -29,7 +29,7 @@
 }
 
 .request-header::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -5rem;
   bottom: -5rem;
@@ -108,7 +108,7 @@
 }
 
 .request-guide::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   opacity: 0.12;

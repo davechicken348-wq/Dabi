@@ -8,7 +8,7 @@
 }
 
 .marketing-section::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0 0 auto 0;
   height: 1px;
@@ -45,35 +45,32 @@
   align-items: flex-end;
   min-height: 100vh;
   overflow: hidden;
-  background-color: #19342d;
-  background-image:
-    linear-gradient(180deg, rgba(17, 37, 31, 0.45) 0%, rgba(17, 37, 31, 0.78) 70%, rgba(17, 37, 31, 0.95) 100%),
-    url('../../assets/images/motel.avif');
-  background-position: center;
   background-size: cover;
-  padding: clamp(4rem, 8vw, 7rem) var(--space-6) clamp(5rem, 9vw, 8rem);
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(5rem, 9vw, 8rem);
   box-sizing: border-box;
+}
+
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(17, 37, 31, 0.35) 0%,
+    rgba(17, 37, 31, 0.75) 65%,
+    rgba(17, 37, 31, 0.95) 100%
+  );
+  z-index: 0;
 }
 
 .about-hero-inner {
   position: relative;
   z-index: 1;
-  max-width: 980px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 var(--space-6);
   width: 100%;
-}
-
-.about-eyebrow {
-  display: inline-block;
-  padding: 0.35rem 0.875rem;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-green);
-  background-color: var(--color-green-50);
-  border-left: 3px solid var(--color-gold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-6);
 }
 
 .about-title {
@@ -88,12 +85,32 @@
 .about-subtitle {
   max-width: 620px;
   font-size: clamp(1rem, 2vw, 1.2rem);
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.75);
   line-height: 1.7;
+  margin-bottom: var(--space-8);
 }
 
-@media (max-width: 768px) {
-  .about-title { font-size: var(--text-3xl); }
+.about-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--color-white);
+  color: var(--color-charcoal);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.about-hero-cta:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .about-title { font-size: clamp(2rem, 8vw, 2.8rem); }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

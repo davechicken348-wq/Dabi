@@ -699,7 +699,7 @@
 }
 
 .explore-hero-community::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.12));

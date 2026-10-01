@@ -14,6 +14,9 @@ interface EnvConfig {
   BREVO_API_KEY?: string;
   EMAIL_FROM?: string;
   EMAIL_FROM_NAME?: string;
+  PAYSTACK_SECRET_KEY?: string;
+  CONTACT_UNLOCK_FEE: number;
+  CONTACT_UNLOCK_CURRENCY: string;
 }
 
 function fail(name: string, reason: string): never {
@@ -77,4 +80,7 @@ export const env: EnvConfig = {
   BREVO_API_KEY: process.env.BREVO_API_KEY?.trim() || undefined,
   EMAIL_FROM: process.env.EMAIL_FROM?.trim() || undefined,
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME?.trim() || "Dabi",
+  PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY?.trim() || undefined,
+  CONTACT_UNLOCK_FEE: Number(process.env.CONTACT_UNLOCK_FEE ?? 5) || 5,
+  CONTACT_UNLOCK_CURRENCY: process.env.CONTACT_UNLOCK_CURRENCY?.trim() || "GHS",
 };

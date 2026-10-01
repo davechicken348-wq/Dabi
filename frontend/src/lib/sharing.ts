@@ -28,9 +28,9 @@ export function getRoomCoverImage(room: Pick<RoomOption, 'photos'>, hostel?: Par
   return photos[0] ?? '/images/hostel-placeholder.svg';
 }
 
-export function buildRoomShareUrl(_roomId: string, origin?: string): string {
+export function buildRoomShareUrl(roomId: string, origin?: string): string {
   const baseOrigin = origin ?? (typeof window !== 'undefined' ? window.location.origin : 'https://dabi.example');
-  return new URL('/findroom/rooms', baseOrigin).toString();
+  return new URL(`/findroom/rooms/${roomId}`, baseOrigin).toString();
 }
 
 export function canUseNativeShare(): boolean {

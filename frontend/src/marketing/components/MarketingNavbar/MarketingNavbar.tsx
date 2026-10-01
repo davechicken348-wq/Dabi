@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Logo } from '../../../shared/Logo/Logo';
-import { Button } from '../../../shared/Button/Button';
 import './MarketingNavbar.css';
 
 export function MarketingNavbar() {
@@ -10,13 +9,10 @@ export function MarketingNavbar() {
   const [scrolled, setScrolled] = useState(false);
 
   const isMarketing = !location.pathname.startsWith('/findroom');
-  // Pages where the nav starts transparent over a dark hero
   const isHeroPage = location.pathname === '/marketing' || location.pathname === '/about';
 
-  // Close menu on route change
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
-  // Scroll listener — only meaningful on hero pages
   useEffect(() => {
     if (!isHeroPage) { setScrolled(false); return; }
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -25,7 +21,6 @@ export function MarketingNavbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [isHeroPage]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -67,36 +62,69 @@ export function MarketingNavbar() {
               </Link>
             );
           })}
-          {/* Mobile-only CTA inside the menu */}
-          <Link to="/findroom" className="mnav-mobile-cta" onClick={() => setMenuOpen(false)}>
-            Find a Room →
-          </Link>
+          {/* Mobile-only CTA removed — handled in mnav-mobile-panel */}
         </nav>
 
-        {/* Desktop CTA */}
-        <Link to="/findroom" className="mnav-cta" tabIndex={menuOpen ? -1 : 0}>
-          <Button size="sm" variant={transparent ? 'outline' : 'primary'}>Find a Room →</Button>
-        </Link>
+        {/* Desktop right-side actions */}
+        <div className="mnav-actions">
+          <Link to="/findroom" className="mnav-btn-outline">Find a Room</Link>
+          <Link to="/contact" className="mnav-btn-primary">Get in touch</Link>
+        </div>
 
-        {/* Hamburger */}
+        {/* Hamburger / Close */}
         <button
           type="button"
           className="mnav-toggle"
           aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
           aria-expanded={menuOpen}
-          aria-controls="mnav-links"
           onClick={() => setMenuOpen(o => !o)}
         >
-          <span className="mnav-toggle-bar" />
-          <span className="mnav-toggle-bar" />
-          <span className="mnav-toggle-bar" />
+          {menuOpen ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
         </button>
       </div>
 
-      {/* Mobile backdrop */}
-      {menuOpen && (
-        <div className="mnav-backdrop" aria-hidden="true" onClick={() => setMenuOpen(false)} />
-      )}
+        {/* Mobile menu panel */}
+        {menuOpen && (
+          <div className="mnav-mobile-panel" role="dialog" aria-label="Navigation menu">
+            <ul className="mnav-mobile-list">
+              {[
+                { to: '/marketing', label: 'Home' },
+                { to: '/about',     label: 'About' },
+                { to: '/contact',   label: 'Contact' },
+              ].map(({ to, label }) => {
+                const active = location.pathname === to;
+                return (
+                  <li className="mnav-mobile-item" key={to}>
+                    <Link
+                      to={to}
+                      className={`mnav-mobile-link${active ? ' mnav-mobile-link--active' : ''}`}
+                      aria-current={active ? 'page' : undefined}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mnav-mobile-footer">
+              <Link to="/findroom" className="mnav-mobile-cta-primary" onClick={() => setMenuOpen(false)}>
+                Find a Room
+              </Link>
+              <Link to="/contact" className="mnav-mobile-cta-ghost" onClick={() => setMenuOpen(false)}>
+                Get in touch
+              </Link>
+            </div>
+          </div>
+        )}
     </header>
   );
 }

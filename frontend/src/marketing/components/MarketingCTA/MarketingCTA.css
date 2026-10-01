@@ -1,44 +1,61 @@
 .marketing-cta {
+  background: #e8f5ee;
+  padding: clamp(5rem, 8vw, 7rem) 0;
   position: relative;
   overflow: hidden;
-  min-height: 100vh;
-  padding: clamp(6rem, 12vw, 11rem) var(--space-6);
-  background-color: #19342d;
-  color: var(--color-white);
-  text-align: center;
-  background-image:
-    linear-gradient(rgba(17, 37, 31, 0.55), rgba(17, 37, 31, 0.55)),
-    url('../../../assets/images/bed.avif');
-  background-position: center;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
+}
+
+.marketing-cta::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 50%;
+  height: 140%;
+  background: radial-gradient(ellipse, rgba(21, 105, 75, 0.07) 0%, transparent 65%);
+  pointer-events: none;
 }
 
 .marketing-cta-inner {
   max-width: 600px;
   margin: 0 auto;
+  text-align: center;
+  padding: 0 var(--space-6);
+  position: relative;
+  z-index: 1;
 }
 
 .marketing-cta-title {
-  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--color-charcoal);
   margin-bottom: var(--space-4);
-  color: var(--color-white);
 }
 
 .marketing-cta-subtitle {
-  font-size: var(--text-lg);
-  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--text-md);
+  color: var(--color-muted);
   margin-bottom: var(--space-8);
+  line-height: 1.6;
 }
 
-.marketing-cta .btn-primary {
-  background-color: var(--color-white);
-  color: var(--color-green);
+.marketing-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: var(--text-md);
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  background: var(--color-charcoal);
+  color: var(--color-white);
+  text-decoration: none;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  letter-spacing: 0.01em;
 }
 
-.marketing-cta .btn-primary:hover {
-  background-color: var(--color-ivory);
+.marketing-cta-btn:hover {
+  background: #2d3d35;
+  transform: translateY(-1px);
 }

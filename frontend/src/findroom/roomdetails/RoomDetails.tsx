@@ -1,19 +1,29 @@
 import { formatPricePeriod } from '../../lib/utils';
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import { formatGhanaCedi, getDabiFeeSummary } from '../../lib/pricing';
 import { ErrorState } from '../components/ErrorState/ErrorState';
 import { RoomCard } from '../components/RoomCard/RoomCard';
 import { ShareDialog } from '../components/ShareDialog/ShareDialog';
 import { fetchHostels, fetchRooms } from '../../services/hostelService';
-import { submitEnquiry } from '../../services/enquiryService';
-import { subscribeToStudentAlerts } from '../../services/api';
 import { buildRoomShareUrl, generateRoomShareMessage } from '../../lib/sharing';
 import { formatDistanceFromStu, getDistanceFromStu } from '../../lib/distance';
-import type { Hostel } from '../../types';
-import type { RoomOption } from '../../types';
-import { EnquirySuccessDialog } from './EnquirySuccessDialog';
+import { subscribeToStudentAlerts } from '../../services/api';
+import { submitEnquiry } from '../../services/enquiryService';
+import { buildEnquiryWhatsAppMessage, openWhatsAppWithMessage } from '../../lib/dabiContact';
+import {
+  getUnlockFee,
+  isContactUnlocked,
+  markRoomUnlocked,
+  startUnlockPayment,
+  verifyUnlockPayment,
+  getContactDetails,
+} from '../../services/contactUnlockService';
+import type { ContactDetails } from '../../services/contactUnlockService';
+import type { Hostel, RoomOption } from '../../types';
+import { UnlockCheckout } from './UnlockCheckout';
+import { UnlockSuccess } from './UnlockSuccess';
 import { RoomDetailsMap } from './RoomDetailsMap';
 import './RoomDetails.css';
 
@@ -35,34 +45,42 @@ function roomLabel(room: RoomOption): string {
 
 export default function RoomDetails() {
   const { roomId } = useParams<{ roomId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [room, setRoom] = useState<RoomOption | null>(null);
   const [hostel, setHostel] = useState<Hostel | null>(null);
   const [relatedRooms, setRelatedRooms] = useState<RoomOption[]>([]);
   const [saved, setSaved] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [unlockFee, setUnlockFee] = useState(5);
+  const [unlockCurrency, setUnlockCurrency] = useState('GHS');
+  const [unlocked, setUnlocked] = useState(false);
+  const [contact, setContact] = useState<ContactDetails | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [unlockError, setUnlockError] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const verifyAttempted = useRef(false);
+
+  // Enquiry (free path)
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [enquirySent, setEnquirySent] = useState(false);
-  const [enquiryDialogOpen, setEnquiryDialogOpen] = useState(false);
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
   const [enquiryError, setEnquiryError] = useState('');
   const [roomAlerts, setRoomAlerts] = useState(true);
-  const [enquiryForm, setEnquiryForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    school: '',
-    moveInDate: '',
-    message: '',
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', school: '', moveInDate: '', message: '' });
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    Promise.all([fetchRooms(), fetchHostels()])
-      .then(([rooms, hostels]) => {
+    Promise.all([fetchRooms(), fetchHostels(), getUnlockFee()])
+      .then(([rooms, hostels, fee]) => {
         if (cancelled) return;
         const selected = rooms.find((candidate) => candidate.id === roomId);
         if (!selected) {
@@ -74,7 +92,21 @@ export default function RoomDetails() {
         setHostel(hostels.find((candidate) => candidate.id === selected.hostelId) ?? null);
         setRelatedRooms(rooms.filter((candidate) => candidate.id !== selected.id && candidate.hostelId === selected.hostelId).slice(0, 6));
         setSaved(getSavedRoomIds().includes(selected.id));
+        setUnlockFee(fee.fee);
+        setUnlockCurrency(fee.currency);
         setLoading(false);
+
+        const roomOfferingId = selected.roomOfferingId ?? selected.id;
+        isContactUnlocked(roomOfferingId).then((alreadyUnlocked) => {
+          if (cancelled) return;
+          setUnlocked(alreadyUnlocked);
+          if (alreadyUnlocked) {
+            markRoomUnlocked(roomOfferingId);
+            getContactDetails(roomOfferingId).then((c) => {
+              if (!cancelled) setContact(c);
+            }).catch(() => undefined);
+          }
+        });
       })
       .catch(() => {
         if (cancelled) return;
@@ -85,6 +117,31 @@ export default function RoomDetails() {
     return () => { cancelled = true; };
   }, [roomId]);
 
+  useEffect(() => {
+    const ref = searchParams.get('unlock_ref');
+    if (!ref || verifyAttempted.current || !room) return;
+    verifyAttempted.current = true;
+    setVerifying(true);
+    setSearchParams((prev) => { prev.delete('unlock_ref'); return prev; }, { replace: true });
+
+    verifyUnlockPayment(ref)
+      .then((result) => {
+        if (result.status === 'paid' && result.contact) {
+          const roomOfferingId = room?.roomOfferingId ?? room?.id;
+          if (roomOfferingId) markRoomUnlocked(roomOfferingId);
+          setUnlocked(true);
+          setContact(result.contact);
+          setSuccessOpen(true);
+        } else {
+          setUnlockError("Payment didn't go through. 😕 Don't worry — your room hasn't changed. You can try again.");
+        }
+      })
+      .catch(() => {
+        setUnlockError("We couldn't verify your payment. Please try again or contact Dabi.");
+      })
+      .finally(() => setVerifying(false));
+  }, [room, searchParams, setSearchParams]);
+
   const toggleSaved = () => {
     if (!room) return;
     const current = getSavedRoomIds();
@@ -94,31 +151,35 @@ export default function RoomDetails() {
     setSaved(next.includes(room.id));
   };
 
-  const updateEnquiryField = (field: keyof typeof enquiryForm, value: string) => {
-    setEnquiryForm((current) => ({ ...current, [field]: value }));
+  const handleUnlockPay = async (email: string) => {
+    if (!room) return;
+    const roomOfferingId = room.roomOfferingId ?? room.id;
+    const result = await startUnlockPayment(roomOfferingId, email);
+    window.location.href = result.authorizationUrl;
   };
 
-  const handleEnquirySubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const updateEnquiryField = (field: keyof typeof enquiryForm, value: string) =>
+    setEnquiryForm((prev) => ({ ...prev, [field]: value }));
+
+  const handleEnquirySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!room) return;
-    const selectedRoom = room;
     setEnquiryError('');
     setEnquirySubmitting(true);
-
     try {
       if (enquiryForm.email.trim() && roomAlerts) {
         await subscribeToStudentAlerts({
           email: enquiryForm.email.trim(),
-          roomType: selectedRoom.name,
-          facilities: selectedRoom.facilities,
-          preferredArea: selectedRoom.hostelLocation,
+          roomType: room.name,
+          facilities: room.facilities,
+          preferredArea: room.hostelLocation,
         }).catch(() => undefined);
       }
       await submitEnquiry({
-        roomId: selectedRoom.id,
-        hostelId: selectedRoom.hostelId,
-        roomName: selectedRoom.name,
-        hostelName: selectedRoom.hostelName ?? 'Dabi hostel',
+        roomId: room.roomOfferingId ?? room.id,
+        hostelId: room.hostelId,
+        roomName: room.name,
+        hostelName: room.hostelName ?? 'Dabi hostel',
         studentName: enquiryForm.name.trim(),
         phone: enquiryForm.phone.trim(),
         email: enquiryForm.email.trim() || undefined,
@@ -127,11 +188,36 @@ export default function RoomDetails() {
         message: enquiryForm.message.trim() || undefined,
       });
       setEnquirySent(true);
-      setEnquiryDialogOpen(true);
+      const waMessage = buildEnquiryWhatsAppMessage({
+        studentName: enquiryForm.name.trim(),
+        phone: enquiryForm.phone.trim(),
+        roomName: room.name,
+        hostelName: room.hostelName ?? 'Hostel',
+        hostelLocation: room.hostelLocation,
+        pricePerYear: room.pricePerYear,
+        pricingPeriod: room.pricingPeriod,
+        school: enquiryForm.school.trim() || undefined,
+        moveInDate: enquiryForm.moveInDate || undefined,
+        message: enquiryForm.message.trim() || undefined,
+        roomUrl: buildRoomShareUrl(room.id),
+      });
+      openWhatsAppWithMessage(waMessage);
     } catch {
-      setEnquiryError('We could not send your enquiry. Please check your details and try again.');
+      setEnquiryError('Could not send your enquiry. Please check your details and try again.');
     } finally {
       setEnquirySubmitting(false);
+    }
+  };
+
+  const handleViewContact = async () => {
+    if (!room) return;
+    const roomOfferingId = room.roomOfferingId ?? room.id;
+    try {
+      const c = await getContactDetails(roomOfferingId);
+      setContact(c);
+      setSuccessOpen(true);
+    } catch {
+      setUnlockError('Could not load contact details. Please try again.');
     }
   };
 
@@ -146,7 +232,6 @@ export default function RoomDetails() {
   const photos = room.photos.length > 0 ? room.photos : ['/placeholder-room.svg'];
   const availability = room.availableUnits > 0 ? `${room.availableUnits} available` : 'Currently full';
   const distanceLabel = formatDistanceFromStu(hostel ? getDistanceFromStu(hostel) : undefined);
-  const feeSummary = getDabiFeeSummary(room.pricePerYear);
   const roomShareUrl = buildRoomShareUrl(room.id);
   const roomShareText = generateRoomShareMessage(
     {
@@ -180,11 +265,33 @@ export default function RoomDetails() {
         </header>
 
         <section className="room-details-gallery" aria-label={`${roomLabel(room)} photos`}>
-          <div className="room-details-featured-photo"><img src={photos[0]} alt={`${roomLabel(room)} at ${room.hostelName ?? 'hostel'}`} /></div>
+          <div className="room-details-featured-photo">
+            <button className="room-details-photo-btn" type="button" onClick={() => setLightboxIndex(0)} aria-label="View full image">
+              <img src={photos[0]} alt={`${roomLabel(room)} at ${room.hostelName ?? 'hostel'}`} />
+            </button>
+          </div>
           <div className="room-details-photo-grid">
-            {photos.slice(1, 5).map((photo, index) => <img key={`${photo}-${index}`} src={photo} alt={`${roomLabel(room)} view ${index + 2}`} />)}
+            {photos.slice(1, 5).map((photo, index) => (
+              <button key={`${photo}-${index}`} className="room-details-photo-btn" type="button" onClick={() => setLightboxIndex(index + 1)} aria-label={`View full image ${index + 2}`}>
+                <img src={photo} alt={`${roomLabel(room)} view ${index + 2}`} />
+              </button>
+            ))}
           </div>
         </section>
+
+        {lightboxIndex !== null && (
+          <div className="room-details-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={() => setLightboxIndex(null)}>
+            <button className="room-details-lightbox-close" type="button" onClick={() => setLightboxIndex(null)} aria-label="Close">✕</button>
+            {photos.length > 1 && (
+              <button className="room-details-lightbox-prev" type="button" onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + photos.length) % photos.length); }} aria-label="Previous">‹</button>
+            )}
+            <img src={photos[lightboxIndex]} alt={`${roomLabel(room)} photo ${lightboxIndex + 1}`} onClick={(e) => e.stopPropagation()} />
+            {photos.length > 1 && (
+              <button className="room-details-lightbox-next" type="button" onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % photos.length); }} aria-label="Next">›</button>
+            )}
+            <span className="room-details-lightbox-counter">{lightboxIndex + 1} / {photos.length}</span>
+          </div>
+        )}
 
         <div className="room-details-layout">
           <div className="room-details-main">
@@ -214,48 +321,121 @@ export default function RoomDetails() {
           </div>
 
           <aside className="room-details-booking">
-            {enquirySent ? (
-              <div className="room-details-enquiry-success" role="status">
-                <strong>Enquiry sent.</strong>
-                <p>Dabi has received your request for this room. We will be in touch with the next steps.</p>
-                <button className="room-details-secondary" type="button" onClick={() => setEnquirySent(false)}>Send another enquiry</button>
+            <div className="room-details-price">
+              <strong>{formatGhanaCedi(room.pricePerYear)}/{formatPricePeriod(room.pricingPeriod)}</strong>
+              <div className="room-details-fee-breakdown">
+                <span>Dabi agent fee (5%)</span>
+                <strong>{formatGhanaCedi(getDabiFeeSummary(room.pricePerYear).fee)}</strong>
               </div>
-            ) : (
-              <>
-                <div className="room-details-price">
-                  <strong>{formatGhanaCedi(room.pricePerYear)}/{formatPricePeriod(room.pricingPeriod)}</strong>
-                  <div className="room-details-fee-breakdown">
-                    <span>Dabi service fee</span>
-                    <strong>5% • {formatGhanaCedi(feeSummary.fee)}</strong>
-                  </div>
-                  <div className="room-details-total-row">
-                    <span>Total with Dabi service</span>
-                    <strong>{formatGhanaCedi(feeSummary.total)}</strong>
-                  </div>
-                  <small className="room-details-fee-note">Your Dabi service fee helps us connect you with the property, coordinate your room search and assist you through the process.</small>
+              <div className="room-details-total-row">
+                <span>Total you pay</span>
+                <strong>{formatGhanaCedi(getDabiFeeSummary(room.pricePerYear).total)}</strong>
+              </div>
+              <small className="room-details-fee-note">Dabi's 5% agent fee covers finding the room, coordinating viewings, and supporting you through the process.</small>
+              <div className="room-details-avail-badge" data-status={room.availabilityStatus ?? 'Available'}>
+                {room.availabilityStatus === 'Full' ? '🔴 Currently full' : room.availabilityStatus === 'Limited' ? '🟡 Limited availability' : '🟢 Available'}
+              </div>
+            </div>
+
+            <div className="room-details-unlock-section">
+              <div className="room-details-unlock-heading">
+                <p className="room-details-unlock-eyebrow">Found something you like? 👀</p>
+                <h2>Get the owner's contact &amp; viewing details</h2>
+                <p>Pay a small unlock fee to get the owner's contact and arrange a viewing directly.</p>
+              </div>
+
+              {verifying && (
+                <div className="room-details-unlock-verifying" role="status" aria-live="polite">
+                  Verifying your payment…
                 </div>
-                <div className="room-details-enquiry-heading">
-                  <h2>Interested in this room?</h2>
-                  <p>Share your details and Dabi will help with availability and viewing times.</p>
+              )}
+
+              {unlockError && (
+                <div className="room-details-unlock-error" role="alert">
+                  <p>{unlockError}</p>
+                  <button type="button" className="room-details-secondary" onClick={() => setUnlockError('')}>Try again</button>
                 </div>
-                <form className="room-details-enquiry-form" onSubmit={handleEnquirySubmit}>
-                  {enquiryError && <div className="room-details-enquiry-error" role="alert">{enquiryError}</div>}
-                  <label><span>Full name</span><input type="text" value={enquiryForm.name} onChange={(event) => updateEnquiryField('name', event.target.value)} placeholder="What should we call you?" required /></label>
-                  <label><span>Phone number</span><input type="tel" value={enquiryForm.phone} onChange={(event) => updateEnquiryField('phone', event.target.value)} placeholder="024 XXX XXXX" required /></label>
-                  <label><span>Email for updates <em>Optional</em></span><input type="email" value={enquiryForm.email} onChange={(event) => updateEnquiryField('email', event.target.value)} placeholder="you@example.com" /></label>
-                  <label className="room-details-alert-consent"><input type="checkbox" checked={roomAlerts} onChange={(event) => setRoomAlerts(event.target.checked)} /><span>Alert me when Dabi adds similar rooms.</span></label>
-                  <label><span>School <em>Optional</em></span><input type="text" value={enquiryForm.school} onChange={(event) => updateEnquiryField('school', event.target.value)} placeholder="Your school or workplace" /></label>
-                  <label><span>Preferred move-in date <em>Optional</em></span><input type="date" value={enquiryForm.moveInDate} onChange={(event) => updateEnquiryField('moveInDate', event.target.value)} /></label>
-                  <label><span>Message <em>Optional</em></span><textarea rows={3} value={enquiryForm.message} onChange={(event) => updateEnquiryField('message', event.target.value)} placeholder="Ask about viewing times or anything else..." /></label>
-                  <button className="room-details-primary" type="submit" disabled={enquirySubmitting}>{enquirySubmitting ? 'Sending enquiry...' : 'Send enquiry'}</button>
-                </form>
-                <p>This is not a booking. Dabi will help you take the next step.</p>
-              </>
-            )}
+              )}
+
+              {!verifying && !unlockError && (
+                unlocked ? (
+                  <div className="room-details-unlock-done">
+                    <p className="room-details-unlock-done-label" aria-label="Contact unlocked">
+                      <span aria-hidden="true">✓</span> Contact unlocked
+                    </p>
+                    <p className="room-details-unlock-done-sub">Welcome back. Your contact is already unlocked. 😊</p>
+                    <button className="room-details-primary" type="button" onClick={handleViewContact}>
+                      View Contact &amp; Viewing Details ✓
+                    </button>
+                  </div>
+                ) : (
+                  <div className="room-details-unlock-cta">
+                    <button
+                      className="room-details-unlock-btn"
+                      type="button"
+                      onClick={() => setCheckoutOpen(true)}
+                    >
+                      Get Contact &amp; Viewing Details — GH₵{unlockFee}
+                    </button>
+                    <p className="room-details-unlock-disclaimer">
+                      <span aria-hidden="true">🔒</span> This unlock fee gives you access to the owner's contact and viewing details. It does not reserve the room.
+                    </p>
+                  </div>
+                )
+              )}
+
+              {/* ── Free path divider ── */}
+              {!unlocked && !verifying && (
+                <>
+                  <div className="room-details-or-divider" aria-hidden="true">
+                    <span>or</span>
+                  </div>
+
+                  {enquirySent ? (
+                    <div className="room-details-enquiry-success" role="status">
+                      <strong>Enquiry sent. 🫶🏽</strong>
+                      <p>Dabi has your details and will be in touch to help you take the next step.</p>
+                      <button className="room-details-secondary" type="button" onClick={() => { setEnquirySent(false); setEnquiryOpen(false); }}>Send another</button>
+                    </div>
+                  ) : enquiryOpen ? (
+                    <>
+                      <div className="room-details-enquiry-heading">
+                        <h2>Let Dabi help you 🫶🏽</h2>
+                        <p>Dabi acts as your agent — we contact the owner, coordinate the viewing, and guide you through the process. A <strong>5% agent fee</strong> ({formatGhanaCedi(getDabiFeeSummary(room.pricePerYear).fee)}) applies on top of the room price if you proceed.</p>
+                      </div>
+                      <form className="room-details-enquiry-form" onSubmit={handleEnquirySubmit}>
+                        {enquiryError && <div className="room-details-enquiry-error" role="alert">{enquiryError}</div>}
+                        <label><span>Full name</span><input type="text" value={enquiryForm.name} onChange={(e) => updateEnquiryField('name', e.target.value)} placeholder="What should we call you?" required /></label>
+                        <label><span>Phone number</span><input type="tel" value={enquiryForm.phone} onChange={(e) => updateEnquiryField('phone', e.target.value)} placeholder="024 XXX XXXX" required /></label>
+                        <label><span>Email <em>Optional</em></span><input type="email" value={enquiryForm.email} onChange={(e) => updateEnquiryField('email', e.target.value)} placeholder="you@example.com" /></label>
+                        <label className="room-details-alert-consent"><input type="checkbox" checked={roomAlerts} onChange={(e) => setRoomAlerts(e.target.checked)} /><span>Alert me when Dabi adds new rooms.</span></label>
+                        <label><span>School <em>Optional</em></span><input type="text" value={enquiryForm.school} onChange={(e) => updateEnquiryField('school', e.target.value)} placeholder="Your school or workplace" /></label>
+                        <label><span>Move-in date <em>Optional</em></span><input type="date" value={enquiryForm.moveInDate} onChange={(e) => updateEnquiryField('moveInDate', e.target.value)} /></label>
+                        <label><span>Message <em>Optional</em></span><textarea rows={3} value={enquiryForm.message} onChange={(e) => updateEnquiryField('message', e.target.value)} placeholder="Any questions for Dabi?" /></label>
+                        <button className="room-details-primary" type="submit" disabled={enquirySubmitting}>{enquirySubmitting ? 'Sending…' : 'Send to Dabi'}</button>
+                        <button className="room-details-secondary" type="button" onClick={() => setEnquiryOpen(false)}>Cancel</button>
+                      </form>
+                    </>
+                  ) : (
+                    <button className="room-details-agent-btn" type="button" onClick={() => setEnquiryOpen(true)}>
+                      Use Dabi as my agent — 5% fee on move-in
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </aside>
         </div>
 
-        {relatedRooms.length > 0 && <section className="room-details-related" aria-labelledby="related-rooms-title"><h2 id="related-rooms-title">More rooms at this hostel</h2><div className="room-details-related-grid">{relatedRooms.map((relatedRoom) => <RoomCard key={relatedRoom.id} room={relatedRoom} />)}</div></section>}
+        {relatedRooms.length > 0 && (
+          <section className="room-details-related" aria-labelledby="related-rooms-title">
+            <h2 id="related-rooms-title">More rooms at this hostel</h2>
+            <div className="room-details-related-grid">
+              {relatedRooms.map((relatedRoom) => <RoomCard key={relatedRoom.id} room={relatedRoom} />)}
+            </div>
+          </section>
+        )}
+
         <ShareDialog
           open={shareOpen}
           title={`${room.name} at ${room.hostelName ?? 'Hostel'}`}
@@ -263,12 +443,23 @@ export default function RoomDetails() {
           shareUrl={roomShareUrl}
           onClose={() => setShareOpen(false)}
         />
-        <EnquirySuccessDialog
-          open={enquiryDialogOpen}
-          roomName={roomLabel(room)}
-          hostelName={room.hostelName ?? 'Dabi hostel'}
-          onClose={() => setEnquiryDialogOpen(false)}
-        />
+
+        {checkoutOpen && (
+          <UnlockCheckout
+            room={room}
+            unlockFee={unlockFee}
+            currency={unlockCurrency}
+            onPay={handleUnlockPay}
+            onCancel={() => setCheckoutOpen(false)}
+          />
+        )}
+
+        {successOpen && contact && (
+          <UnlockSuccess
+            contact={contact}
+            onClose={() => setSuccessOpen(false)}
+          />
+        )}
       </article>
     </FindRoomShell>
   );

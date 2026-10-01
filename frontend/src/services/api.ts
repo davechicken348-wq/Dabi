@@ -69,3 +69,11 @@ export async function uploadHostelImage(file: File, folder?: string): Promise<st
 }
 export async function confirmTenancy(id: string): Promise<any> { return request(`/tenancies/${id}/confirm`, { method: 'POST' }); }
 export async function endTenancy(id: string): Promise<any> { return request(`/tenancies/${id}/end`, { method: 'POST' }); }
+
+// Contact unlock
+export async function fetchContactUnlockFee(): Promise<{ fee: number; currency: string }> { return request('/contact-unlocks/fee'); }
+export async function checkContactUnlock(roomOfferingId: string, studentRef: string): Promise<{ unlocked: boolean }> { return request(`/contact-unlocks/check?roomOfferingId=${encodeURIComponent(roomOfferingId)}&studentRef=${encodeURIComponent(studentRef)}`); }
+export async function initializeContactUnlock(value: unknown): Promise<any> { return request('/contact-unlocks/initialize', body(value)); }
+export async function verifyContactUnlock(reference: string): Promise<any> { return request('/contact-unlocks/verify', body({ reference })); }
+export async function fetchContactDetails(roomOfferingId: string, studentRef: string): Promise<any> { return request(`/contact-unlocks/contact?roomOfferingId=${encodeURIComponent(roomOfferingId)}&studentRef=${encodeURIComponent(studentRef)}`); }
+export async function fetchContactUnlocks(): Promise<any[]> { return request('/contact-unlocks'); }

@@ -27,7 +27,7 @@
 }
 
 .rooms-community-hero::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.12));
@@ -400,7 +400,7 @@
 }
 
 .rooms-unsplash-tile::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 55%, rgba(0, 0, 0, 0.55) 100%);
@@ -845,7 +845,7 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(12, 38, 31, 0.32), rgba(12, 38, 31, 0.9) 82%);
-    content: '';
+    content: "";
   }
 
   .rooms-community-hero-copy {

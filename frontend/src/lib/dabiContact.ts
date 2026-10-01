@@ -50,7 +50,45 @@ export function buildDabiRoomRequestMessage(form: {
   return lines.join('\n');
 }
 
-export function openDabiWhatsApp(message: string): boolean {
+export function buildEnquiryWhatsAppMessage(data: {
+  studentName: string;
+  phone: string;
+  roomName: string;
+  hostelName: string;
+  hostelLocation?: string;
+  pricePerYear?: number;
+  pricingPeriod?: string;
+  school?: string;
+  moveInDate?: string;
+  message?: string;
+  roomUrl: string;
+}): string {
+  const period = data.pricingPeriod === 'Semester' ? 'semester' : data.pricingPeriod === 'Month' ? 'month' : 'academic year';
+  const lines = [
+    '🏠 *New Room Enquiry — Dabi*',
+    '',
+    `👤 *Name:* ${data.studentName}`,
+    `📱 *Phone:* ${data.phone}`,
+  ];
+
+  if (data.school) lines.push(`🎓 *School:* ${data.school}`);
+
+  lines.push(
+    '',
+    `🛏️ *Room:* ${data.roomName} at ${data.hostelName}`,
+  );
+
+  if (data.hostelLocation) lines.push(`📍 *Location:* ${data.hostelLocation}`);
+  if (data.pricePerYear) lines.push(`💰 *Price:* GH₵${data.pricePerYear.toLocaleString()} / ${period}`);
+  if (data.moveInDate) lines.push(`📅 *Move-in:* ${data.moveInDate}`);
+  if (data.message) lines.push(``, `📝 *Message:* ${data.message}`);
+
+  lines.push('', `🔗 *Room link:* ${data.roomUrl}`);
+
+  return lines.join('\n');
+}
+
+export function openWhatsAppWithMessage(message: string): boolean {
   if (typeof window === 'undefined') return false;
 
   const url = `${DABI_WHATSAPP_URL}?text=${encodeURIComponent(message)}`;

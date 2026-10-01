@@ -36,6 +36,13 @@ enum TenancyStatus {
   Ended
 }
 
+enum ContactUnlockStatus {
+  Pending
+  Paid
+  Failed
+  Refunded
+}
+
 model Hostel {
   id              String       @id @default(uuid())
   slug            String       @unique
@@ -106,8 +113,9 @@ model RoomOffering {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  enquiries Enquiry[]
-  tenancies Tenancy[]
+  enquiries      Enquiry[]
+  tenancies      Tenancy[]
+  contactUnlocks ContactUnlock[]
 
   @@index([hostelId])
   @@index([roomType])
@@ -208,6 +216,26 @@ model Facility {
 
 // Admin accounts back the admin login (Login page). Passwords are stored
 // hashed; see auth work when the frontend is wired to the API.
+model ContactUnlock {
+  id             String              @id @default(cuid())
+  studentRef     String
+  studentEmail   String?
+  roomOfferingId String
+  amount         Int
+  currency       String              @default("GHS")
+  provider       String              @default("paystack")
+  reference      String              @unique
+  status         ContactUnlockStatus @default(Pending)
+  createdAt      DateTime            @default(now())
+  paidAt         DateTime?
+
+  roomOffering RoomOffering @relation(fields: [roomOfferingId], references: [id], onDelete: Cascade)
+
+  @@index([studentRef])
+  @@index([roomOfferingId])
+  @@index([status])
+}
+
 model Admin {
   id        String   @id @default(uuid())
   name      String

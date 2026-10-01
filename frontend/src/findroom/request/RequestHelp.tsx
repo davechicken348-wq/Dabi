@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DABI_AREA_OPTIONS, DABI_FACILITY_OPTIONS, DABI_ROOM_TYPE_OPTIONS } from '../../lib/constants';
-import { DABI_COMMUNITY_LINK, DABI_WHATSAPP_URL, buildDabiRoomRequestMessage, openDabiWhatsApp } from '../../lib/dabiContact';
+import { DABI_COMMUNITY_LINK, DABI_WHATSAPP_URL, buildDabiRoomRequestMessage, openWhatsAppWithMessage } from '../../lib/dabiContact';
 import { subscribeToStudentAlerts } from '../../services/api';
 import { FindRoomShell } from '../components/FindRoomShell/FindRoomShell';
 import './RequestHelp.css';
@@ -78,7 +78,7 @@ export default function RequestHelp() {
         facilities: form.preferences,
       }).catch(() => undefined);
     }
-    const opened = openDabiWhatsApp(message);
+    const opened = openWhatsAppWithMessage(message);
     if (!opened) {
       window.location.href = `${DABI_WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
     }

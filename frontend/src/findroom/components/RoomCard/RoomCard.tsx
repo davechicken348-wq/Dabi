@@ -8,6 +8,7 @@ import {
 import { formatGhanaCedi, getDabiFeeSummary } from '../../../lib/pricing';
 import { formatPricePeriod } from '../../../lib/utils';
 import { ShareDialog } from '../ShareDialog/ShareDialog';
+import { getUnlockedRoomIds } from '../../../services/contactUnlockService';
 import './RoomCard.css';
 
 const SAVED_KEY = 'dabi-saved-rooms';
@@ -35,10 +36,12 @@ interface RoomCardProps {
 export function RoomCard({ room, index = 0 }: RoomCardProps) {
   const [shareOpen, setShareOpen] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   useEffect(() => {
     setSaved(getSavedRoomIds().includes(room.id));
-  }, [room.id]);
+    setIsUnlocked(getUnlockedRoomIds().includes(room.roomOfferingId ?? room.id));
+  }, [room.id, room.roomOfferingId]);
 
   const toggleSave = () => {
     const current = getSavedRoomIds();
@@ -122,16 +125,20 @@ export function RoomCard({ room, index = 0 }: RoomCardProps) {
             <div className="room-card-overlay-foreground">
               <div className="room-card-actions-top">
                 <div>
-                  <Link
-                    className="room-card-plus-link"
-                    rel="nofollow"
-                    to={`/findroom/rooms/${room.id}`}
-                    data-discover="true"
-                  >
-                    <svg className="room-card-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M11.281 8.3H8.156V3.125L11.281 1v7.3Zm.316 4.05H4.955V7.868L1.5 10.636v4.55h6.656V22h4.713l3.552-2.84h-4.824v-6.81Zm4.24 0v2.835h4.587l2.911-2.834h-7.497Z" />
-                    </svg>
-                  </Link>
+                  {isUnlocked ? (
+                    <span className="room-card-unlocked-badge">✓ Unlocked</span>
+                  ) : (
+                    <Link
+                      className="room-card-plus-link"
+                      rel="nofollow"
+                      to={`/findroom/rooms/${room.id}`}
+                      data-discover="true"
+                    >
+                      <svg className="room-card-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11.281 8.3H8.156V3.125L11.281 1v7.3Zm.316 4.05H4.955V7.868L1.5 10.636v4.55h6.656V22h4.713l3.552-2.84h-4.824v-6.81Zm4.24 0v2.835h4.587l2.911-2.834h-7.497Z" />
+                      </svg>
+                    </Link>
+                  )}
                 </div>
                 <div className="room-card-actions-top-right">
                   <div className="showOnHover">

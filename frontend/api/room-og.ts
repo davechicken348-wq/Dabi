@@ -2,14 +2,9 @@ export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request) {
   const url = new URL(req.url);
-  const roomId = url.pathname.split('/').pop();
+  const roomId = url.searchParams.get('roomId') ?? url.pathname.split('/').pop();
 
-  // Only bots / crawlers need OG tags — real browsers get the SPA as normal.
-  // WhatsApp, Telegram, Twitter, Slack, iMessage all send a recognisable UA.
-  const ua = req.headers.get('user-agent') ?? '';
-  const isCrawler = /whatsapp|facebookexternalhit|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|iframely|preview/i.test(ua);
-
-  if (!isCrawler || !roomId) {
+  if (!roomId) {
     return new Response(null, { status: 200 });
   }
 
@@ -19,7 +14,7 @@ export default async function handler(req: Request) {
   let ogTitle = 'Dabi — Find Your Room';
   let ogDescription = 'Verified student accommodation near your campus.';
   let ogImage = 'https://dabi.vercel.app/og-default.jpg';
-  let ogUrl = url.toString();
+  const ogUrl = `${url.origin}/findroom/rooms/${roomId}`;
 
   try {
     const res = await fetch(`${apiUrl}/api/hostels`);

@@ -10,7 +10,7 @@ export default async function handler(req: Request) {
   const isCrawler = /whatsapp|facebookexternalhit|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|iframely|preview/i.test(ua);
 
   if (!isCrawler || !roomId) {
-    return; // let Vercel's SPA rewrite handle it normally
+    return new Response(null, { status: 200 });
   }
 
   const env = globalThis as unknown as Record<string, string>;

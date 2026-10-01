@@ -1,6 +1,16 @@
 {
-  "rewrites": [
-    { "source": "/findroom/rooms/:roomId", "destination": "/api/room-og" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    {
+      "src": "/findroom/rooms/[^/]+",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(whatsapp|facebookexternalhit|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|iframely|preview).*"
+        }
+      ],
+      "dest": "/api/room-og"
+    },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

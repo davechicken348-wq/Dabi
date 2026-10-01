@@ -136,7 +136,7 @@ export async function initializeContactUnlock(params: {
   roomOfferingId: string;
   studentRef: string;
   studentEmail: string;
-  callbackUrl: string;
+  callbackUrl?: string;
 }): Promise<InitPaymentResult> {
   const room = await prisma.roomOffering.findUnique({
     where: { id: params.roomOfferingId },
@@ -157,6 +157,7 @@ export async function initializeContactUnlock(params: {
   const fee = env.CONTACT_UNLOCK_FEE;
   const currency = env.CONTACT_UNLOCK_CURRENCY;
   const reference = generateReference(params.roomOfferingId);
+  const callbackUrl = (params.callbackUrl ?? `${env.CLIENT_URL}/findroom/rooms/${params.roomOfferingId}?unlock_ref=`) + reference;
 
   // Create a Pending unlock record before hitting the payment provider so we
   // have an audit trail even if the provider call fails.
@@ -175,9 +176,9 @@ export async function initializeContactUnlock(params: {
 
   const psData = await paystackInitialize({
     email: params.studentEmail,
-    amountKobo: fee * 100, // Paystack uses pesewas (smallest unit)
+    amountKobo: fee * 100,
     reference,
-    callbackUrl: params.callbackUrl,
+    callbackUrl,
     metadata: {
       roomOfferingId: params.roomOfferingId,
       studentRef: params.studentRef,

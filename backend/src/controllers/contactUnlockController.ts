@@ -18,13 +18,11 @@ export const initialize = asyncHandler(async (req: Request, res: Response) => {
   if (!studentRef?.trim()) throw new ApiError(400, "studentRef is required");
   if (!studentEmail?.trim()) throw new ApiError(400, "studentEmail is required");
 
-  const resolvedCallback = callbackUrl?.trim() || `${env.CLIENT_URL}/findroom/rooms/${roomOfferingId}?unlock_ref={REFERENCE}`;
-
   const result = await service.initializeContactUnlock({
     roomOfferingId: roomOfferingId.trim(),
     studentRef: studentRef.trim(),
     studentEmail: studentEmail.trim(),
-    callbackUrl: resolvedCallback,
+    callbackUrl: callbackUrl?.trim(),
   });
 
   res.json(result);

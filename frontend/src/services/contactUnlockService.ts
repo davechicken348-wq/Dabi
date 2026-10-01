@@ -83,7 +83,7 @@ export async function startUnlockPayment(
   studentEmail: string,
 ): Promise<InitResult> {
   const studentRef = getStudentRef();
-  const callbackUrl = `${window.location.origin}/findroom/rooms/${roomOfferingId}?unlock_ref=REFERENCE`;
+  const callbackUrl = `${window.location.origin}/findroom/rooms/${roomOfferingId}?unlock_ref={REFERENCE}`;
   return initializeContactUnlock({ roomOfferingId, studentRef, studentEmail, callbackUrl });
 }
 
